@@ -2,21 +2,24 @@ import os
 import re
 import time
 from fastapi.responses import JSONResponse
-from app.lib.constants.constants import ALLOWED_EXTENSIONS_TEXT
 
 
-def allowed_file(filename: str) -> bool:
+def allowed_file(filename: str, allowed_extensions: set) -> bool:
     """Check if the file is allowed based on the extension."""
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS_TEXT
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in allowed_extensions
 
 
 def sanitize_filename(filename: str) -> str:
     """Sanitize the filename by removing or replacing invalid characters."""
     name = os.path.splitext(filename)[0]
+    name = name[0].upper() + name[1:]
     return re.sub(r'[^a-zA-Z0-9_\-]', '-', name)
 
+def split_filename_from_extension(filename: str) -> str:
+    """Split the filename from the extension."""
+    return filename.rsplit('.', 1)[0]
 
-def handle_exception(request, exc):
+def handle_exception(request, exc) -> JSONResponse:
     """Custom exception handler for FastAPI."""
     return JSONResponse(
         status_code=500,

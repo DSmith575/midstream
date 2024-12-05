@@ -1,6 +1,7 @@
-from openai import OpenAI
 import os
 from dotenv import load_dotenv
+from openai import OpenAI
+from io import BytesIO
 from app.lib.constants.gptCompletions import GPT_COMPLETION_SECTIONS
 
 load_dotenv()
@@ -9,40 +10,21 @@ api_key = os.getenv('OPENAI_API_KEY')
 
 client = OpenAI(api_key=api_key)
 
-def process_client_audio(audio_path):
+async def process_client_audio(audio_buffer: BytesIO) -> str:
     """Main processing function: chunk audio, process, transcribe, and convert."""
     try:
-        # with open(audio_path, "rb") as audio_file:  # Automatically closes the file
-        #     # Transcribe audio using OpenAI's Whisper model
-        #     transcript = client.audio.transcriptions.create(
-        #         model="whisper-1",
-        #         file=audio_file,
-        #     )
-        print("Processing audio file:", audio_path)
-        audio_file=open(audio_path, "rb")
         transcript = client.audio.transcriptions.create(
             model="whisper-1",
-            file=audio_file,
+            file=audio_buffer,
             response_format="text"
         )
-        audio_file.close()
-        # cleaned_transcript = re.sub(r'[^\w\s,.?!;:()-]', '', transcript)
-        # print("Transcript:", cleaned_transcript)
-
-        # remove the audio file
-        try:
-            os.remove(audio_path)
-        except Exception as e:
-            print(f"Error removing audio file: {e}")
-            raise
 
         return transcript
     
     except Exception as e:
-        print(f"Failed to process audio: {e}")
-        raise
+        raise RuntimeError(f"Unexpected error processing audio: {e}")
 
-def get_relevant_information(section, text):
+async def get_relevant_information(section, text):
     prompt = (f"Based on the following text, does the person mentioned have any issues related to {section}? do not include asking if there are any issues, just provide the information.\n\n"
               f"If yes, provide details. Text: {text} try to turn it into a usable narrative.\n\n"
               f"If there is nothing related to {section}, please just return No information found."
@@ -63,7 +45,7 @@ def get_relevant_information(section, text):
         return None
     
 
-def analyze_completions_for_form(text):
+async def analyze_completions_for_form(text):
     form_data = {}
 
     print("Analyzing PDF for form data...")

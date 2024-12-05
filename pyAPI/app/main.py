@@ -1,8 +1,8 @@
 from fastapi import FastAPI, status
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from app.testdir.test import test_text
 from app.lib.constants.routes import APIRoutes, CORS_CONFIG
+from app.routes import upload_audio
 
 
 app = FastAPI()
@@ -15,10 +15,12 @@ app.add_middleware(
     allow_headers=CORS_CONFIG["headers"],
 )
 
-@app.get(APIRoutes.HOME.value, status_code=status.HTTP_200_OK)
+@app.get(APIRoutes.HOME.value)
 async def main():
     return {"Hello": "World"}
 
-@app.get("/items", status_code=status.HTTP_200_OK)
+@app.get("/items")
 def read_root():
-    return JSONResponse(content={"message": "Hello World"})
+    return JSONResponse(content={"status_code": status.HTTP_200_OK,"message": "Hello World"}, status_code=status.HTTP_200_OK)
+
+app.include_router(upload_audio.router)

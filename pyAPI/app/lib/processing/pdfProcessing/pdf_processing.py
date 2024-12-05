@@ -1,41 +1,68 @@
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 import os
 import pymupdf
 from datetime import datetime
 
+from io import BytesIO
 
-def save_audio_transcription_to_pdf(transcription, filename, uploads_dir):
-    pdf_filename = f"{filename}-audio-transcription.pdf"
-    pdf_filepath = os.path.join(uploads_dir, pdf_filename)
+
+def generate_pdf_with_audio_transcript(text: str, filename: str) -> BytesIO:
+    """Generate a PDF containing the provided text using ReportLab."""
     try:
-        doc = SimpleDocTemplate(pdf_filepath, pagesize=A4)
-        story = []
+        pdf_buffer = BytesIO()
+        c = canvas.Canvas(pdf_buffer, pagesize=A4)  # Set page size to A4
+        c.setTitle("Audio Transcription")
+        c.setAuthor("Test")
+        
+        # Title, subtitle, and date
+        title = f"{filename} Audio Transcription"
+        subtitle = "Village Wise"
+        date = datetime.now().strftime("%B %d, %Y")  # Current date
+        
+        # Positioning values
+        page_width, page_height = A4
+        x_position = 50  # Start from the far left
+        title_y_position = page_height - 50  # Start from the top of the page
+        subtitle_y_position = title_y_position - 20  # Subtitle below the title
+        date_y_position = subtitle_y_position - 20  # Date below the subtitle
+        gap_y_position = date_y_position - 30  # Gap before the transcription starts
 
-        styles = getSampleStyleSheet()
+        # Add title on the far left
+        c.setFont("Times-Roman", 16)
+        c.drawString(x_position, title_y_position, title)
 
-        paragraph_style = styles['BodyText']
+        # # Add subtitle below the title
+        # c.setFont("Helvetica", 10)
+        # c.drawString(x_position, subtitle_y_position, subtitle)
 
-        if isinstance(transcription, dict) and 'text' in transcription:
-            transcription_text = transcription['text']
-        else:
-            transcription_text = str(transcription)
+        # # Add date below the subtitle
+        # c.setFont("Helvetica", 10)
+        # c.drawString(x_position, date_y_position, f"Date: {date}")
 
-        story.append(
-            Paragraph(f'{pdf_filename} Audio Transcription', styles['Title']))
-        story.append(Spacer(1, 12))
+        # Gap before transcription text
+        c.setFont("Helvetica", 14)
+        y_position = gap_y_position
 
-        # Add transcription text
-        story.append(Paragraph(transcription_text, paragraph_style))
-        story.append(Spacer(1, 10))
+        # Add transcription text below the gap
+        text_lines = text.split("\n")
+        for line in text_lines:
+            if y_position < 50:  # Prevent text from going off the page
+                c.showPage()
+                y_position = page_height - 50  # Reset position after page break
+            c.drawString(50, y_position, line)
+            y_position -= 20
 
-        doc.build(story)
-        return pdf_filepath
+        c.save()
+        pdf_buffer.seek(0)
+        pdf_buffer.name = f"{filename}.pdf"
+        return pdf_buffer
+    
     except Exception as e:
-        print(f"Failed to write transcription to PDF: {e}")
-        return None
+        raise RuntimeError(f"An error occurred while generating the PDF: {str(e)}")
 
 
 def save_form_data_to_pdf(form_data, filename, uploads_dir):

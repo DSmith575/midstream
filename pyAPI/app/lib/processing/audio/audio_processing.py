@@ -2,6 +2,18 @@ from pydub import AudioSegment
 from pydub.silence import detect_silence
 import noisereduce as nr
 import numpy as np
+from io import BytesIO
+from fastapi import UploadFile
+
+
+def convert_to_wav(file: UploadFile, filename: str) -> BytesIO:
+    """Convert audio file to .wav format using pydub."""
+    input_audio = AudioSegment.from_file(file.file)
+    output_buffer = BytesIO()
+    input_audio.export(output_buffer, format="wav")
+    output_buffer.seek(0)
+    output_buffer.name = f"{filename}.wav"
+    return output_buffer
 
 def process_chunks(chunk, min_silence_len, silence_threshold):
     try:
