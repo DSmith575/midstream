@@ -1,46 +1,54 @@
 import {
 	Navbar,
-	NavbarBrand,
 	NavbarContent,
 	NavbarItem,
 	Link,
 	Button,
 } from '@nextui-org/react';
+import NavBarLogo from './navBarComponents/NavBarLogo';
+import { routerRoutes } from '@/utils/router/routerPaths';
+import { cn } from '@/utils';
 
 const NavBar = () => {
 	return (
-		<Navbar isBordered shouldHideOnScroll>
-			<NavbarBrand>
-				<Link href="/">
-				<h1 className="font-bold text-inherit">
-					Mid<span className={'text-brand-700'}>Stream</span>
-				</h1>
-				</Link>
-			</NavbarBrand>
-			<NavbarContent className="hidden sm:flex gap-4" justify="center">
+		<Navbar shouldHideOnScroll maxWidth={'full'} className={cn('shadow-sm')}>
+			<NavBarLogo />
+
+			<NavbarContent className={cn('hidden sm:flex gap-4')} justify={'center'}>
 				<NavbarItem>
-					<Link color="foreground" href="#">
+					<Link
+						color={'foreground'}
+						className={cn('font-openSans')}
+						href={routerRoutes.features}>
 						Features
 					</Link>
 				</NavbarItem>
-				<NavbarItem isActive>
-					<Link aria-current="page" href="#">
-						Customers
-					</Link>
-				</NavbarItem>
 				<NavbarItem>
-					<Link color="foreground" href="#">
-						Integrations
+					<Link
+						color={'foreground'}
+						className={cn('font-openSans')}
+						href={routerRoutes.about}>
+						About
 					</Link>
 				</NavbarItem>
 			</NavbarContent>
-			<NavbarContent justify="end">
-				<NavbarItem className="hidden lg:flex">
-					<Link href="/login">Login</Link>
+			<NavbarContent justify={'end'}>
+				<NavbarItem className={cn('hidden lg:flex')}>
+					<Link
+						color={'foreground'}
+						className={cn('font-openSans')}
+						href={routerRoutes.login}>
+						Login
+					</Link>
 				</NavbarItem>
 				<NavbarItem>
-					<Button as={Link} color="primary" href="/signin" variant="flat">
-						Sign Up
+					<Button
+						as={Link}
+						color={'danger'}
+						href={routerRoutes.register}
+						variant={'light'}
+						className={cn('font-openSans')}>
+						Register
 					</Button>
 				</NavbarItem>
 			</NavbarContent>

@@ -1,23 +1,21 @@
-import { BrowserRouter, Routes, Route, Outlet } from 'react-router';
-import NavBar from '@/lib/components/navBar/NavBar';
+import { BrowserRouter, Routes, Route } from 'react-router';
+import { routerConfig } from '@/utils/router/routerConfig';
 
-const AppLayout = () => {
-	return (
-		<>
-			<NavBar />
-			<Outlet />
-		</>
-	);
-};
-
-const Router: React.FC = () => {
+const Router = () => {
 	return (
 		<BrowserRouter>
 			<Routes>
-                <Route element={<AppLayout />}>
-				<Route index path={'/'} element={<h1>Test</h1>} />
-				<Route path="/login" element={<h1>Test2</h1>}/>
-                </Route>
+				{routerConfig.map((route) => (
+					<Route path={route.path} element={route.element}>
+						{route.children?.map((child) => (
+							<Route
+								path={child.path}
+								index={child.pageIndex}
+								element={child.element}
+							/>
+						))}
+					</Route>
+				))};
 			</Routes>
 		</BrowserRouter>
 	);

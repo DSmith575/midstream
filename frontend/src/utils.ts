@@ -1,11 +1,11 @@
 import { type ClassValue, clsx } from 'clsx';
-import {twMerge} from 'tw-merge';
+import { twMerge } from 'tw-merge';
 
 export function cn(...inputs: ClassValue[]) {
-    return twMerge(clsx(inputs));
+	return twMerge(clsx(inputs));
 }
 
 export const parseColor = (color: string) => {
-    const hex = color.startsWith('#') ? color.slice(1) : color;
-    return parseInt(hex, 16);
+	const hex = color.startsWith('#') ? color.slice(1) : color;
+	return parseInt(hex, 16);
 };

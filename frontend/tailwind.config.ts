@@ -1,6 +1,7 @@
 import type { Config } from 'tailwindcss';
 import { fontFamily } from 'tailwindcss/defaultTheme';
-import {nextui} from '@nextui-org/react';
+import { nextui } from '@nextui-org/react';
+import tailwindcssAnimate from 'tailwindcss-animate';
 
 const config: Config = {
 	darkMode: ['class'],
@@ -13,6 +14,10 @@ const config: Config = {
 		extend: {
 			fontFamily: {
 				heading: ['var(--font-heading)', ...fontFamily.sans],
+					inter: ['Inter', 'sans-serif'],
+					lato: ['Lato', 'sans-serif'],
+					nunito: ['Nunito', 'sans-serif'],
+					openSans: ['"Open Sans"', 'sans-serif'],
 			},
 			colors: {
 				brand: {
@@ -82,7 +87,7 @@ const config: Config = {
 			},
 		},
 	},
-	plugins: [nextui(), require('tailwindcss-animate')],
+	plugins: [nextui(), tailwindcssAnimate],
 };
 
 export default config;
