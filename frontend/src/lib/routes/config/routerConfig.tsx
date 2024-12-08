@@ -1,26 +1,27 @@
 import { RootLayout } from '@/lib/components/layouts/Layout';
-import { routerRoutes } from './routerPaths';
+import { routerRoutes } from '@/lib/routes/routerRoutes';
+import ChatPage from '@/lib/components/pages/chat/ChatPage';
 
-interface RouterConfig {
+interface RouterConfigProps {
 	path?: string;
-	element: JSX.Element;
+	element?: JSX.Element;
 	pageIndex?: boolean;
-	children?: RouterConfig[];
+	children?: RouterConfigProps[];
 }
 
-export const routerConfig: RouterConfig[] = [
+export const routerConfig: RouterConfigProps[] = [
 	{
-		path: routerRoutes.home,
+		path: routerRoutes.home.path,
 		element: <RootLayout />,
 		children: [
 			{
 				pageIndex: true,
-				element: <h1>Test</h1>,
+				element: <h1>Home</h1>,
 			},
 		],
 	},
 	{
-		path: routerRoutes.features,
+		path: routerRoutes.features.path,
 		element: <RootLayout />,
 		children: [
 			{
@@ -30,7 +31,7 @@ export const routerConfig: RouterConfig[] = [
 		],
 	},
 	{
-		path: routerRoutes.about,
+		path: routerRoutes.about.path,
 		element: <RootLayout />,
 		children: [
 			{
@@ -40,7 +41,7 @@ export const routerConfig: RouterConfig[] = [
 		],
 	},
 	{
-		path: routerRoutes.register,
+		path: routerRoutes.register.path,
 		element: <RootLayout />,
 		children: [
 			{
@@ -50,7 +51,7 @@ export const routerConfig: RouterConfig[] = [
 		],
 	},
 	{
-		path: routerRoutes.login,
+		path: routerRoutes.login.path,
 		element: <RootLayout />,
 		children: [
 			{
@@ -60,7 +61,17 @@ export const routerConfig: RouterConfig[] = [
 		],
 	},
 	{
-		path: routerRoutes.profile,
+		path: routerRoutes.chat.path,
+		element: <RootLayout />,
+		children: [
+			{
+				pageIndex: true,
+				element: <ChatPage/>,
+			},
+		],
+	},
+	{
+		path: routerRoutes.profile.path,
 		element: <RootLayout children={<h1>Profile Page Test Layout</h1>} />,
 		children: [
 			{
@@ -68,11 +79,11 @@ export const routerConfig: RouterConfig[] = [
 				element: <h1>Profile Test</h1>,
 			},
 			{
-				path: ':userId',
+				path: routerRoutes.profileUser.path,
 				element: <h1>User Id Here</h1>,
 			},
 			{
-				path: ':userId/edit',
+				path: routerRoutes.profileEdit.path,
 				element: <h1>UserId Edit Test</h1>,
 			},
 		],
