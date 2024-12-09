@@ -3,7 +3,7 @@ import { RouterPathProps } from "@/interfaces/routerInterfaces";
 
 export const routerRoutes: RouterPathProps = {
 	home: { path: routerConstants.home.path, name: routerConstants.home.name },
-	login: { path: routerConstants.login.path, name: routerConstants.login.name },
+	account: { path: routerConstants.account.path, name: routerConstants.account.name },
 	register: { path: routerConstants.register.path, name: routerConstants.register.name },
 	features: { path: routerConstants.features.path, name: routerConstants.features.name },
 	about: { path: routerConstants.about.path, name: routerConstants.about.name },

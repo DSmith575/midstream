@@ -9,6 +9,5 @@ export const navBarContentRoutes: NavBarContentProps = {
 
 export const navBarDropDownRoutes: NavBarDropDownProps = {
 	dashboard: {path: routerConstants.dashboard.path, name: routerConstants.dashboard.name},
-	login: { path: routerConstants.login.path, name: routerConstants.login.name },
-	register: { path: routerConstants.register.path, name: routerConstants.register.name },
-}
+	account: { path: routerConstants.account.path, name: routerConstants.account.name },
+};

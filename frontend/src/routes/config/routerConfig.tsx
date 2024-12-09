@@ -1,6 +1,9 @@
 import { RootLayout } from '@/components/layouts/Layout';
 import { routerRoutes } from '@/routes/routerRoutes';
 import Dashboard from '@/pages/dashboard/Dashboard';
+import LoginPage from '@/pages/auth/LoginPage';
+import HomePage from '@/pages/home/HomePage';
+import RegisterPage from '@/pages/auth/RegisterPage';
 
 interface RouterConfigProps {
 	path?: string;
@@ -16,7 +19,7 @@ export const routerConfig: RouterConfigProps[] = [
 		children: [
 			{
 				pageIndex: true,
-				element: <h1>Home</h1>,
+				element: <HomePage />,
 			},
 		],
 	},
@@ -41,28 +44,28 @@ export const routerConfig: RouterConfigProps[] = [
 		],
 	},
 	{
+		path: routerRoutes.account.path,
+		element: <RootLayout />,
+		children: [
+			{
+				pageIndex: true,
+				element: <LoginPage />,
+			},
+		],
+	},
+	{
 		path: routerRoutes.register.path,
 		element: <RootLayout />,
 		children: [
 			{
 				pageIndex: true,
-				element: <h1>Register</h1>,
-			},
-		],
-	},
-	{
-		path: routerRoutes.login.path,
-		element: <RootLayout />,
-		children: [
-			{
-				pageIndex: true,
-				element: <h1>Login Test</h1>,
+				element: <RegisterPage />,
 			},
 		],
 	},
 	{
 		path: routerRoutes.dashboard.path,
-		element: <RootLayout/>,
+		element: <RootLayout />,
 		children: [
 			{
 				pageIndex: true,
@@ -70,7 +73,7 @@ export const routerConfig: RouterConfigProps[] = [
 			},
 			{
 				path: routerRoutes.dashboardUser.path,
-				element: <Dashboard/>,
+				element: <Dashboard />,
 			},
 			{
 				path: routerRoutes.dashboardUserEdit.path,

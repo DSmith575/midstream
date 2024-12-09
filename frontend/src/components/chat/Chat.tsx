@@ -27,33 +27,32 @@ const Chat = () => {
 
 	const conversationEndRef = useRef<HTMLDivElement>(null);
 
-	// Scroll to the bottom whenever messages change
 	useEffect(() => {
 		if (conversationEndRef.current) {
 			conversationEndRef.current.scrollIntoView({ behavior: 'smooth' });
 		}
-	}, [messages]); // Trigger on messages change
+	}, [messages]);
 
 	return (
 		<div className={`flex flex-col xs:justify-center h-[80vh] mx-8`}>
 			{/* Conversation Area */}
 			<div
-	className={`flex flex-col overflow-y-auto p-4 ${
-		messages.length > 0 ? 'bg-gray-100' : 'bg-none'
-	} rounded-md flex-grow`}>
-	{messages.map((msg, idx) => (
-		<div
-			key={idx}
-			className={cn(
-				'p-3 rounded-md mb-3 max-w-full sm:max-w-md lg:max-w-lg break-words',
-				idx % 2 === 0 ? 'bg-gray-200 self-start' : 'bg-blue-200 self-end',
-			)}>
-			<p>{msg}</p>
-		</div>
-	))}
-	{/* Ref element to scroll to the bottom */}
-	<div ref={conversationEndRef} />
-</div>
+				className={`flex flex-col overflow-y-auto p-4 ${
+					messages.length > 0 ? 'bg-gray-100' : 'bg-none'
+				} rounded-md flex-grow`}>
+				{messages.map((msg, idx) => (
+					<div
+						key={idx}
+						className={cn(
+							'p-3 rounded-md mb-3 max-w-full sm:max-w-md lg:max-w-lg break-words',
+							idx % 2 === 0 ? 'bg-gray-200 self-start' : 'bg-blue-200 self-end',
+						)}>
+						<p>{msg}</p>
+					</div>
+				))}
+				{/* Ref element to scroll to the bottom */}
+				<div ref={conversationEndRef} />
+			</div>
 
 			{/* Input Area */}
 			<div
@@ -67,8 +66,11 @@ const Chat = () => {
 						onChange={(e) => setInputValue(e.target.value)}
 						placeholder="Type a message..."
 					/>
-					<Button disabled={disabled} className={`bg-blue-500 ${disabled && 'disabled cursor-not-allowed '}`} onClick={handleSend}>
-						{disabled ? <Spinner className={'w-8 h-8'}/> : 'Send'}
+					<Button
+						disabled={disabled}
+						className={`bg-blue-500 ${disabled && 'disabled cursor-not-allowed '}`}
+						onClick={handleSend}>
+						{disabled ? <Spinner className={'w-8 h-8'} /> : 'Send'}
 					</Button>
 					<p className="text-sm text-muted-foreground">
 						AI conversations are not recorded.

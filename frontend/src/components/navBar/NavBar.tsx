@@ -13,11 +13,11 @@ import {
 import { DialogTitle } from '@radix-ui/react-dialog';
 import { Button } from '@/components/ui/button';
 import { Menu } from 'lucide-react';
+import { SignedIn, useAuth, UserButton } from '@clerk/clerk-react';
 
 const NavBar = () => {
-	const user = { name: 'John Doe',
-		userId: 1,
-	 };
+	const { userId } = useAuth();
+
 	return (
 		<section className="flex h-20 w-full shrink-0 items-center px-4 md:px-6 shadow-md">
 			<Sheet>
@@ -28,18 +28,17 @@ const NavBar = () => {
 					</SheetDescription>
 					<NavBarLogo />
 					<div className="flex flex-col">
-						<section className={'flex mb-4 shadow-sm rounded-sm'}>
+						<section className={'flex my-8 shadow-sm'}>
 							{Object.entries(navBarDropDownRoutes).map(([key, value]) =>
 								// if user only show dashboard
-								user && value.name === navBarDropDownRoutes.dashboard.name ? (
+								userId && value.name === navBarDropDownRoutes.dashboard.name ? (
 									<NavItem
 										key={key}
-										routerPath={`${value.path}/${user.userId}`}
+										routerPath={`${value.path}/${userId}`}
 										routerName={value.name}
 									/>
 								) : (
-									// if user is not logged in show login and register
-									!user &&
+									!userId &&
 									value.name !== navBarDropDownRoutes.dashboard.name && (
 										<NavItem
 											key={key}
@@ -63,11 +62,22 @@ const NavBar = () => {
 
 				<nav className="w-full flex items-center justify-between">
 					<NavBarLogo />
-					<SheetTrigger asChild>
-						<Button variant="outline" size="lg" className="">
-							<Menu size={24} />
-						</Button>
-					</SheetTrigger>
+					<section className={'flex gap-4'}>
+						<SignedIn>
+							<UserButton
+								appearance={{
+									elements: {
+										userButtonAvatarBox: 'w-10 h-10',
+									},
+								}}
+							/>
+						</SignedIn>
+						<SheetTrigger asChild>
+							<Button variant="outline" size="lg" className="">
+								<Menu size={24} />
+							</Button>
+						</SheetTrigger>
+					</section>
 				</nav>
 			</Sheet>
 		</section>
