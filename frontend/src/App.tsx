@@ -1,9 +1,9 @@
-import Router from '@/lib/routes/Router';
+import Router from '@/routes/Router';
 
 const App = () => {
 	return (
 		<>
-				<Router />
+			<Router />
 		</>
 	);
 };

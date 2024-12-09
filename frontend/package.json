@@ -13,6 +13,7 @@
 		"pretty:format": "npx prettier . --write"
 	},
 	"dependencies": {
+		"@clerk/clerk-react": "^5.19.0",
 		"@radix-ui/react-dialog": "^1.1.2",
 		"@radix-ui/react-label": "^2.1.0",
 		"@radix-ui/react-navigation-menu": "^1.2.1",

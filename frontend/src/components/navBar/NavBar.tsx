@@ -1,9 +1,9 @@
-import NavBarLogo from './navBarComponents/NavBarLogo';
+import NavBarLogo from '@/components/navBar/navBarComponents/NavBarLogo';
 import {
 	navBarContentRoutes,
 	navBarDropDownRoutes,
-} from '@/lib/routes/navBarRoutes';
-import NavItem from './navBarComponents/NavItem';
+} from '@/routes/navBarRoutes';
+import NavItem from '@/components/navBar/navBarComponents/NavItem';
 import {
 	Sheet,
 	SheetTrigger,
@@ -15,6 +15,9 @@ import { Button } from '@/components/ui/button';
 import { Menu } from 'lucide-react';
 
 const NavBar = () => {
+	const user = { name: 'John Doe',
+		userId: 1,
+	 };
 	return (
 		<section className="flex h-20 w-full shrink-0 items-center px-4 md:px-6 shadow-md">
 			<Sheet>
@@ -25,6 +28,29 @@ const NavBar = () => {
 					</SheetDescription>
 					<NavBarLogo />
 					<div className="flex flex-col">
+						<section className={'flex mb-4 shadow-sm rounded-sm'}>
+							{Object.entries(navBarDropDownRoutes).map(([key, value]) =>
+								// if user only show dashboard
+								user && value.name === navBarDropDownRoutes.dashboard.name ? (
+									<NavItem
+										key={key}
+										routerPath={`${value.path}/${user.userId}`}
+										routerName={value.name}
+									/>
+								) : (
+									// if user is not logged in show login and register
+									!user &&
+									value.name !== navBarDropDownRoutes.dashboard.name && (
+										<NavItem
+											key={key}
+											routerPath={value.path}
+											routerName={value.name}
+										/>
+									)
+								),
+							)}
+						</section>
+
 						{Object.entries(navBarContentRoutes).map(([key, value]) => (
 							<NavItem
 								key={key}
@@ -32,15 +58,6 @@ const NavBar = () => {
 								routerName={value.name}
 							/>
 						))}
-						<section className={'flex'}>
-							{Object.entries(navBarDropDownRoutes).map(([key, value]) => (
-								<NavItem
-									key={key}
-									routerPath={value.path}
-									routerName={value.name}
-								/>
-							))}
-						</section>
 					</div>
 				</SheetContent>
 

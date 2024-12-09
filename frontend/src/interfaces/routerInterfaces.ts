@@ -4,9 +4,7 @@ export interface RouterPathProps {
 	register: { path: string; name: string };
 	features: { path: string; name: string };
 	about: { path: string; name: string };
-	chat: { path: string; name: string };
-	// dashboard: { path: string; name: string };
-	profile: { path: string; name: string };
-	profileUser: { path: string; name: string };
-	profileEdit: { path: string; name: string };
+	dashboard: { path: string; name: string };
+	dashboardUser: { path: string; name: string };
+	dashboardUserEdit: { path: string; name: string };
 }

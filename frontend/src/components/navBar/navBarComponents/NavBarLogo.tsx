@@ -1,6 +1,6 @@
 import logo from '@/assets/svgs/cccoil.svg';
 import { cn } from '@/utils';
-import { routerRoutes } from '@/lib/routes/routerRoutes';
+import { routerRoutes } from '@/routes/routerRoutes';
 import { Link } from 'react-router';
 
 const NavBarLogo = () => {

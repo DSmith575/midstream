@@ -13,12 +13,3 @@ export const RootLayout = ({}: LayoutProps) => {
 		</>
 	);
 };
-
-export const DashboardLayout = ({ children }: LayoutProps) => {
-	return (
-		<>
-			{children}
-			<Outlet />
-		</>
-	);
-};

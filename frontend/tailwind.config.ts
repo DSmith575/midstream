@@ -18,6 +18,9 @@ const config: Config = {
     			nunito: ['Nunito', 'sans-serif'],
     			openSans: ['Open Sans"', 'sans-serif']
     		},
+			boxShadow: {
+				bottom: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1)',
+			  },
     		colors: {
     			brand: {
     				'25': '#F8F9FD',

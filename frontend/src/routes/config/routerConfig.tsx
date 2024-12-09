@@ -1,6 +1,6 @@
-import { RootLayout } from '@/lib/components/layouts/Layout';
-import { routerRoutes } from '@/lib/routes/routerRoutes';
-import ChatPage from '@/lib/components/pages/chat/ChatPage';
+import { RootLayout } from '@/components/layouts/Layout';
+import { routerRoutes } from '@/routes/routerRoutes';
+import Dashboard from '@/pages/dashboard/Dashboard';
 
 interface RouterConfigProps {
 	path?: string;
@@ -61,29 +61,19 @@ export const routerConfig: RouterConfigProps[] = [
 		],
 	},
 	{
-		path: routerRoutes.chat.path,
-		element: <RootLayout />,
+		path: routerRoutes.dashboard.path,
+		element: <RootLayout/>,
 		children: [
 			{
 				pageIndex: true,
-				element: <ChatPage/>,
-			},
-		],
-	},
-	{
-		path: routerRoutes.profile.path,
-		element: <RootLayout children={<h1>Profile Page Test Layout</h1>} />,
-		children: [
-			{
-				pageIndex: true,
-				element: <h1>Profile Test</h1>,
+				element: <h1>404</h1>,
 			},
 			{
-				path: routerRoutes.profileUser.path,
-				element: <h1>User Id Here</h1>,
+				path: routerRoutes.dashboardUser.path,
+				element: <Dashboard/>,
 			},
 			{
-				path: routerRoutes.profileEdit.path,
+				path: routerRoutes.dashboardUserEdit.path,
 				element: <h1>UserId Edit Test</h1>,
 			},
 		],
