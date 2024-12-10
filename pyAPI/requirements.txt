@@ -35,7 +35,7 @@ openai==1.56.2
 orjson==3.10.12
 packaging==24.2
 pillow==11.0.0
-PyAudio==0.2.14
+# PyAudio==0.2.14
 pydantic==2.10.2
 pydantic-extra-types==2.10.0
 pydantic-settings==2.6.1
