@@ -8,7 +8,8 @@ import { DialogTitle } from '@radix-ui/react-dialog';
 
 import { Button } from '@/components/ui/button';
 import Chat from '../../components/chat/Chat';
-import { useAuth, SignedIn, UserButton, useUser } from '@clerk/clerk-react';
+import { useAuth, useUser } from '@clerk/clerk-react';
+import ReferralForm from '@/components/forms/ReferralForm';
 
 interface UserProps {
 	firstName: string;
@@ -46,6 +47,7 @@ const Dashboard = () => {
 					</SheetTrigger>
 				</nav>
 			</Sheet>
+		<ReferralForm/>
 		</div>
 	);
 };
