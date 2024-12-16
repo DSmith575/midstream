@@ -1,60 +1,97 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-
-import { z } from "zod";
+import { Input } from "@/components/ui/input";
+import {
+	Select,
+	SelectContent,
+	SelectGroup,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+import { Button } from "../ui/button";
+import {
+	Form,
+	FormControl,
+	FormDescription,
+	FormField,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from "@/components/ui/form";
 import { referralFormSchema } from "@/lib/referralForm";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 
 type Inputs = z.infer<typeof referralFormSchema>;
+type FieldName = keyof Inputs;
 
 const steps = [
 	{
 		id: "Step 1",
 		name: "Personal Information",
-		fields: ["firstName", "lastName", "title", "email", "phone"],
+		fields: [
+			"firstName",
+			"lastName",
+			"title",
+			"preferredName",
+		],
 	},
 	{
 		id: "Step 2",
+		name: "Contact Information",
+		fields: ["email", "mobilePhone", "homePhone"],
+	},
+	{
+		id: "Step 3",
 		name: "Address",
 		fields: ["country", "city", "street", "zip"],
 	},
-	{ id: "Step 3", name: "Complete" },
+	{ id: "Step 4", name: "Complete" },
 ];
 
-export default function Form() {
+const ReferralForm = () => {
+	const form = useForm<Inputs>({
+		resolver: zodResolver(referralFormSchema),
+		// defaultValues: {
+		// 	firstName: "",
+		// 	lastName: "",
+		// 	title: "",
+		// 	preferredName: "",
+		// 	email: "",
+		// 	phone: "",
+		// 	referral: "",
+		// 	street: "",
+		// 	city: "",
+		// 	country: "",
+		// 	zip: "",
+		// },
+	});
+
+	const {
+		control,
+		handleSubmit,
+		trigger,
+		watch,
+		formState: { errors },
+	} = form;
 	const [previousStep, setPreviousStep] = useState(0);
 	const [currentStep, setCurrentStep] = useState(0);
 	const delta = currentStep - previousStep;
 
-	const {
-		register,
-		handleSubmit,
-		watch,
-		reset,
-		trigger,
-		formState: { errors },
-	} = useForm<Inputs>({
-		resolver: zodResolver(referralFormSchema),
-	});
-
-	const processForm: SubmitHandler<Inputs> = (data) => {
-		console.log(data);
-		reset();
+	const onSubmit = (values: z.infer<typeof referralFormSchema>) => {
+		console.log(values);
 	};
 
-	type FieldName = keyof Inputs;
-
 	const next = async () => {
-		const fields = steps[currentStep].fields;
+		const fields = steps[currentStep]?.fields;
+		console.log(watch());
+		if (!fields) return;
 		const output = await trigger(fields as FieldName[], { shouldFocus: true });
-
 		if (!output) return;
 
 		if (currentStep < steps.length - 1) {
-			if (currentStep === steps.length - 2) {
-				await handleSubmit(processForm)();
-			}
 			setPreviousStep(currentStep);
 			setCurrentStep((step) => step + 1);
 		}
@@ -104,270 +141,210 @@ export default function Form() {
 			</nav>
 
 			{/* Form */}
-			<form className="mt-4 py-4" onSubmit={handleSubmit(processForm)}>
-				{currentStep === 0 && (
-					<motion.div
-						initial={{ x: delta >= 0 ? "50%" : "-50%", opacity: 0 }}
-						animate={{ x: 0, opacity: 1 }}
-						transition={{ duration: 0.3, ease: "easeInOut" }}>
-						<h2 className="text-base font-semibold leading-7 text-gray-900">
-							Personal Information
-						</h2>
-						<p className="mt-1 text-sm leading-6 text-gray-600">
-							Provide your personal details.
-						</p>
-						<div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-							<div className="sm:col-span-3">
-								<label
-									htmlFor="firstName"
-									className="block text-sm font-medium leading-6 text-gray-900">
-									First name
-								</label>
-								<div className="mt-2">
-									<input
-										type="text"
-										id="firstName"
-										{...register("firstName")}
-										autoComplete="given-name"
-										className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
+			<Form {...form}>
+				<form
+					onSubmit={form.handleSubmit(onSubmit)}
+					className="mt-4 space-y-8 py-4">
+					{currentStep === 0 && (
+						<motion.div
+							initial={{ x: delta >= 0 ? "50%" : "-50%", opacity: 0 }}
+							animate={{ x: 0, opacity: 1 }}
+							transition={{ duration: 0.3, ease: "easeInOut" }}>
+							<h2 className="text-base font-semibold leading-7 text-gray-900">
+								Personal Information
+							</h2>
+							<p className="mt-1 text-sm leading-6 text-gray-600">
+								Provide your personal details.
+							</p>
+							<section className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+								<div className="sm:col-span-3">
+									<FormField
+										control={form.control}
+										name="firstName"
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>First Name</FormLabel>
+												<FormControl>
+													<Input
+														placeholder="John"
+														{...field}
+														className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
+													/>
+												</FormControl>
+												<FormDescription>
+													This is your first name.
+												</FormDescription>
+												<FormMessage />
+											</FormItem>
+										)}
 									/>
-									{errors.firstName?.message && (
-										<p className="mt-2 text-sm text-red-400">
-											{errors.firstName.message}
-										</p>
-									)}
 								</div>
-							</div>
 
-							<div className="sm:col-span-3">
-								<label
-									htmlFor="lastName"
-									className="block text-sm font-medium leading-6 text-gray-900">
-									Last name
-								</label>
-								<div className="mt-2">
-									<input
-										type="text"
-										id="lastName"
-										{...register("lastName")}
-										autoComplete="family-name"
-										className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
+								<div className="sm:col-span-3">
+									<FormField
+										control={form.control}
+										name="lastName"
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>Last Name</FormLabel>
+												<FormControl>
+													<Input
+														placeholder="Doe"
+														{...field}
+														className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
+													/>
+												</FormControl>
+												<FormDescription>
+													This is your last name.
+												</FormDescription>
+												<FormMessage />
+											</FormItem>
+										)}
 									/>
-									{errors.lastName?.message && (
-										<p className="mt-2 text-sm text-red-400">
-											{errors.lastName.message}
-										</p>
-									)}
 								</div>
-							</div>
 
-							<div className="sm:col-span-3">
-								<label
-									htmlFor="email"
-									className="block text-sm font-medium leading-6 text-gray-900">
-									Email address
-								</label>
-								<div className="mt-2">
-									<input
-										id="email"
-										type="email"
-										{...register("email")}
-										autoComplete="email"
-										className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
+								<div className={'sm:col-span-3'}>
+									<FormField
+										control={form.control}
+										name={'title'}
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>Title</FormLabel>
+												<Select onValueChange={field.onChange} value={field.value}>
+												<FormControl>
+													<SelectTrigger>
+														<SelectValue placeholder={'Title'}/>
+													</SelectTrigger>
+												</FormControl>
+												<SelectContent>
+													<SelectGroup>
+														<SelectItem value={'Mr'}>Mr</SelectItem>
+														<SelectItem value={'Mrs'}>Mrs</SelectItem>
+														<SelectItem value={'Miss'}>Miss</SelectItem>
+														<SelectItem value={'Dr'}>Dr</SelectItem>
+														<SelectItem value={'Other'}>Other</SelectItem>
+													</SelectGroup>
+												</SelectContent>
+												</Select>
+												<FormDescription>
+													This is your title.
+												</FormDescription>
+												<FormMessage />
+											</FormItem>
+										)}
 									/>
-									{errors.email?.message && (
-										<p className="mt-2 text-sm text-red-400">
-											{errors.email.message}
-										</p>
-									)}
 								</div>
-							</div>
-							<div className="sm:col-span-3">
-								<label
-									htmlFor="phone"
-									className="block text-sm font-medium leading-6 text-gray-900">
-									Phone number
-								</label>
-								<div className={"mt-2"}>
-									<input
-										id="phone"
-										type="phone"
-										{...register("phone")}
-										autoComplete="phone"
-										className={
-											"block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
-										}
+
+								<div className={'sm:col-span-3'}>
+									<FormField
+										control={form.control}
+										name={'preferredName'}
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>Preferred Name</FormLabel>
+												<FormControl>
+													<Input
+													placeholder="Optional"
+													{...field}
+													/>
+												</FormControl>
+												<FormDescription>
+													This is your preferred name.
+												</FormDescription>
+												<FormMessage />
+											</FormItem>
+										)}
+										/>
+								</div>
+							</section>
+						</motion.div>
+					)}
+
+					{currentStep === 1 && (
+						<motion.div
+							initial={{ x: delta >= 0 ? "50%" : "-50%", opacity: 0 }}
+							animate={{ x: 0, opacity: 1 }}
+							transition={{ duration: 0.3, ease: "easeInOut" }}>
+							<h2 className="text-base font-semibold leading-7 text-gray-900">
+								Address
+							</h2>
+							<p className="mt-1 text-sm leading-6 text-gray-600">
+								Address where you can receive mail.
+							</p>
+
+							<section className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+								<div className="sm:col-span-3">
+									<FormField
+										control={form.control}
+										name="firstName"
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>First Name</FormLabel>
+												<FormControl>
+													<Input
+														placeholder="John"
+														{...field}
+														className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
+													/>
+												</FormControl>
+												<FormDescription>
+													This is your first name.
+												</FormDescription>
+												<FormMessage />
+											</FormItem>
+										)}
 									/>
-									{errors.phone?.message && (
-										<p className="mt-2 text-sm text-red-400">
-											{errors.phone.message}
-										</p>
-									)}
 								</div>
-							</div>
+
+								<div className="sm:col-span-3">
+									<FormField
+										control={form.control}
+										name="lastName"
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>Last Name</FormLabel>
+												<FormControl>
+													<Input
+														placeholder="Doe"
+														{...field}
+														className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
+													/>
+												</FormControl>
+												<FormDescription>
+													This is your last name.
+												</FormDescription>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+								</div>
+							</section>
+						</motion.div>
+					)}
+
+					<div className="mt-8 pt-5">
+						<div className="flex justify-between">
+							{currentStep > 0 && (
+								<Button type="button" onClick={prev} variant="outline">
+									Previous
+								</Button>
+							)}
+							{currentStep < steps.length - 1 && (
+								<Button type="button" onClick={next} variant={"outline"}>
+									Next
+								</Button>
+							)}
+							{currentStep === steps.length - 1 && (
+								<Button type="submit" variant={"outline"}>
+									Submit
+								</Button>
+							)}
 						</div>
-					</motion.div>
-				)}
-
-				{currentStep === 1 && (
-					<motion.div
-						initial={{ x: delta >= 0 ? "50%" : "-50%", opacity: 0 }}
-						animate={{ x: 0, opacity: 1 }}
-						transition={{ duration: 0.3, ease: "easeInOut" }}>
-						<h2 className="text-base font-semibold leading-7 text-gray-900">
-							Address
-						</h2>
-						<p className="mt-1 text-sm leading-6 text-gray-600">
-							Address where you can receive mail.
-						</p>
-
-						<div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-							<div className="sm:col-span-3">
-								<label
-									htmlFor="country"
-									className="block text-sm font-medium leading-6 text-gray-900">
-									Country
-								</label>
-								<div className="mt-2">
-									<select
-										id="country"
-										{...register("country")}
-										autoComplete="country-name"
-										className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:max-w-xs sm:text-sm sm:leading-6">
-										<option>New Zealand</option>
-									</select>
-									{errors.country?.message && (
-										<p className="mt-2 text-sm text-red-400">
-											{errors.country.message}
-										</p>
-									)}
-								</div>
-							</div>
-
-							<div className="col-span-full">
-								<label
-									htmlFor="street"
-									className="block text-sm font-medium leading-6 text-gray-900">
-									Street address
-								</label>
-								<div className="mt-2">
-									<input
-										type="text"
-										id="street"
-										{...register("street")}
-										autoComplete="street-address"
-										className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
-									/>
-									{errors.street?.message && (
-										<p className="mt-2 text-sm text-red-400">
-											{errors.street.message}
-										</p>
-									)}
-								</div>
-							</div>
-
-							<div className="sm:col-span-2 sm:col-start-1">
-								<label
-									htmlFor="city"
-									className="block text-sm font-medium leading-6 text-gray-900">
-									City
-								</label>
-								<div className="mt-2">
-									<input
-										type="text"
-										id="city"
-										{...register("city")}
-										autoComplete="address-level2"
-										className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
-									/>
-									{errors.city?.message && (
-										<p className="mt-2 text-sm text-red-400">
-											{errors.city.message}
-										</p>
-									)}
-								</div>
-							</div>
-
-							<div className="sm:col-span-2">
-								<label
-									htmlFor="zip"
-									className="block text-sm font-medium leading-6 text-gray-900">
-									ZIP / Postal code
-								</label>
-								<div className="mt-2">
-									<input
-										type="text"
-										id="zip"
-										{...register("zip")}
-										autoComplete="postal-code"
-										className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
-									/>
-									{errors.zip?.message && (
-										<p className="mt-2 text-sm text-red-400">
-											{errors.zip.message}
-										</p>
-									)}
-								</div>
-							</div>
-						</div>
-					</motion.div>
-				)}
-
-				{currentStep === 2 && (
-					<>
-						<h2 className="text-base font-semibold leading-7 text-gray-900">
-							Complete
-						</h2>
-						<p className="mt-1 text-sm leading-6 text-gray-600">
-							Thank you for your submission.
-						</p>
-					</>
-				)}
-			</form>
-
-			{/* Navigation */}
-			<div className="mt-8 pt-5">
-				<div className="flex justify-between">
-					<button
-						type="button"
-						onClick={prev}
-						disabled={currentStep === 0}
-						className="rounded bg-white px-2 py-1 text-sm font-semibold text-sky-900 shadow-sm ring-1 ring-inset ring-sky-300 hover:bg-sky-50 disabled:cursor-not-allowed disabled:opacity-50">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 24 24"
-							strokeWidth="1.5"
-							stroke="currentColor"
-							className="h-6 w-6">
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								d="M15.75 19.5L8.25 12l7.5-7.5"
-							/>
-						</svg>
-					</button>
-					<button
-						type="button"
-						onClick={next}
-						disabled={currentStep === steps.length - 1}
-						className="rounded bg-white px-2 py-1 text-sm font-semibold text-sky-900 shadow-sm ring-1 ring-inset ring-sky-300 hover:bg-sky-50 disabled:cursor-not-allowed disabled:opacity-50">
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 24 24"
-							strokeWidth="1.5"
-							stroke="currentColor"
-							className="h-6 w-6">
-							<path
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								d="M8.25 4.5l7.5 7.5-7.5 7.5"
-							/>
-						</svg>
-					</button>
-				</div>
-			</div>
+					</div>
+				</form>
+			</Form>
 		</section>
 	);
-}
+};
+
+export default ReferralForm;

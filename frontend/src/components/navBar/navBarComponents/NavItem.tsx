@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { cn } from "@/utils";
+import { cn } from "@/lib/utils";
 
 interface NavBarItemProps {
 	routerPath: string;

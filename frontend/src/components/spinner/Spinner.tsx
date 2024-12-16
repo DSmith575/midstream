@@ -1,5 +1,5 @@
 import logo from "@/assets/svgs/cccoil.svg";
-import { cn } from "@/utils";
+import { cn } from "@/lib/utils";
 
 interface SpinnerProps {
 	className?: string;
