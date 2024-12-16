@@ -1,5 +1,5 @@
-import { Outlet } from 'react-router';
-import NavBar from '../navBar/NavBar';
+import { Outlet } from "react-router";
+import NavBar from "../navBar/NavBar";
 
 interface LayoutProps {
 	children?: JSX.Element;

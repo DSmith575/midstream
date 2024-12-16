@@ -1,5 +1,5 @@
-import { BrowserRouter, Routes, Route } from 'react-router';
-import { routerConfig } from '@/routes/config/routerConfig';
+import { BrowserRouter, Routes, Route } from "react-router";
+import { routerConfig } from "@/routes/config/routerConfig";
 
 const Router = () => {
 	return (

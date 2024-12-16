@@ -1,25 +1,25 @@
-import NavBarLogo from '@/components/navBar/navBarComponents/NavBarLogo';
+import NavBarLogo from "@/components/navBar/navBarComponents/NavBarLogo";
 import {
 	navBarContentRoutes,
 	navBarDropDownRoutes,
-} from '@/routes/navBarRoutes';
-import NavItem from '@/components/navBar/navBarComponents/NavItem';
+} from "@/routes/navBarRoutes";
+import NavItem from "@/components/navBar/navBarComponents/NavItem";
 import {
 	Sheet,
 	SheetTrigger,
 	SheetContent,
 	SheetDescription,
-} from '@/components/ui/sheet';
-import { DialogTitle } from '@radix-ui/react-dialog';
-import { Button } from '@/components/ui/button';
-import { Menu } from 'lucide-react';
-import { SignedIn, useAuth, UserButton } from '@clerk/clerk-react';
+} from "@/components/ui/sheet";
+import { DialogTitle } from "@radix-ui/react-dialog";
+import { Button } from "@/components/ui/button";
+import { Menu } from "lucide-react";
+import { SignedIn, useAuth, UserButton } from "@clerk/clerk-react";
 
 const NavBar = () => {
 	const { userId } = useAuth();
 
 	return (
-		<section className="flex h-20 w-full shrink-0 items-center px-4 md:px-6 shadow-md">
+		<section className="flex h-20 w-full shrink-0 items-center px-4 shadow-md md:px-6">
 			<Sheet>
 				<SheetContent side="right">
 					<DialogTitle className="sr-only">Menu</DialogTitle>
@@ -28,7 +28,7 @@ const NavBar = () => {
 					</SheetDescription>
 					<NavBarLogo />
 					<div className="flex flex-col">
-						<section className={'flex my-8 shadow-sm'}>
+						<section className={"my-8 flex shadow-sm"}>
 							{Object.entries(navBarDropDownRoutes).map(([key, value]) =>
 								// if user only show dashboard
 								userId && value.name === navBarDropDownRoutes.dashboard.name ? (
@@ -60,14 +60,14 @@ const NavBar = () => {
 					</div>
 				</SheetContent>
 
-				<nav className="w-full flex items-center justify-between">
+				<nav className="flex w-full items-center justify-between">
 					<NavBarLogo />
-					<section className={'flex gap-4'}>
+					<section className={"flex gap-4"}>
 						<SignedIn>
 							<UserButton
 								appearance={{
 									elements: {
-										userButtonAvatarBox: 'w-10 h-10',
+										userButtonAvatarBox: "w-10 h-10",
 									},
 								}}
 							/>

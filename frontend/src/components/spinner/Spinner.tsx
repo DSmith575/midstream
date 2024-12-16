@@ -1,16 +1,20 @@
-import logo from '@/assets/svgs/cccoil.svg';
-import { cn } from '@/utils';
+import logo from "@/assets/svgs/cccoil.svg";
+import { cn } from "@/utils";
 
 interface SpinnerProps {
-    className?: string;
+	className?: string;
 }
 
-const Spinner = ({className}: SpinnerProps) => {
-    return (
-        <div className={cn('flex items-center')}>
-            <img src={logo} alt="logo" className={cn('w-16 h-16 animate animate-spin', className)} />
-        </div>
-    );
+const Spinner = ({ className }: SpinnerProps) => {
+	return (
+		<div className={cn("flex items-center")}>
+			<img
+				src={logo}
+				alt="logo"
+				className={cn("animate h-16 w-16 animate-spin", className)}
+			/>
+		</div>
+	);
 };
 
 export default Spinner;

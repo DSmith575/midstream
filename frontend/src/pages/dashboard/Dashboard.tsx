@@ -1,15 +1,16 @@
+import { useState } from "react";
 import {
 	Sheet,
 	SheetTrigger,
 	SheetContent,
 	SheetDescription,
-} from '@/components/ui/sheet';
-import { DialogTitle } from '@radix-ui/react-dialog';
+} from "@/components/ui/sheet";
+import { DialogTitle } from "@radix-ui/react-dialog";
 
-import { Button } from '@/components/ui/button';
-import Chat from '../../components/chat/Chat';
-import { useAuth, useUser } from '@clerk/clerk-react';
-import ReferralForm from '@/components/forms/ReferralForm';
+import { Button } from "@/components/ui/button";
+import Chat from "../../components/chat/Chat";
+import { useAuth, useUser } from "@clerk/clerk-react";
+import ReferralForm from "@/components/forms/ReferralForm";
 
 interface UserProps {
 	firstName: string;
@@ -18,6 +19,7 @@ interface UserProps {
 
 const Dashboard = () => {
 	const { isLoaded, userId } = useAuth();
+	const [referralFormStart, setReferralFormStart] = useState<boolean>(false);
 	const user = useUser();
 
 	if (!isLoaded || !userId) {
@@ -28,26 +30,37 @@ const Dashboard = () => {
 
 	return (
 		<div>
-			<div>
-				Welcome Back! {firstName} {lastName}
-			</div>
-			<Sheet>
-				<SheetContent side="bottom">
-					<DialogTitle className="sr-only">Menu</DialogTitle>
-					<SheetDescription className="sr-only">
-						Navigation menu
-					</SheetDescription>
-					<Chat />
-				</SheetContent>
-				<nav className="">
-					<SheetTrigger asChild>
-						<Button variant="outline" size="lg" className="">
-							Chat with an AI
-						</Button>
-					</SheetTrigger>
-				</nav>
-			</Sheet>
-		<ReferralForm/>
+			<div></div>
+			{referralFormStart ? (
+				<ReferralForm />
+			) : (
+				<>
+					<p>
+						Welcome Back! {firstName} {lastName}
+					</p>
+					<section>
+						<button onClick={() => setReferralFormStart(!referralFormStart)}>
+							Referral Form
+						</button>
+					</section>
+					<Sheet>
+						<SheetContent side="bottom">
+							<DialogTitle className="sr-only">Menu</DialogTitle>
+							<SheetDescription className="sr-only">
+								Navigation menu
+							</SheetDescription>
+							<Chat />
+						</SheetContent>
+						<nav className="">
+							<SheetTrigger asChild>
+								<Button variant="outline" size="lg" className="">
+									Chat with an AI
+								</Button>
+							</SheetTrigger>
+						</nav>
+					</Sheet>
+				</>
+			)}
 		</div>
 	);
 };

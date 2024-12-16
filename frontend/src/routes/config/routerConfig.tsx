@@ -1,9 +1,9 @@
-import { RootLayout } from '@/components/layouts/Layout';
-import { routerRoutes } from '@/routes/routerRoutes';
-import Dashboard from '@/pages/dashboard/Dashboard';
-import LoginPage from '@/pages/auth/LoginPage';
-import HomePage from '@/pages/home/HomePage';
-import RegisterPage from '@/pages/auth/RegisterPage';
+import { RootLayout } from "@/components/layouts/Layout";
+import { routerRoutes } from "@/routes/routerRoutes";
+import Dashboard from "@/pages/dashboard/Dashboard";
+import LoginPage from "@/pages/auth/LoginPage";
+import HomePage from "@/pages/home/HomePage";
+import RegisterPage from "@/pages/auth/RegisterPage";
 
 interface RouterConfigProps {
 	path?: string;

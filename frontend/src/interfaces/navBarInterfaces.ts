@@ -6,5 +6,5 @@ export interface NavBarContentProps {
 
 export interface NavBarDropDownProps {
 	dashboard: { path: string; name: string };
-    account: { path: string; name: string };
-};
+	account: { path: string; name: string };
+}
