@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const referralFormSchema = z.object({
+export const profileFormSchema = z.object({
 	firstName: z.string({ message: "First name is required" }).nonempty(),
 	lastName: z.string({ message: "Last name is required" }).nonempty(),
 	title: z.string({message: "Please select a title"}).nonempty(),

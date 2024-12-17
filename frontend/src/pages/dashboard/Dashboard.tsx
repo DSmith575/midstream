@@ -10,7 +10,7 @@ import { DialogTitle } from "@radix-ui/react-dialog";
 import { Button } from "@/components/ui/button";
 import Chat from "../../components/chat/Chat";
 import { useAuth, useUser } from "@clerk/clerk-react";
-import ProfileForm from "@/components/forms/ProfileForm";
+import ProfileForm from "@/components/forms/profileForm/ProfileForm";
 
 interface UserProps {
 	firstName: string;

@@ -9,7 +9,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { Button } from "../ui/button";
+import { Button } from "../../ui/button";
 import {
 	Form,
 	FormControl,
@@ -18,12 +18,12 @@ import {
 	FormLabel,
 	FormMessage,
 } from "@/components/ui/form";
-import { referralFormSchema } from "@/lib/schemas/referralFormSchema";
+import { profileFormSchema } from "@/lib/schemas/profileFormSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-type Inputs = z.infer<typeof referralFormSchema>;
+type Inputs = z.infer<typeof profileFormSchema>;
 type FieldName = keyof Inputs;
 
 const steps = [
@@ -54,7 +54,7 @@ const steps = [
 
 const ReferralForm = () => {
 	const form = useForm<Inputs>({
-		resolver: zodResolver(referralFormSchema),
+		resolver: zodResolver(profileFormSchema),
 	});
 
 	const { trigger, watch } = form;
@@ -62,8 +62,9 @@ const ReferralForm = () => {
 	const [currentStep, setCurrentStep] = useState(0);
 	const delta = currentStep - previousStep;
 
-	const onSubmit = (values: z.infer<typeof referralFormSchema>) => {
-		console.log(values);
+	const onSubmit = (values: z.infer<typeof profileFormSchema>) => {
+		console.log("here", values);
+		// Submit to backend api
 	};
 
 	const next = async () => {
@@ -71,7 +72,7 @@ const ReferralForm = () => {
 		console.log(watch());
 
 		const output = await trigger(fields as FieldName[], { shouldFocus: true });
-		console.log(output)
+		console.log(output);
 		if (!output) return;
 
 		if (currentStep < steps.length - 1) {
@@ -127,7 +128,6 @@ const ReferralForm = () => {
 				<form
 					onSubmit={form.handleSubmit(onSubmit)}
 					className="mt-4 space-y-8 py-4">
-
 					{currentStep === 0 && (
 						<motion.div
 							initial={{ x: delta >= 0 ? "50%" : "-50%", opacity: 0 }}
@@ -466,10 +466,31 @@ const ReferralForm = () => {
 							<h2 className="text-base font-semibold leading-7 text-gray-900">
 								Form Complete
 							</h2>
-							<p className="mt-1 text-sm leading-6 text-gray-600">Memes</p>
+							<p className="mt-1 text-sm leading-6 text-gray-600">
+								Please check that all information is correct.
+							</p>
 
 							<section className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-								<div className="sm:col-span-3">Complete</div>
+								{Object.entries(form.getValues()).map(([key, value]) => (
+									<div key={key} className="sm:col-span-3">
+										<FormItem>
+											<FormLabel>
+												{key
+													// Adds space between camelCase words
+													.replace(/([a-z])([A-Z])/g, "$1 $2")
+													// Capitalize first letter
+													.replace(/^./, (str) => str.toUpperCase())}
+											</FormLabel>
+											<FormControl>
+												<Input
+													value={value as string}
+													readOnly
+													className="block cursor-not-allowed w-full rounded-md border-0 bg-gray-200 py-1.5 text-gray-900 shadow-sm sm:text-sm sm:leading-6"
+												/>
+											</FormControl>
+										</FormItem>
+									</div>
+								))}
 							</section>
 						</motion.div>
 					)}
@@ -481,7 +502,7 @@ const ReferralForm = () => {
 									Previous
 								</Button>
 							)}
-							{currentStep < steps.length -1 && (
+							{currentStep < steps.length - 1 && (
 								<Button type="button" onClick={next} variant={"outline"}>
 									Next
 								</Button>
