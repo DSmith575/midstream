@@ -10,7 +10,7 @@ import { DialogTitle } from "@radix-ui/react-dialog";
 import { Button } from "@/components/ui/button";
 import Chat from "../../components/chat/Chat";
 import { useAuth, useUser } from "@clerk/clerk-react";
-import ReferralForm from "@/components/forms/ReferralForm";
+import ProfileForm from "@/components/forms/ProfileForm";
 
 interface UserProps {
 	firstName: string;
@@ -19,8 +19,9 @@ interface UserProps {
 
 const Dashboard = () => {
 	const { isLoaded, userId } = useAuth();
-	const [referralFormStart, setReferralFormStart] = useState<boolean>(false);
+	const [profileStart, setProfileStart] = useState<boolean>(false);
 	const user = useUser();
+	console.log(user);
 
 	if (!isLoaded || !userId) {
 		return null;
@@ -30,35 +31,36 @@ const Dashboard = () => {
 
 	return (
 		<div>
-			{referralFormStart ? (
+			{profileStart ? (
 				<>
 					<section className={"mr-10 mt-2 grid justify-end"}>
 						<Button
 							variant="outline"
 							size="lg"
 							className={"ml-2"}
-							onClick={() => setReferralFormStart(false)}>
+							onClick={() => setProfileStart(false)}>
 							Back
 						</Button>
 						<p className="ml-2 text-sm text-muted-foreground">
 							Progress will not be saved.
 						</p>
 					</section>
-					<ReferralForm />
+					<ProfileForm />
 				</>
 			) : (
 				<>
-					<section className={"mt-2 flex justify-between"}>
-						<p>
-							Welcome Back! {firstName} {lastName}
-						</p>
+					<section className={"mt-2 flex flex-col items-center text-center justify-center mx-8 h-[50vh]"}>
+						<h1 className={'text-xl'}>
+							Hello {firstName} {lastName}!
+						</h1>
+							<p>Get your profile setup to get started.</p>
 						<section className={"mr-2 flex gap-2"}>
 							<Button
 								variant="outline"
 								size="lg"
 								className={""}
-								onClick={() => setReferralFormStart(true)}>
-								Referral Form
+								onClick={() => setProfileStart(true)}>
+								Profile Setup
 							</Button>
 							<Sheet>
 								<SheetContent side="bottom">

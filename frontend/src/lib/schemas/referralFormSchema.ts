@@ -1,16 +1,19 @@
 import { z } from "zod";
 
 export const referralFormSchema = z.object({
-	firstName: z.string().nonempty({ message: "First name is required" }),
-	lastName: z.string().nonempty({ message: "Last name is required" }),
-	title: z.string().nonempty({message: "Please enter a title"}),
+	firstName: z.string({ message: "First name is required" }).nonempty(),
+	lastName: z.string({ message: "Last name is required" }).nonempty(),
+	title: z.string({message: "Please select a title"}).nonempty(),
 	preferredName: z.string().optional(),
-	dateOfBirth: z.string(),
-	gender: z.string().nonempty(),
-	email: z.string().email(),
-	phone: z.string().min(1, "Please enter a valid phone number"),
-	address: z.string().nonempty(),
-	town: z.string().nonempty(),
-	postCode: z.string().nonempty(),
+	dateOfBirth: z.string({message: "Please enter a valid date of birth"}).nonempty(),
+	gender: z.string({ message: "Please select from the options above"}).nonempty(),
+	email: z.string({ message: "Please enter a valid email" }).email(),
+	phone: z.string({message:"Please enter a valid phone number"}).nonempty(),
+	address: z.string({message: "Please enter a valid address"}).nonempty(),
+	suburb: z.string({message: "Please enter a valid suburb"}).nonempty(),
+	city: z.string({message: "Please enter a valid city"}).nonempty(),
+	postCode: z.coerce.number({ message: "Postcode must be at least 4 digits"}).min(1000)
+  .max(9999, "Postcode must be at most 4 digits")
+  .int("Postcode must be a number"),
 	country: z.string().nonempty(),
 });

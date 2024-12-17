@@ -13,7 +13,6 @@ import { Button } from "../ui/button";
 import {
 	Form,
 	FormControl,
-	FormDescription,
 	FormField,
 	FormItem,
 	FormLabel,
@@ -31,7 +30,14 @@ const steps = [
 	{
 		id: "Step 1",
 		name: "Personal Information",
-		fields: ["firstName", "lastName", "title", "preferredName", "dateOfBirth"],
+		fields: [
+			"firstName",
+			"lastName",
+			"title",
+			"preferredName",
+			"dateOfBirth",
+			"gender",
+		],
 	},
 	{
 		id: "Step 2",
@@ -41,36 +47,17 @@ const steps = [
 	{
 		id: "Step 3",
 		name: "Address",
-		fields: ["address", "town/city", "postCode", "country"],
+		fields: ["address", "suburb", "city", "postCode", "country"],
 	},
-	{ id: "Step 4", name: "Complete" },
+	{ id: "Step 4", name: "Complete", fields: ["complete"] },
 ];
 
 const ReferralForm = () => {
 	const form = useForm<Inputs>({
 		resolver: zodResolver(referralFormSchema),
-		// defaultValues: {
-		// 	firstName: "",
-		// 	lastName: "",
-		// 	title: "",
-		// 	preferredName: "",
-		// 	email: "",
-		// 	phone: "",
-		// 	referral: "",
-		// 	street: "",
-		// 	city: "",
-		// 	country: "",
-		// 	zip: "",
-		// },
 	});
 
-	const {
-		control,
-		handleSubmit,
-		trigger,
-		watch,
-		formState: { errors },
-	} = form;
+	const { trigger, watch } = form;
 	const [previousStep, setPreviousStep] = useState(0);
 	const [currentStep, setCurrentStep] = useState(0);
 	const delta = currentStep - previousStep;
@@ -82,8 +69,9 @@ const ReferralForm = () => {
 	const next = async () => {
 		const fields = steps[currentStep]?.fields;
 		console.log(watch());
-		if (!fields) return;
+
 		const output = await trigger(fields as FieldName[], { shouldFocus: true });
+		console.log(output)
 		if (!output) return;
 
 		if (currentStep < steps.length - 1) {
@@ -139,6 +127,7 @@ const ReferralForm = () => {
 				<form
 					onSubmit={form.handleSubmit(onSubmit)}
 					className="mt-4 space-y-8 py-4">
+
 					{currentStep === 0 && (
 						<motion.div
 							initial={{ x: delta >= 0 ? "50%" : "-50%", opacity: 0 }}
@@ -272,7 +261,7 @@ const ReferralForm = () => {
 													value={field.value}>
 													<FormControl>
 														<SelectTrigger>
-															<SelectValue placeholder={"Title"} />
+															<SelectValue placeholder={"Gender"} />
 														</SelectTrigger>
 													</FormControl>
 													<SelectContent>
@@ -304,7 +293,7 @@ const ReferralForm = () => {
 								Contact Information
 							</h2>
 							<p className="mt-1 text-sm leading-6 text-gray-600">
-								Provide your address details.
+								Provide your contact information.
 							</p>
 
 							<section className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
@@ -368,14 +357,13 @@ const ReferralForm = () => {
 								<div className="sm:col-span-3">
 									<FormField
 										control={form.control}
-										name="email"
+										name="address"
 										render={({ field }) => (
 											<FormItem>
-												<FormLabel>Email</FormLabel>
+												<FormLabel>Address</FormLabel>
 												<FormControl>
 													<Input
-														type={"email"}
-														placeholder="JohnDoe@email.com"
+														placeholder="123 Example Street"
 														{...field}
 														className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
 													/>
@@ -389,13 +377,74 @@ const ReferralForm = () => {
 								<div className="sm:col-span-3">
 									<FormField
 										control={form.control}
-										name="phone"
+										name="suburb"
 										render={({ field }) => (
 											<FormItem>
-												<FormLabel>Phone Number</FormLabel>
+												<FormLabel>Suburb</FormLabel>
 												<FormControl>
 													<Input
-														placeholder="Home or Mobile"
+														placeholder="Richmond"
+														{...field}
+														className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+								</div>
+
+								<div className="sm:col-span-3">
+									<FormField
+										control={form.control}
+										name="city"
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>City</FormLabel>
+												<FormControl>
+													<Input
+														placeholder="Christchurch"
+														{...field}
+														className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+								</div>
+
+								<div className="sm:col-span-3">
+									<FormField
+										control={form.control}
+										name="postCode"
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>Post Code</FormLabel>
+												<FormControl>
+													<Input
+														type={"number"}
+														placeholder={"1234"}
+														{...field}
+														className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+								</div>
+
+								<div className="sm:col-span-3">
+									<FormField
+										control={form.control}
+										name="country"
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>Country</FormLabel>
+												<FormControl>
+													<Input
+														placeholder="New Zealand"
 														{...field}
 														className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
 													/>
@@ -409,6 +458,22 @@ const ReferralForm = () => {
 						</motion.div>
 					)}
 
+					{currentStep === 3 && (
+						<motion.div
+							initial={{ x: delta >= 0 ? "50%" : "-50%", opacity: 0 }}
+							animate={{ x: 0, opacity: 1 }}
+							transition={{ duration: 0.3, ease: "easeInOut" }}>
+							<h2 className="text-base font-semibold leading-7 text-gray-900">
+								Form Complete
+							</h2>
+							<p className="mt-1 text-sm leading-6 text-gray-600">Memes</p>
+
+							<section className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+								<div className="sm:col-span-3">Complete</div>
+							</section>
+						</motion.div>
+					)}
+
 					<div className="mt-8 pt-5">
 						<div className="flex justify-between">
 							{currentStep > 0 && (
@@ -416,7 +481,7 @@ const ReferralForm = () => {
 									Previous
 								</Button>
 							)}
-							{currentStep < steps.length - 1 && (
+							{currentStep < steps.length -1 && (
 								<Button type="button" onClick={next} variant={"outline"}>
 									Next
 								</Button>
