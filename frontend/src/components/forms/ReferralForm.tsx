@@ -19,7 +19,7 @@ import {
 	FormLabel,
 	FormMessage,
 } from "@/components/ui/form";
-import { referralFormSchema } from "@/lib/referralForm";
+import { referralFormSchema } from "@/lib/schemas/referralFormSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -31,22 +31,17 @@ const steps = [
 	{
 		id: "Step 1",
 		name: "Personal Information",
-		fields: [
-			"firstName",
-			"lastName",
-			"title",
-			"preferredName",
-		],
+		fields: ["firstName", "lastName", "title", "preferredName", "dateOfBirth"],
 	},
 	{
 		id: "Step 2",
 		name: "Contact Information",
-		fields: ["email", "mobilePhone", "homePhone"],
+		fields: ["email", "phone"],
 	},
 	{
 		id: "Step 3",
 		name: "Address",
-		fields: ["country", "city", "street", "zip"],
+		fields: ["address", "town/city", "postCode", "country"],
 	},
 	{ id: "Step 4", name: "Complete" },
 ];
@@ -106,7 +101,6 @@ const ReferralForm = () => {
 
 	return (
 		<section className="flex flex-col justify-between px-10 py-10">
-			{/* steps */}
 			<nav aria-label="Progress">
 				<ol role="list" className="space-y-4 md:flex md:space-x-8 md:space-y-0">
 					{steps.map((step, index) => (
@@ -171,9 +165,6 @@ const ReferralForm = () => {
 														className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
 													/>
 												</FormControl>
-												<FormDescription>
-													This is your first name.
-												</FormDescription>
 												<FormMessage />
 											</FormItem>
 										)}
@@ -194,67 +185,111 @@ const ReferralForm = () => {
 														className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
 													/>
 												</FormControl>
-												<FormDescription>
-													This is your last name.
-												</FormDescription>
 												<FormMessage />
 											</FormItem>
 										)}
 									/>
 								</div>
 
-								<div className={'sm:col-span-3'}>
+								<div className={"sm:col-span-3"}>
 									<FormField
 										control={form.control}
-										name={'title'}
+										name={"title"}
 										render={({ field }) => (
 											<FormItem>
 												<FormLabel>Title</FormLabel>
-												<Select onValueChange={field.onChange} value={field.value}>
-												<FormControl>
-													<SelectTrigger>
-														<SelectValue placeholder={'Title'}/>
-													</SelectTrigger>
-												</FormControl>
-												<SelectContent>
-													<SelectGroup>
-														<SelectItem value={'Mr'}>Mr</SelectItem>
-														<SelectItem value={'Mrs'}>Mrs</SelectItem>
-														<SelectItem value={'Miss'}>Miss</SelectItem>
-														<SelectItem value={'Dr'}>Dr</SelectItem>
-														<SelectItem value={'Other'}>Other</SelectItem>
-													</SelectGroup>
-												</SelectContent>
+												<Select
+													onValueChange={field.onChange}
+													value={field.value}>
+													<FormControl>
+														<SelectTrigger>
+															<SelectValue placeholder={"Title"} />
+														</SelectTrigger>
+													</FormControl>
+													<SelectContent>
+														<SelectGroup>
+															<SelectItem value={"Mr"}>Mr</SelectItem>
+															<SelectItem value={"Mrs"}>Mrs</SelectItem>
+															<SelectItem value={"Miss"}>Miss</SelectItem>
+															<SelectItem value={"Dr"}>Dr</SelectItem>
+															<SelectItem value={"Other"}>Other</SelectItem>
+														</SelectGroup>
+													</SelectContent>
 												</Select>
-												<FormDescription>
-													This is your title.
-												</FormDescription>
 												<FormMessage />
 											</FormItem>
 										)}
 									/>
 								</div>
 
-								<div className={'sm:col-span-3'}>
+								<div className={"sm:col-span-3"}>
 									<FormField
 										control={form.control}
-										name={'preferredName'}
+										name={"preferredName"}
 										render={({ field }) => (
 											<FormItem>
 												<FormLabel>Preferred Name</FormLabel>
 												<FormControl>
-													<Input
-													placeholder="Optional"
-													{...field}
-													/>
+													<Input placeholder="Optional" {...field} />
 												</FormControl>
-												<FormDescription>
-													This is your preferred name.
-												</FormDescription>
 												<FormMessage />
 											</FormItem>
 										)}
-										/>
+									/>
+								</div>
+								<div className={"sm:col-span-3"}>
+									<FormField
+										control={form.control}
+										name={"dateOfBirth"}
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>Date of birth</FormLabel>
+												<FormControl>
+													<Input
+														type={"date"}
+														{...field}
+														placeholder="DD/MM/YYYY"
+														className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
+													/>
+												</FormControl>
+
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+								</div>
+
+								<div className={"sm:col-span-3"}>
+									{/* Gender */}
+									<FormField
+										control={form.control}
+										name={"gender"}
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>Gender</FormLabel>
+												<Select
+													onValueChange={field.onChange}
+													value={field.value}>
+													<FormControl>
+														<SelectTrigger>
+															<SelectValue placeholder={"Title"} />
+														</SelectTrigger>
+													</FormControl>
+													<SelectContent>
+														<SelectGroup>
+															<SelectItem value={"Male"}>Male</SelectItem>
+															<SelectItem value={"Female"}>Female</SelectItem>
+															<SelectItem value={"Other"}>Other</SelectItem>
+															<SelectItem value={"Prefer not to say"}>
+																Prefer not to say
+															</SelectItem>
+														</SelectGroup>
+													</SelectContent>
+												</Select>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
 								</div>
 							</section>
 						</motion.div>
@@ -266,30 +301,28 @@ const ReferralForm = () => {
 							animate={{ x: 0, opacity: 1 }}
 							transition={{ duration: 0.3, ease: "easeInOut" }}>
 							<h2 className="text-base font-semibold leading-7 text-gray-900">
-								Address
+								Contact Information
 							</h2>
 							<p className="mt-1 text-sm leading-6 text-gray-600">
-								Address where you can receive mail.
+								Provide your address details.
 							</p>
 
 							<section className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
 								<div className="sm:col-span-3">
 									<FormField
 										control={form.control}
-										name="firstName"
+										name="email"
 										render={({ field }) => (
 											<FormItem>
-												<FormLabel>First Name</FormLabel>
+												<FormLabel>Email</FormLabel>
 												<FormControl>
 													<Input
-														placeholder="John"
+														type={"email"}
+														placeholder="JohnDoe@email.com"
 														{...field}
 														className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
 													/>
 												</FormControl>
-												<FormDescription>
-													This is your first name.
-												</FormDescription>
 												<FormMessage />
 											</FormItem>
 										)}
@@ -299,20 +332,74 @@ const ReferralForm = () => {
 								<div className="sm:col-span-3">
 									<FormField
 										control={form.control}
-										name="lastName"
+										name="phone"
 										render={({ field }) => (
 											<FormItem>
-												<FormLabel>Last Name</FormLabel>
+												<FormLabel>Phone Number</FormLabel>
 												<FormControl>
 													<Input
-														placeholder="Doe"
+														placeholder="Home or Mobile"
 														{...field}
 														className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
 													/>
 												</FormControl>
-												<FormDescription>
-													This is your last name.
-												</FormDescription>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+								</div>
+							</section>
+						</motion.div>
+					)}
+
+					{currentStep === 2 && (
+						<motion.div
+							initial={{ x: delta >= 0 ? "50%" : "-50%", opacity: 0 }}
+							animate={{ x: 0, opacity: 1 }}
+							transition={{ duration: 0.3, ease: "easeInOut" }}>
+							<h2 className="text-base font-semibold leading-7 text-gray-900">
+								Address Information
+							</h2>
+							<p className="mt-1 text-sm leading-6 text-gray-600">
+								Provide your address details.
+							</p>
+
+							<section className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
+								<div className="sm:col-span-3">
+									<FormField
+										control={form.control}
+										name="email"
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>Email</FormLabel>
+												<FormControl>
+													<Input
+														type={"email"}
+														placeholder="JohnDoe@email.com"
+														{...field}
+														className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
+													/>
+												</FormControl>
+												<FormMessage />
+											</FormItem>
+										)}
+									/>
+								</div>
+
+								<div className="sm:col-span-3">
+									<FormField
+										control={form.control}
+										name="phone"
+										render={({ field }) => (
+											<FormItem>
+												<FormLabel>Phone Number</FormLabel>
+												<FormControl>
+													<Input
+														placeholder="Home or Mobile"
+														{...field}
+														className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-sky-600 sm:text-sm sm:leading-6"
+													/>
+												</FormControl>
 												<FormMessage />
 											</FormItem>
 										)}
