@@ -1,7 +1,5 @@
 from fastapi import APIRouter, File, UploadFile, HTTPException
 from fastapi.responses import StreamingResponse
-from io import BytesIO
-from reportlab.pdfgen import canvas
 from app.lib.constants.routes import APIRoutes
 from app.lib.utils.utils import allowed_file, sanitize_filename, split_filename_from_extension
 from app.lib.constants.constants import ALLOWED_EXTENSIONS_AUDIO
