@@ -18,12 +18,17 @@ import {
 	profileFormSteps,
 } from "@/lib/formOptions/profileFormOptions";
 import FormStepButtons from "./profileFormComponents/FormStepButtons";
+import useProfileStart from "@/hooks/profileForm/useProfileStart";
+import useCreateUserProfile from "@/hooks/userProfile/useCreateUserProfile";
+import { CreateUserProps } from "@/interfaces/profileInterfaces";
 
 type Inputs = z.infer<typeof profileFormSchema>;
 type FieldName = keyof Inputs;
 
 const ReferralForm = () => {
 	const user = useUser();
+	const { mutate } = useCreateUserProfile();
+
 	const form = useForm<Inputs>({
 		resolver: zodResolver(profileFormSchema),
 		defaultValues: {
@@ -49,34 +54,29 @@ const ReferralForm = () => {
 	const delta = currentStep - previousStep;
 
 	const onSubmit = async (values: z.infer<typeof profileFormSchema>) => {
-		const userDetails = {
-				googleId: user.user?.id,
-				firstName: values.firstName,
-				lastName: values.lastName,
-				title: values.title,
-				preferredName: values.preferredName,
-				gender: values.gender,
-				dateOfBirth: values.dateOfBirth,
-				email: values.email,
-				phone: values.phone,
-				address: values.address,
-				suburb: values.suburb,
-				city: values.city,
-				postCode: values.postCode,
-				country: values.country,
+		const googleUserId = user.user?.id;
+		if (!googleUserId) {
+			return;
+		}
+		const userDetails: CreateUserProps = {
+			googleId: googleUserId,
+			firstName: values.firstName,
+			lastName: values.lastName,
+			title: values.title,
+			preferredName: values.preferredName,
+			gender: values.gender,
+			dateOfBirth: values.dateOfBirth,
+			email: values.email,
+			phone: values.phone,
+			address: values.address,
+			suburb: values.suburb,
+			city: values.city,
+			postCode: values.postCode,
+			country: values.country,
 		};
-		// send to localhost:3000
-		const url = "http://localhost:3000/api/v1/userProfiles/createUserProfile";
-		try {
-			const response = await fetch(url, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify(userDetails),
-			});
-			console.log(response.json());
 
+		try {
+			mutate(userDetails);
 		} catch (error) {
 			console.error(error);
 		}

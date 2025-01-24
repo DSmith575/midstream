@@ -121,6 +121,7 @@ const createUserProfile = async (req: Request, res: Response): Promise<any> => {
 const getUserProfile = async (req: Request, res: Response): Promise<any> => {
 	try {
 		const { googleId } = req.query;
+		console.log(googleId)
 
 		const user = await prisma.user.findUnique({
 			where: {
@@ -133,9 +134,23 @@ const getUserProfile = async (req: Request, res: Response): Promise<any> => {
 			},
 		});
 
+		// const genderCounts = await prisma.personalInformation.groupBy({
+		// 	by: ["gender"],
+		// 	_count: {
+		// 		gender: true,
+		// 	}});
+
+		// const x = await prisma.personalInformation.count({
+		// 	where: {
+		// 		gender: "Male"
+		// 	}
+		// });
+
 		if (!user) {
 			return res.status(400).json({ message: "User not found" });
 		}
+
+		console.log(user);
 
 		return res.status(200).json({ user });
 	} catch (error) {
