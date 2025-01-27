@@ -8,6 +8,10 @@ export interface Steps {
 export interface UserInformationProps {
 	firstName: string;
 	lastName: string;
+	title: string;
+	preferredName?: string;
+	gender: string;
+	dateOfBirth: string;
 }
 
 export interface AddressInformationProps {
@@ -23,9 +27,9 @@ export interface ContactInformationProps {
 }
 
 export interface UserProfileProps {
-	personalInformation?: UserInformationProps;
-	addressInformation?: AddressInformationProps;
-	contactInformation?: ContactInformationProps;
+	personalInformation?: UserInformationProps | null;
+	addressInformation?: AddressInformationProps | null;
+	contactInformation?: ContactInformationProps | null;
 }
 
 export interface CreateUserProps {
