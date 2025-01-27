@@ -1,5 +1,6 @@
 import NavBarLogo from "@/components/navBar/navBarComponents/NavBarLogo";
 import {
+	navBarAuthRoutes,
 	navBarContentRoutes,
 	navBarDropDownRoutes,
 } from "@/routes/navBarRoutes";
@@ -27,7 +28,7 @@ const NavBar = () => {
 						Navigation menu
 					</SheetDescription>
 					<NavBarLogo />
-					<div className="flex flex-col">
+					<section className="flex flex-col h-full">
 						<section className={"my-8 flex shadow-sm"}>
 							{Object.entries(navBarDropDownRoutes).map(([key, value]) =>
 								// if user only show dashboard
@@ -50,6 +51,7 @@ const NavBar = () => {
 							)}
 						</section>
 
+						<section>
 						{Object.entries(navBarContentRoutes).map(([key, value]) => (
 							<NavItem
 								key={key}
@@ -57,7 +59,17 @@ const NavBar = () => {
 								routerName={value.name}
 							/>
 						))}
-					</div>
+						</section>
+
+						{userId && (
+    <section className="mt-10">
+      <NavItem
+        routerPath={navBarAuthRoutes.analytics.path}
+        routerName={navBarAuthRoutes.analytics.name}
+      />
+    </section>
+  )}
+					</section>
 				</SheetContent>
 
 				<nav className="flex w-full items-center justify-between">

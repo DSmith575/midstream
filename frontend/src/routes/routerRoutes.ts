@@ -28,4 +28,8 @@ export const routerRoutes: RouterPathProps = {
 		path: routerConstants.dashboardUserEdit.path,
 		name: routerConstants.dashboardUserEdit.name,
 	},
+	analytics: {
+		path: routerConstants.analytics.path,
+		name: routerConstants.analytics.name,
+	},
 };

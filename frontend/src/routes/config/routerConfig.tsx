@@ -4,6 +4,7 @@ import Dashboard from "@/pages/dashboard/Dashboard";
 import LoginPage from "@/pages/auth/LoginPage";
 import HomePage from "@/pages/home/HomePage";
 import RegisterPage from "@/pages/auth/RegisterPage";
+import AnalyticsPage from "@/pages/analytics/Analytics";
 
 interface RouterConfigProps {
 	path?: string;
@@ -81,4 +82,14 @@ export const routerConfig: RouterConfigProps[] = [
 			},
 		],
 	},
+	{
+		path: routerRoutes.analytics.path,
+		element: <RootLayout />,
+		children: [
+			{
+				pageIndex: true,
+				element: <AnalyticsPage />,
+			},
+		],
+	}
 ];

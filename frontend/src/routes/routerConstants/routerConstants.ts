@@ -7,4 +7,5 @@ export const routerConstants = {
 	dashboard: { path: "/dashboard", name: "Dashboard" },
 	dashboardUser: { path: ":userId", name: "Dashboard" },
 	dashboardUserEdit: { path: ":userId/edit", name: "DashboardUserEdit" },
+	analytics: { path: "/analytics", name: "Analytics" },
 };

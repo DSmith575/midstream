@@ -103,13 +103,35 @@ const Dashboard = () => {
 							</div>
 							<div className="mt-4 space-y-2">
 								<div className="flex items-center justify-between">
+									<button>Referral Form</button>
+									<button className="rounded-full bg-blue-500 px-4 py-1 text-sm text-white">
+										Pending
+									</button>
+								</div>
+								<div className="flex items-center justify-between">
 									<p>Referral Form</p>
 									<button className="rounded-full bg-red-500 px-4 py-1 text-sm text-white">
 										Denied
 									</button>
 								</div>
+								<div className="flex items-center justify-between">
+									<p>Referral Form</p>
+									<button className="rounded-full bg-green-500 px-4 py-1 text-sm text-white">
+										Accepted
+									</button>
+								</div>
+								<div className="flex items-center justify-between">
+									<p>Referral Form</p>
+									<button className="rounded-full bg-blue-500 px-4 py-1 text-sm text-white">
+										Viewed
+									</button>
+								</div>
 							</div>
 						</div>
+
+
+
+
 
 						{/* Bills Card */}
 						<div className="col-span-2 row-start-3 rounded-2xl bg-white p-6 shadow-lg md:col-span-1">
@@ -131,7 +153,7 @@ const Dashboard = () => {
 													? "bg-green-100 text-green-500"
 													: "bg-red-100 text-red-500"
 											}`}>
-											{bill.status === "paid" ? "Still paid" : "Not paid"}
+											{bill.status === "paid" ? "Paid" : "Not paid"}
 										</span>
 									</div>
 								))}

@@ -21,48 +21,59 @@ datasource db {
 // }
 
 model User {
-  id Int @id @default(autoincrement())
-  googleId String @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-  contactInformation ContactInformation[]
+  id                  Int                   @id @default(autoincrement())
+  googleId            String                @unique
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @default(now()) @updatedAt
+  contactInformation  ContactInformation[]
   personalInformation PersonalInformation[]
-  addressInformation AddressInformation[]
+  addressInformation  AddressInformation[]
+  referralForms       ReferralForm[]
 }
 
 model ContactInformation {
-  id Int @id @default(autoincrement())
-  userId Int
-  email String
-  phone String
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  email     String
+  phone     String
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
-  user User @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model PersonalInformation {
-  id Int @id @default(autoincrement())
-  userId Int
-  firstName String
-  lastName String
-  title String
-  gender String
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  firstName     String
+  lastName      String
+  title         String
+  gender        String
   preferredName String
-  dateOfBirth DateTime
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-  user User @relation(fields: [userId], references: [id])
+  dateOfBirth   DateTime
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now()) @updatedAt
+  user          User     @relation(fields: [userId], references: [id])
 }
 
 model AddressInformation {
-  id Int @id @default(autoincrement())
-  userId Int
-  address String
-  suburb String
-  city String
-  postCode Int
-  country String
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  address   String
+  suburb    String
+  city      String
+  postCode  Int
+  country   String
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
-  user User @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model ReferralForm {
+  id           Int    @id @default(autoincrement())
+  userId       Int
+  referralName String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
 }
