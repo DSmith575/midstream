@@ -28,7 +28,6 @@ model User {
   contactInformation  ContactInformation[]
   personalInformation PersonalInformation[]
   addressInformation  AddressInformation[]
-  referralForms       ReferralForm[]
 }
 
 model ContactInformation {
@@ -63,16 +62,6 @@ model AddressInformation {
   city      String
   postCode  Int
   country   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-  user      User     @relation(fields: [userId], references: [id])
-}
-
-model ReferralForm {
-  id           Int    @id @default(autoincrement())
-  userId       Int
-  referralName String
-
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
   user      User     @relation(fields: [userId], references: [id])
