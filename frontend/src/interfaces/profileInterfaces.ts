@@ -19,11 +19,12 @@ export interface AddressInformationProps {
 	suburb: string;
 	city: string;
 	postCode: number;
+	country: string;
 }
 
 export interface ContactInformationProps {
 	email: string;
-	phone: number;
+	phone: string;
 }
 
 export interface UserProfileProps {

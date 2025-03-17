@@ -25,7 +25,7 @@ import { CreateUserProps } from "@/interfaces/profileInterfaces";
 type Inputs = z.infer<typeof profileFormSchema>;
 type FieldName = keyof Inputs;
 
-const ReferralForm = () => {
+const ProfileForm = () => {
 	const user = useUser();
 	const { mutate } = useCreateUserProfile();
 
@@ -284,4 +284,4 @@ const ReferralForm = () => {
 	);
 };
 
-export default ReferralForm;
+export default ProfileForm;

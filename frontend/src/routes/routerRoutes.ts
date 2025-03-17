@@ -28,6 +28,10 @@ export const routerRoutes: RouterPathProps = {
 		path: routerConstants.dashboardUserEdit.path,
 		name: routerConstants.dashboardUserEdit.name,
 	},
+	dashboardNewReferral: {
+		path: routerConstants.dashboardNewReferral.path,
+		name: routerConstants.dashboardNewReferral.name,
+	},
 	analytics: {
 		path: routerConstants.analytics.path,
 		name: routerConstants.analytics.name,

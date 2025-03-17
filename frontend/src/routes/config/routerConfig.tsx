@@ -5,6 +5,7 @@ import LoginPage from "@/pages/auth/LoginPage";
 import HomePage from "@/pages/home/HomePage";
 import RegisterPage from "@/pages/auth/RegisterPage";
 import AnalyticsPage from "@/pages/analytics/Analytics";
+import ReferralForm from "@/components/forms/referralForm/ReferralForm";
 
 interface RouterConfigProps {
 	path?: string;
@@ -80,6 +81,10 @@ export const routerConfig: RouterConfigProps[] = [
 				path: routerRoutes.dashboardUserEdit.path,
 				element: <h1>UserId Edit Test</h1>,
 			},
+			{
+				path: routerRoutes.dashboardNewReferral.path,
+				element: <ReferralForm />,
+			}
 		],
 	},
 	{
