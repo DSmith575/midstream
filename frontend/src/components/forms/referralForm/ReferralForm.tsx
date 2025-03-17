@@ -1,6 +1,12 @@
 import { useState, useEffect } from "react";
 import { SelectItem } from "@/components/ui/select";
-import { Form, FormControl, FormItem, FormLabel } from "@/components/ui/form";
+import {
+	Form,
+	FormControl,
+	FormItem,
+	FormLabel,
+	FormMessage,
+} from "@/components/ui/form";
 import { referralFormSchema } from "@/lib/schemas/referralFormSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -24,6 +30,7 @@ import {
 	UserInformationProps,
 } from "@/interfaces/profileInterfaces";
 import { Textarea } from "@/components/ui/textarea";
+import FormTextArea from "../profileForm/profileFormComponents/FormTextArea";
 
 type Inputs = z.infer<typeof referralFormSchema>;
 type FieldName = keyof Inputs;
@@ -46,6 +53,12 @@ interface ReferralFormProps {
 	interpreter: string;
 	culturalSupport: string;
 	communicationNeeds: string;
+	doctorName: string;
+	doctorPhone: string;
+	doctorAddress: string;
+	doctorSuburb: string;
+	doctorCity: string;
+	nationalHealthIndex: string;
 }
 
 const ReferralForm = () => {
@@ -75,6 +88,12 @@ const ReferralForm = () => {
 		interpreter: "",
 		culturalSupport: "",
 		communicationNeeds: "",
+		doctorName: "",
+		doctorPhone: "",
+		doctorAddress: "",
+		doctorSuburb: "",
+		doctorCity: "",
+		nationalHealthIndex: "",
 	};
 
 	const form = useForm<Inputs>({
@@ -98,6 +117,7 @@ const ReferralForm = () => {
 	const next = async () => {
 		const fields = referralFormSteps[currentStep]?.fields;
 		// console.log(watch());
+		console.log(form.getValues());
 
 		const output = await trigger(fields as FieldName[], { shouldFocus: true });
 		// console.log(output);
@@ -291,17 +311,64 @@ const ReferralForm = () => {
 									/>
 
 									{communicationNeedsValue === "Yes" && (
-                    <div className={"grid w-full gap-1.5"}>
-                      <FormItem>
-                        <FormLabel>Communication Needs Details</FormLabel>
-                        {/* Add input to text area */}
-                        <Textarea
-                          {...form.register("communicationNeeds")}
-                          placeholder="Please provide details of your communication needs."
-                        />
-                      </FormItem>
-                    </div>
-                  ) }
+										<FormTextArea
+											control={form.control}
+											fieldName={"communicationNeedsDetails"}
+											formLabel={"Communication Needs Details"}
+											placeholder={
+												"Non-verbal communication (e.g., requires anticipation and support)"
+											}
+										/>
+									)}
+								</MotionContainer>
+							)}
+
+							{currentStep === 2 && (
+								<MotionContainer
+									delta={delta}
+									header={referralFormSteps[currentStep].name}
+									subtitle={referralFormSteps[currentStep].subtitle}>
+									<FormInput
+										control={form.control}
+										fieldName={"doctorName"}
+										formLabel={"Doctor/GP Name"}
+										placeholder={"Dr. Jane Doe"}
+									/>
+
+									<FormInput
+										control={form.control}
+										fieldName={"doctorPhone"}
+										formLabel={"Medical Centre Contact Number"}
+										placeholder={"021 123 4567"}
+									/>
+
+									<FormInput
+										control={form.control}
+										fieldName={"doctorAddress"}
+										formLabel={"Medical Centre Address"}
+										placeholder={"123 Medical Centre Street"}
+									/>
+
+									<FormInput
+										control={form.control}
+										fieldName={"doctorSuburb"}
+										formLabel={"Medical Centre Suburb"}
+										placeholder={"Medical Centre Suburb"}
+									/>
+
+									<FormInput
+										control={form.control}
+										fieldName={"doctorCity"}
+										formLabel={"Medical Centre City"}
+										placeholder={"Medical Centre City"}
+									/>
+
+									<FormInput
+										control={form.control}
+										fieldName={"nationalHealthIndex"}
+										formLabel={"National Health Index (NHI) Number"}
+										placeholder={"XYZ1234"}
+									/>
 								</MotionContainer>
 							)}
 

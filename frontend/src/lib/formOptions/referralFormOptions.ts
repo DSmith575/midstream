@@ -44,13 +44,14 @@ export const referralFormSteps: Steps[] = [
 			"interpreter",
 			"culturalSupport",
 			"communicationNeeds",
+			"communicationNeedsDetails",
 		],
 	},
 	{
 		id: "Step 3",
-		name: "Address",
-		subtitle: "Provide your address details.",
-		fields: ["address", "suburb", "city", "postCode", "country"],
+		name: "Medical Information",
+		subtitle: "Provide your medical information.",
+		fields: ["doctorName", "doctorPhone", "doctorAddress", "doctorSuburb", "doctorCity", "nationalHealthIndex"],
 	},
 	{
 		id: "Step 4",
