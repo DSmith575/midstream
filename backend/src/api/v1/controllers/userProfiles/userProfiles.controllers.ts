@@ -121,7 +121,7 @@ const createUserProfile = async (req: Request, res: Response): Promise<any> => {
 const getUserProfile = async (req: Request, res: Response): Promise<any> => {
 	try {
 		const { googleId } = req.query;
-		console.log(googleId)
+		console.log(googleId);
 
 		const user = await prisma.user.findUnique({
 			where: {

@@ -20,8 +20,8 @@ const getAnalytics = async (req: Request, res: Response): Promise<any> => {
 		};
 
 		analytics.forEach((user) => {
-			const personalInfo = user.personalInformation[0];
-			const addressInfo = user.addressInformation[0];
+			const personalInfo = user.personalInformation;
+			const addressInfo = user.addressInformation;
 
 			// Calculate age
 			const age = personalInfo?.dateOfBirth

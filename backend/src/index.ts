@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import userProfileRouter from '@/api/v1/routes/userProfiles/userProfiles.routes';
 import analyticsRouter from '@/api/v1/routes/analytics/analytics.routes';
+import referralFormRouter from '@/api/v1/routes/referralForms/referralForms.routes';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -18,6 +19,7 @@ app.use(cors());
 
 app.use(`${API_BASE_URL}/userProfiles`, userProfileRouter);
 app.use(`${API_BASE_URL}/analytics`, analyticsRouter);
+app.use(`${API_BASE_URL}/referralForms`, referralFormRouter);
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);

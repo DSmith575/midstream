@@ -5,15 +5,16 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { referralFormSteps } from "@/lib/formOptions/referralFormOptions";
-import MotionContainer from "../profileForm/profileFormComponents/MotionContainer";
 import FormStepButtons from "../profileForm/profileFormComponents/FormStepButtons";
 import { useAuth } from "@clerk/clerk-react";
+import useCreateReferralForm from "@/hooks/userProfile/useCreateReferralForm";
 import useUserProfile from "@/hooks/userProfile/useUserProfile";
 import Spinner from "@/components/spinner/Spinner";
 import StepNavigation from "../profileForm/profileFormComponents/StepNavigation";
 import {
 	AddressInformationProps,
 	ContactInformationProps,
+	CreateReferralProps,
 	UserInformationProps,
 } from "@/interfaces/profileInterfaces";
 import StepPersonalInfo from "./referralFormComponents/ReferralStepPersonalInfo";
@@ -54,7 +55,6 @@ interface ReferralFormProps {
 	nationalHealthIndex: string;
 	disabilityType: string;
 	disabilityDetails: string;
-	disabilitySupportDetails: string;
 	disabilityReasonForReferral: string;
 	disabilitySupportRequired: string;
 	safety: string;
@@ -106,7 +106,6 @@ const preLoadedData = (userData: any): ReferralFormProps => ({
 	nationalHealthIndex: "",
 	disabilityType: "",
 	disabilityDetails: "",
-	disabilitySupportDetails: "",
 	disabilityReasonForReferral: "",
 	disabilitySupportRequired: "",
 	safety: "",
@@ -139,7 +138,7 @@ const stepReducer = (
 const ReferralForm = () => {
 	const { isLoaded, userId } = useAuth();
 	const { isLoading, isError, error, userData } = useUserProfile(userId || "");
-	// const { mutate } = useCreateUserProfile();
+	const { mutate } = useCreateReferralForm();
 	const preLoadData = useMemo(() => preLoadedData(userData), [userData]);
 
 	const form = useForm<Inputs>({
@@ -151,7 +150,6 @@ const ReferralForm = () => {
 	const { trigger } = form;
 
 	const next = async () => {
-		console.log(form.getValues());
 		const fields = referralFormSteps[step.current]?.fields;
 		const isValid = await trigger(fields as FieldName[], { shouldFocus: true });
 		if (isValid && step.current < referralFormSteps.length - 1) {
@@ -173,7 +171,81 @@ const ReferralForm = () => {
 		if (!googleUserId) {
 			return;
 		}
+		const referralDetails: CreateReferralProps = {
+			googleId: userId,
+			userProfile: {
+				firstName: values.firstName,
+				lastName: values.lastName,
+				title: values.title,
+				preferredName: values.preferredName,
+				gender: values.gender,
+				dateOfBirth: values.dateOfBirth,
+			},
+			addressInformation: {
+				address: values.address,
+				suburb: values.suburb,
+				city: values.city,
+				postCode: values.postCode,
+				country: values.country,
+			},
+			contactInformation: {
+				email: values.email,
+				phone: values.phone,
+			},
+			languageInfo: {
+				firstLanguage: values.firstLanguage,
+				interpreter: values.interpreter,
+				culturalSupport: values.culturalSupport,
+				communicationNeeds: values.communicationNeeds,
+			},
+			doctorInfo: {
+				doctorName: values.doctorName,
+				doctorPhone: values.doctorPhone,
+				doctorAddress: values.doctorAddress,
+				doctorSuburb: values.doctorSuburb,
+				doctorCity: values.doctorCity,
+				nationalHealthIndex: values.nationalHealthIndex,
+			},
+			disabilityInfo: {
+				disabilityType: values.disabilityType,
+				disabilityDetails: values.disabilityDetails,
+				disabilityReasonForReferral: values.disabilityReasonForReferral,
+				disabilitySupportRequired: values.disabilitySupportRequired,
+			},
+			additionalInfo: {
+				safety: values.safety,
+				otherImportantInformation: values.otherImportantInformation,
+			},
+			referrerInfo: {
+				referrerFirstName: values.referrerFirstName,
+				referrerLastName: values.referrerLastName,
+				referrerEmail: values.referrerEmail,
+				referrerPhone: values.referrerPhone,
+				referrerRelationship: values.referrerRelationship,
+			},
+			emergencyContactInfo: {
+				emergencyContactFirstName: values.emergencyContactFirstName,
+				emergencyContactLastName: values.emergencyContactLastName,
+				emergencyContactPhone: values.emergencyContactPhone,
+				emergencyContactEmail: values.emergencyContactEmail,
+				emergencyContactRelationship: values.emergencyContactRelationship,
+			},
+			consentInfo: {
+				provideInformation: values.provideInformation,
+				shareInformation: values.shareInformation,
+				contactedForAdditionalInformation: values.contactedForAdditionalInformation,
+				statisticalInformation: values.statisticalInformation,
+				correctInformationProvided: values.correctInformationProvided,
+			},
+		};
+
+		try {
+			mutate(referralDetails);
+		} catch (error) {
+			console.error(error);
+		};
 	};
+
 
 	return (
 		<section className="flex flex-col justify-between px-10 pt-10">

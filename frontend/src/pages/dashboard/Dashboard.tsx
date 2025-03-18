@@ -11,7 +11,7 @@ const Dashboard = () => {
 	const { isLoaded, userId } = useAuth();
 	const { isLoading, isError, error, userData } = useUserProfile(userId || "");
 	const { profileStart, handleProfileStart } = useProfileStart();
-
+	console.log(userData)
 	if (!isLoaded || !userId) {
 		return null;
 	}

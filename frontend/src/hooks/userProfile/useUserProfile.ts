@@ -23,9 +23,9 @@ const useUserProfile = (userId: string) => {
   if (data && isFetched) {
     const { personalInformation, addressInformation, contactInformation } = data;
     const userData: UserProfileProps = {
-      personalInformation: personalInformation?.[0] ?? null,
-      addressInformation: addressInformation?.[0] ?? null,
-      contactInformation: contactInformation?.[0] ?? null,
+      personalInformation: personalInformation,
+      addressInformation: addressInformation,
+      contactInformation: contactInformation,
     };
 
     return { isFetched, userData };
