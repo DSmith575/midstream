@@ -23,6 +23,7 @@ import StepDisabilityInfo from "./referralFormComponents/ReferralStepDisabilityI
 import StepAdditionalInfo from "./referralFormComponents/ReferralStepAdditionalInfo";
 import StepReferralContactInfo from "./referralFormComponents/ReferralStepRefContactInfo";
 import StepEmergencyContactInfo from "./referralFormComponents/ReferralStepEmergencyInfo";
+import StepConsentInfo from "./referralFormComponents/ReferralStepConsentInfo";
 
 type Inputs = z.infer<typeof referralFormSchema>;
 type FieldName = keyof Inputs;
@@ -250,6 +251,15 @@ const ReferralForm = () => {
 
 							{step.current === 6 && (
 								<StepEmergencyContactInfo
+									form={form}
+									delta={delta}
+									header={referralFormSteps[step.current].name}
+									subtitle={referralFormSteps[step.current].subtitle}
+								/>
+							)}
+
+							{step.current === 7 && (
+								<StepConsentInfo
 									form={form}
 									delta={delta}
 									header={referralFormSteps[step.current].name}
