@@ -118,7 +118,7 @@ export const referralFormSteps: Steps[] = [
 		id: "Step 7",
 		name: "Emergency Contact Details",
 		subtitle: "Subtitle Information",
-		fields: ["emergencyContactFirstName", "emergencyContactLastName", "emergencyContactPhone", "emergencyContactRelationship"],
+		fields: ["emergencyContactFirstName", "emergencyContactLastName", "emergencyContactEmail", "emergencyContactPhone", "emergencyContactRelationship"],
 	},
 	{
 		id: "Step 8",
