@@ -7,9 +7,10 @@ interface FormTextAreaProps<T extends FieldValues> {
   fieldName: Path<T>;
   formLabel: string;
   placeholder: string;
+  height?: string;
 };
 
-const FormTextArea = <T extends FieldValues>({control, fieldName, formLabel, placeholder}: FormTextAreaProps<T>) => {
+const FormTextArea = <T extends FieldValues>({control, fieldName, formLabel, placeholder, height = "h-32"}: FormTextAreaProps<T>) => {
   return (
     <div className={"sm:col-span-3"}>
       <FormField
@@ -20,7 +21,7 @@ const FormTextArea = <T extends FieldValues>({control, fieldName, formLabel, pla
             <FormLabel>{formLabel}</FormLabel>
             <FormControl>
             <Textarea
-            className={"resize-none h-32"}
+            className={`resize-none ${height}`}
               placeholder={placeholder}
               {...field}
             />
