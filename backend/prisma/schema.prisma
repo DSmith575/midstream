@@ -91,7 +91,7 @@ model ReferralForm {
 model ReferralCommunication {
   id                 Int           @id @default(autoincrement())
   firstLanguage      String
-  interpreter        Boolean
+  interpreter        String
   culturalSupport    String?
   communicationNeeds String?
   referral           ReferralForm?

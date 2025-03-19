@@ -35,6 +35,16 @@ const createReferralForm = async (
 			consentInfo,
 		} = req.body;
 
+
+    const consentInformation = {
+      provideInformation: consentInfo.provideInformation === 'Yes',
+      shareInformation: consentInfo.shareInformation === 'Yes',
+      contactedForAdditionalInformation: consentInfo.contactedForAdditionalInformation === 'Yes',
+      statisticalInformation: consentInfo.statisticalInformation === 'Yes',
+      correctInformationProvided: consentInfo.correctInformationProvided === 'Yes',
+    }
+    
+
     console.log(consentInfo);
 	} catch (error) {
 		return res.status(500).json({ message: "Internal server error" });
