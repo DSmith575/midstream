@@ -6,15 +6,19 @@ import useUserProfile from "@/hooks/userProfile/useUserProfile";
 import Spinner from "@/components/spinner/Spinner";
 import ProfileSetup from "@/components/profileSetup/ProfileSetup";
 import useProfileStart from "@/hooks/profileForm/useProfileStart";
+import useGetReferralForms from "@/hooks/userProfile/useGetReferralForms";
 
 const Dashboard = () => {
 	const { isLoaded, userId } = useAuth();
 	const { isLoading, isError, error, userData } = useUserProfile(userId || "");
+	// const { isLoading: refFormLoading, isError: refFormHasError, error: refFormError, userReferralForms } = useGetReferralForms(userId || "");
+	const {referralForms} = useGetReferralForms(userId || "");
 	const { profileStart, handleProfileStart } = useProfileStart();
-	console.log(userData)
+	console.log(referralForms)
 	if (!isLoaded || !userId) {
 		return null;
-	}
+	};
+
 
 	return (
 		<section>
@@ -102,36 +106,24 @@ const Dashboard = () => {
 								</Button>
 							</div>
 							<div className="mt-4 space-y-2">
-								<div className="flex items-center justify-between">
-									<button>Referral Form</button>
-									<button className="rounded-full bg-blue-500 px-4 py-1 text-sm text-white">
-										Pending
-									</button>
-								</div>
-								<div className="flex items-center justify-between">
-									<p>Referral Form</p>
-									<button className="rounded-full bg-red-500 px-4 py-1 text-sm text-white">
-										Denied
-									</button>
-								</div>
-								<div className="flex items-center justify-between">
-									<p>Referral Form</p>
-									<button className="rounded-full bg-green-500 px-4 py-1 text-sm text-white">
-										Accepted
-									</button>
-								</div>
-								<div className="flex items-center justify-between">
-									<p>Referral Form</p>
-									<button className="rounded-full bg-blue-500 px-4 py-1 text-sm text-white">
-										Viewed
-									</button>
-								</div>
+								{/* map referalForms */}
+								{referralForms.map((form: any, idx: number) => (
+									<div key={idx} className="flex items-center justify-between text-sm">
+										<p>{new Date(form.createdAt).toLocaleString()}</p>
+										<span
+											className={`rounded-full px-3 py-1 ${
+												form.status === "SUBMITTED"
+													? "bg-green-100"
+													: form.status === "approved"
+													? "bg-green-100 text-green-500"
+													: "bg-red-100 text-red-500"
+											}`}>
+											{form.status}
+										</span>
+										</div>
+								))}
 							</div>
 						</div>
-
-
-
-
 
 						{/* Bills Card */}
 						<div className="col-span-2 row-start-3 rounded-2xl bg-white p-6 shadow-lg md:col-span-1">

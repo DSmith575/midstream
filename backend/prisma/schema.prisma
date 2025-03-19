@@ -20,6 +20,14 @@ datasource db {
 //   PREFER_NOT_TO_SAY
 // }
 
+// enum ReferralStatus {
+//   SUBMITTED
+//   VIEWED
+//   REVIEWED
+//   APPROVED
+//   REJECTED
+// }
+
 model User {
   id                  Int                  @id @default(autoincrement())
   googleId            String               @unique
@@ -69,16 +77,23 @@ model AddressInformation {
 }
 
 model ReferralForm {
-  id                 Int                   @id @default(autoincrement())
-  userId             Int?
-  createdAt          DateTime              @default(now())
-  updatedAt          DateTime              @default(now()) @updatedAt
+  id        Int            @id @default(autoincrement())
+  userId    Int
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @default(now()) @updatedAt
+  // status    ReferralStatus @default(SUBMITTED)
+  status   String         @default("SUBMITTED")
+  // maybe change worker status
+  // lastUpdatedBy       Int?
+  // worker             User?               @relation(fields: [lastUpdatedBy], references: [id])
   communicationId    Int                   @unique
   medicalId          Int                   @unique
   disabilityId       Int                   @unique
   referrerId         Int                   @unique
   emergencyContactId Int                   @unique
   consentId          Int                   @unique
+  additionalInformationId Int              @unique
+  additionalInformation AdditionalInformation? @relation(fields: [additionalInformationId], references: [id])
   user               User?                 @relation(fields: [userId], references: [id])
   referrer           Referrer              @relation(fields: [referrerId], references: [id])
   emergencyContact   EmergencyContact      @relation(fields: [emergencyContactId], references: [id])
@@ -91,10 +106,18 @@ model ReferralForm {
 model ReferralCommunication {
   id                 Int           @id @default(autoincrement())
   firstLanguage      String
-  interpreter        String
-  culturalSupport    String?
-  communicationNeeds String?
+  interpreter        Boolean
+  culturalSupport    Boolean?
+  communicationNeeds Boolean?
+  communicationNeedsDetails String?
   referral           ReferralForm?
+}
+
+model AdditionalInformation {
+  id Int @id @default(autoincrement())
+  safety String
+  otherImportantInformation String?
+  referral ReferralForm?
 }
 
 model ReferralMedical {
@@ -104,7 +127,6 @@ model ReferralMedical {
   doctorAddress  String
   doctorSuburb   String
   doctorCity     String
-  doctorPostCode Int
   nhiNumber      String        @unique
   referral       ReferralForm?
 }
