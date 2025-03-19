@@ -7,6 +7,8 @@ import Spinner from "@/components/spinner/Spinner";
 import ProfileSetup from "@/components/profileSetup/ProfileSetup";
 import useProfileStart from "@/hooks/profileForm/useProfileStart";
 import useGetReferralForms from "@/hooks/userProfile/useGetReferralForms";
+import ReferralFormButton from "@/components/referralForms/ReferralFormButton";
+import { Link } from "react-router";
 
 const Dashboard = () => {
 	const { isLoaded, userId } = useAuth();
@@ -101,22 +103,20 @@ const Dashboard = () => {
 						<div className="col-span-2 row-start-2 rounded-2xl bg-white p-6 shadow-lg md:col-start-3 md:row-start-1">
 							<div className={"flex items-center justify-between text-center"}>
 								<h3 className="text-lg font-semibold">My Applications</h3>
-								<Button variant="outline" size="sm" className="text-sm">
-									New Form
+								<Button asChild>
+								<Link to={`/dashboard/${userId}/referral`}>New Form</Link>
 								</Button>
 							</div>
 							<div className="mt-4 space-y-2">
 								{/* map referalForms */}
 								{referralForms.map((form: any, idx: number) => (
 									<div key={idx} className="flex items-center justify-between text-sm">
-										<p>{new Date(form.createdAt).toLocaleString()}</p>
+										<ReferralFormButton referralForm={form} />
 										<span
 											className={`rounded-full px-3 py-1 ${
 												form.status === "SUBMITTED"
 													? "bg-green-100"
-													: form.status === "approved"
-													? "bg-green-100 text-green-500"
-													: "bg-red-100 text-red-500"
+													: "bg-red-100"
 											}`}>
 											{form.status}
 										</span>

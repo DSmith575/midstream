@@ -170,6 +170,7 @@ const getUserReferrals = async (req: Request, res: Response): Promise<any> => {
 
 		const referrals = await prisma.referralForm.findMany({
 			where: { userId: Number(userId) },
+			
 			include: {
 				communication: true,
 				medical: true,
@@ -179,6 +180,7 @@ const getUserReferrals = async (req: Request, res: Response): Promise<any> => {
 				consent: true,
 			},
 		});
+
 
 		if (referrals.length === 0) {
 			return res.status(404).json({ message: "No referrals found" });
