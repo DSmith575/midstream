@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@clerk/clerk-react";
 import ProfileForm from "@/components/forms/profileForm/ProfileForm";
-import ChatButton from "@/components/chat/ChatButton";
 import useUserProfile from "@/hooks/userProfile/useUserProfile";
 import Spinner from "@/components/spinner/Spinner";
 import ProfileSetup from "@/components/profileSetup/ProfileSetup";
