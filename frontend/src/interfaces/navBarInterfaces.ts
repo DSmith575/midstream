@@ -8,3 +8,7 @@ export interface NavBarDropDownProps {
 	dashboard: { path: string; name: string };
 	account: { path: string; name: string };
 }
+
+export interface NavBarAuthProps {
+	analytics: { path: string; name: string };
+}

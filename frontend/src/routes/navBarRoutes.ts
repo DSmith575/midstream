@@ -2,6 +2,7 @@ import { routerConstants } from "@/routes/routerConstants/routerConstants";
 import {
 	NavBarContentProps,
 	NavBarDropDownProps,
+	NavBarAuthProps,
 } from "@/interfaces/navBarInterfaces";
 
 export const navBarContentRoutes: NavBarContentProps = {
@@ -21,5 +22,12 @@ export const navBarDropDownRoutes: NavBarDropDownProps = {
 	account: {
 		path: routerConstants.account.path,
 		name: routerConstants.account.name,
+	},
+};
+
+export const navBarAuthRoutes: NavBarAuthProps = {
+	analytics: {
+		path: routerConstants.analytics.path,
+		name: routerConstants.analytics.name,
 	},
 };

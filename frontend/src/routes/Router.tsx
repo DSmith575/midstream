@@ -17,7 +17,6 @@ const Router = () => {
 						))}
 					</Route>
 				))}
-				;
 			</Routes>
 		</BrowserRouter>
 	);

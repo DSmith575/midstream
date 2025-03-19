@@ -1,4 +1,4 @@
-import { Steps } from "@/interfaces/profileFormInterfaces";
+import { Steps } from "@/interfaces/profileInterfaces";
 
 export const titleSelectOptions: string[] = ["Mr", "Mrs", "Miss", "Other"];
 export const genderSelectOptions: string[] = [
