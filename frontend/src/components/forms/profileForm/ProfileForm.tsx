@@ -6,6 +6,7 @@ import { profileFormSchema } from "@/lib/schemas/profileFormSchema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { useUser } from "@clerk/clerk-react";
 
 import MotionContainer from "./profileFormComponents/MotionContainer";
 import StepNavigation from "./profileFormComponents/StepNavigation";
@@ -17,23 +18,68 @@ import {
 	profileFormSteps,
 } from "@/lib/formOptions/profileFormOptions";
 import FormStepButtons from "./profileFormComponents/FormStepButtons";
+import useProfileStart from "@/hooks/profileForm/useProfileStart";
+import useCreateUserProfile from "@/hooks/userProfile/useCreateUserProfile";
+import { CreateUserProps } from "@/interfaces/profileInterfaces";
 
 type Inputs = z.infer<typeof profileFormSchema>;
 type FieldName = keyof Inputs;
 
-const ReferralForm = () => {
+const ProfileForm = () => {
+	const user = useUser();
+	const { mutate } = useCreateUserProfile();
+
 	const form = useForm<Inputs>({
 		resolver: zodResolver(profileFormSchema),
+		defaultValues: {
+			firstName: "",
+			lastName: "",
+			title: "",
+			preferredName: "",
+			dateOfBirth: "",
+			gender: "",
+			email: "",
+			phone: "",
+			address: "",
+			suburb: "",
+			city: "",
+			postCode: 0,
+			country: "",
+		},
 	});
 
-	const { trigger, watch } = form;
+	const { trigger } = form;
 	const [previousStep, setPreviousStep] = useState(0);
 	const [currentStep, setCurrentStep] = useState(0);
 	const delta = currentStep - previousStep;
 
-	const onSubmit = (values: z.infer<typeof profileFormSchema>) => {
-		console.log("here", values);
-		// Submit to backend api
+	const onSubmit = async (values: z.infer<typeof profileFormSchema>) => {
+		const googleUserId = user.user?.id;
+		if (!googleUserId) {
+			return;
+		}
+		const userDetails: CreateUserProps = {
+			googleId: googleUserId,
+			firstName: values.firstName,
+			lastName: values.lastName,
+			title: values.title,
+			preferredName: values.preferredName,
+			gender: values.gender,
+			dateOfBirth: values.dateOfBirth,
+			email: values.email,
+			phone: values.phone,
+			address: values.address,
+			suburb: values.suburb,
+			city: values.city,
+			postCode: values.postCode,
+			country: values.country,
+		};
+
+		try {
+			mutate(userDetails);
+		} catch (error) {
+			console.error(error);
+		}
 	};
 
 	const next = async () => {
@@ -238,4 +284,4 @@ const ReferralForm = () => {
 	);
 };
 
-export default ReferralForm;
+export default ProfileForm;
