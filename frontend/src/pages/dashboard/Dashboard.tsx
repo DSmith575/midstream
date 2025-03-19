@@ -108,19 +108,23 @@ const Dashboard = () => {
 							</div>
 							<div className="mt-4 space-y-2">
 								{/* map referalForms */}
-								{referralForms.map((form: any, idx: number) => (
-									<div key={idx} className="flex items-center justify-between text-sm">
-										<ReferralFormButton referralForm={form} />
-										<span
-											className={`rounded-full px-3 py-1 ${
-												form.status === "SUBMITTED"
-													? "bg-green-100"
-													: "bg-red-100"
-											}`}>
-											{form.status}
-										</span>
-										</div>
-								))}
+								{referralForms && (
+									<>
+									{referralForms.map((form: any, idx: number) => (
+										<div key={idx} className="flex items-center justify-between text-sm">
+											<ReferralFormButton referralForm={form} />
+											<span
+												className={`rounded-full px-3 py-1 ${
+													form.status === "SUBMITTED"
+														? "bg-green-100"
+														: "bg-red-100"
+												}`}>
+												{form.status}
+											</span>
+											</div>
+									))}
+									</>
+								)}
 							</div>
 						</div>
 
