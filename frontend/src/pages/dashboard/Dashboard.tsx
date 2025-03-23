@@ -13,13 +13,12 @@ const Dashboard = () => {
 	const { isLoaded, userId } = useAuth();
 	const { isLoading, isError, error, userData } = useUserProfile(userId || "");
 	// const { isLoading: refFormLoading, isError: refFormHasError, error: refFormError, userReferralForms } = useGetReferralForms(userId || "");
-	const {referralForms} = useGetReferralForms(userId || "");
+	const { referralForms } = useGetReferralForms(userId || "");
 	const { profileStart, handleProfileStart } = useProfileStart();
-	console.log(referralForms)
+	console.log(referralForms);
 	if (!isLoaded || !userId) {
 		return null;
-	};
-
+	}
 
 	return (
 		<section>
@@ -41,54 +40,59 @@ const Dashboard = () => {
 
 			{!isLoading && !isError && userData ? (
 				<div className="min-h-[50vh] bg-gray-100 p-8">
-					<div className="grid grid-cols-1 gap-2 md:grid-cols-3">
+					<div className="grid grid-cols-1 items-start gap-2 md:grid-cols-3">
 						{/* Profile Card */}
-						<div className="col-span-2 rounded-2xl bg-white p-6 shadow-lg  ">
+						<div className="col-span-2 min-h-[300px] rounded-2xl bg-white p-6 shadow-lg">
+							{/* User Information */}
 							{userData.personalInformation && (
 								<>
-								<h1 className="mt-2 text-xl text-muted-foreground">
-								{userData.personalInformation.title}{" "}
-									{userData.personalInformation.firstName}{" "}
-									{userData.personalInformation.lastName}
-								</h1>
-								<p className="text-sm text-muted-foreground">
-									{userData.personalInformation.preferredName}
-								</p>
-								<p className="text-sm text-muted-foreground">
-									{userData.personalInformation.gender}
-								</p>
-								<p className="text-sm text-muted-foreground">
-									{/* Get age from date of birth */}
-									{new Date().getFullYear() - new Date(userData.personalInformation.dateOfBirth).getFullYear()}
-								</p>
+									<h1 className="mt-2 text-xl text-muted-foreground">
+										{userData.personalInformation.title}{" "}
+										{userData.personalInformation.firstName}{" "}
+										{userData.personalInformation.lastName}
+									</h1>
+									<p className="text-sm text-muted-foreground">
+										{userData.personalInformation.preferredName}
+									</p>
+									<p className="text-sm text-muted-foreground">
+										{userData.personalInformation.gender}
+									</p>
+									<p className="text-sm text-muted-foreground">
+										{new Date().getFullYear() -
+											new Date(
+												userData.personalInformation.dateOfBirth,
+											).getFullYear()}
+									</p>
 								</>
 							)}
+							{/* Address */}
 							{userData.addressInformation && (
 								<section className="mt-4">
 									<h3 className="font-semibold">Address:</h3>
-									<p className="rounded-md text-sm text-muted-foreground">
+									<p className="text-sm text-muted-foreground">
 										{userData.addressInformation.address}
 									</p>
-									<p className="rounded-md text-sm text-muted-foreground">
+									<p className="text-sm text-muted-foreground">
 										{userData.addressInformation.suburb}
 									</p>
-									<p className="rounded-md text-sm text-muted-foreground">
+									<p className="text-sm text-muted-foreground">
 										{userData.addressInformation.city}
 									</p>
-									<p className="rounded-md text-sm text-muted-foreground">
+									<p className="text-sm text-muted-foreground">
 										{userData.addressInformation.postCode}
 									</p>
 								</section>
 							)}
+							{/* Contact */}
 							{userData.contactInformation && (
 								<section className="mt-4">
 									<h3 className="font-semibold">Contact:</h3>
 									<p className="text-sm text-muted-foreground">
-										<span className={"text-black"}>Email: </span>{" "}
+										<span className="text-black">Email: </span>{" "}
 										{userData.contactInformation.email}
 									</p>
 									<p className="text-sm text-muted-foreground">
-										<span className={"text-black"}>Phone: </span>
+										<span className="text-black">Phone: </span>
 										{userData.contactInformation.phone}
 									</p>
 								</section>
@@ -99,19 +103,20 @@ const Dashboard = () => {
 						</div>
 
 						{/* Application Card */}
-						<div className="col-span-2 row-start-2 rounded-2xl bg-white p-6 shadow-lg md:col-start-3 md:row-start-1">
-							<div className={"flex items-center justify-between text-center"}>
+						<div className="col-span-2 row-start-2 flex min-h-[100%] flex-col rounded-2xl bg-white p-6 shadow-lg md:col-start-1 md:row-start-2 lg:col-start-3 lg:row-start-1">
+							<div className="flex items-center justify-between">
 								<h3 className="text-lg font-semibold">My Applications</h3>
 								<Button asChild>
-								<Link to={`/dashboard/${userId}/referral`}>New Form</Link>
+									<Link to={`/dashboard/${userId}/referral`}>New Form</Link>
 								</Button>
 							</div>
-							<div className="mt-4 space-y-2">
-								{/* map referalForms */}
-								{referralForms && (
-									<>
-									{referralForms.map((form: any, idx: number) => (
-										<div key={idx} className="flex items-center justify-between text-sm">
+							<div className="mt-4 max-h-[300px] space-y-2 overflow-y-auto">
+								{/* map referralForms */}
+								{referralForms &&
+									referralForms.map((form: any, idx: number) => (
+										<div
+											key={idx}
+											className="flex items-center justify-between text-sm">
 											<ReferralFormButton referralForm={form} />
 											<span
 												className={`rounded-full px-3 py-1 ${
@@ -121,10 +126,8 @@ const Dashboard = () => {
 												}`}>
 												{form.status}
 											</span>
-											</div>
+										</div>
 									))}
-									</>
-								)}
 							</div>
 						</div>
 

@@ -18,16 +18,17 @@ import {
 	profileFormSteps,
 } from "@/lib/formOptions/profileFormOptions";
 import FormStepButtons from "./profileFormComponents/FormStepButtons";
-import useProfileStart from "@/hooks/profileForm/useProfileStart";
 import useCreateUserProfile from "@/hooks/userProfile/useCreateUserProfile";
 import { CreateUserProps } from "@/interfaces/profileInterfaces";
+import { useNavigate } from "react-router";
 
 type Inputs = z.infer<typeof profileFormSchema>;
 type FieldName = keyof Inputs;
 
 const ProfileForm = () => {
 	const user = useUser();
-	const { mutate } = useCreateUserProfile();
+	const { mutate, isPending } = useCreateUserProfile();
+	const navigate = useNavigate();
 
 	const form = useForm<Inputs>({
 		resolver: zodResolver(profileFormSchema),
@@ -77,6 +78,8 @@ const ProfileForm = () => {
 
 		try {
 			mutate(userDetails);
+
+			navigate(`/dashboard/${googleUserId}`);
 		} catch (error) {
 			console.error(error);
 		}
@@ -275,7 +278,7 @@ const ProfileForm = () => {
 						nextButtonText={"Next"}
 						onClickPrev={prev}
 						onClickNext={next}
-						submitButtonText={"Submit"}
+						submitButtonText={isPending ? "Submitting" : "Submit"}
 						submitButtonType={"submit"}
 					/>
 				</form>

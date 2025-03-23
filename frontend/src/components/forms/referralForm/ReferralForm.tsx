@@ -25,6 +25,7 @@ import StepAdditionalInfo from "./referralFormComponents/ReferralStepAdditionalI
 import StepReferralContactInfo from "./referralFormComponents/ReferralStepRefContactInfo";
 import StepEmergencyContactInfo from "./referralFormComponents/ReferralStepEmergencyInfo";
 import StepConsentInfo from "./referralFormComponents/ReferralStepConsentInfo";
+import { useNavigate } from "react-router";
 
 type Inputs = z.infer<typeof referralFormSchema>;
 type FieldName = keyof Inputs;
@@ -138,8 +139,9 @@ const stepReducer = (
 const ReferralForm = () => {
 	const { isLoaded, userId } = useAuth();
 	const { isLoading, isError, error, userData } = useUserProfile(userId || "");
-	const { mutate } = useCreateReferralForm();
+	const { mutate, isPending } = useCreateReferralForm();
 	const preLoadData = useMemo(() => preLoadedData(userData), [userData]);
+	const navigate = useNavigate();
 
 	const form = useForm<Inputs>({
 		resolver: zodResolver(referralFormSchema),
@@ -241,6 +243,8 @@ const ReferralForm = () => {
 
 		try {
 			mutate(referralDetails);
+
+			navigate(`/dashboard/${googleUserId}`);
 		} catch (error) {
 			console.error(error);
 		};
@@ -348,7 +352,7 @@ const ReferralForm = () => {
 								nextButtonText={"Next"}
 								onClickPrev={prev}
 								onClickNext={next}
-								submitButtonText={"Submit"}
+								submitButtonText={isPending ? "Submitting..." : "Submit"}
 								submitButtonType={"submit"}
 							/>
 						</form>

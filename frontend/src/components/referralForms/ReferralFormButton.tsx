@@ -10,6 +10,7 @@ import ReferralFormDetails from "./ReferralFormDetails";
 
 const ReferralFormButton = ({ referralForm }: any) => {
 	return (
+		console.log(referralForm),
 		<Sheet>
 			<SheetContent side={"right"} className="max-h-screen overflow-y-scroll">
 				<DialogTitle className="sr-only">ReferralForm</DialogTitle>
@@ -19,7 +20,7 @@ const ReferralFormButton = ({ referralForm }: any) => {
 			<nav>
 				<SheetTrigger asChild>
 					<Button variant="outline" size="lg" className="">
-						{referralForm.createdAt}
+						{new Date(referralForm.createdAt).toLocaleString()}
 					</Button>
 				</SheetTrigger>
 			</nav>

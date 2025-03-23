@@ -132,7 +132,6 @@ const createReferralForm = async (
 						additionalInformationId: referralAdditionalData.id,
 					},
 				});
-				console.log("here");
 				return referralData;
 			} catch (error) {
 				// UPDATE THIS
@@ -140,6 +139,8 @@ const createReferralForm = async (
 				throw error;
 			}
 		});
+
+		console.log('here');
 
 		return res.status(201).json({
 			message: "Referral form created successfully",
@@ -162,12 +163,12 @@ const getUserReferrals = async (req: Request, res: Response): Promise<any> => {
 			},
 		});
 
+
 		if (!userExists) {
 			return res.status(400).json({ message: "User does not exist" });
 		};
 
 		const userId = userExists.id;
-
 		const referrals = await prisma.referralForm.findMany({
 			where: { userId: Number(userId) },
 			
@@ -180,6 +181,7 @@ const getUserReferrals = async (req: Request, res: Response): Promise<any> => {
 				consent: true,
 			},
 		});
+
 
 
 		if (referrals.length === 0) {
