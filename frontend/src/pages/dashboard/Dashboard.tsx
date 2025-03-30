@@ -8,14 +8,16 @@ import useProfileStart from "@/hooks/profileForm/useProfileStart";
 import useGetReferralForms from "@/hooks/userProfile/useGetReferralForms";
 import ReferralFormButton from "@/components/referralForms/ReferralFormButton";
 import { Link } from "react-router";
+import { OrganizationSwitcher } from "@clerk/clerk-react";
+import AnalyticsPage from "../analytics/Analytics";
 
 const Dashboard = () => {
-	const { isLoaded, userId } = useAuth();
+	const { isLoaded, userId, orgRole } = useAuth();
+	console.log(orgRole)
 	const { isLoading, isError, error, userData } = useUserProfile(userId || "");
 	// const { isLoading: refFormLoading, isError: refFormHasError, error: refFormError, userReferralForms } = useGetReferralForms(userId || "");
 	const { referralForms } = useGetReferralForms(userId || "");
 	const { profileStart, handleProfileStart } = useProfileStart();
-	console.log(referralForms);
 	if (!isLoaded || !userId) {
 		return null;
 	}
@@ -40,6 +42,12 @@ const Dashboard = () => {
 
 			{!isLoading && !isError && userData ? (
 				<div className="min-h-[50vh] bg-gray-100 p-8">
+					<OrganizationSwitcher />
+					{orgRole === "org:admin" ? (
+						<div className="mt-4">
+							<AnalyticsPage />
+						</div>
+					) : (
 					<div className="grid grid-cols-1 items-start gap-2 md:grid-cols-3">
 						{/* Profile Card */}
 						<div className="col-span-2 min-h-[300px] rounded-2xl bg-white p-6 shadow-lg">
@@ -158,6 +166,7 @@ const Dashboard = () => {
 							</div>
 						</div>
 					</div>
+			)};
 				</div>
 			) : null}
 

@@ -10,7 +10,6 @@ import ReferralFormDetails from "./ReferralFormDetails";
 
 const ReferralFormButton = ({ referralForm }: any) => {
 	return (
-		console.log(referralForm),
 		<Sheet>
 			<SheetContent side={"right"} className="max-h-screen overflow-y-scroll">
 				<DialogTitle className="sr-only">ReferralForm</DialogTitle>
