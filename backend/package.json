@@ -11,6 +11,7 @@
     "studio": "npx prisma studio",
     "seed": "ts-node prisma/seed.ts",
     "generate": "npx prisma generate",
+    "deploy": "npx prisma migrate deploy",
     "migrate": "npx prisma migrate dev"
   },
   "keywords": [],
