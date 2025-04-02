@@ -194,4 +194,35 @@ const getUserReferrals = async (req: Request, res: Response): Promise<any> => {
 	};
 }
 
-export { createReferralForm, getUserReferrals };
+const getAllReferrals = async (req: Request, res: Response): Promise<any> => {
+	try {
+		const referrals = await prisma.referralForm.findMany({
+			include: {
+				user: {
+					include: {
+						contactInformation: true,
+						personalInformation: true,
+						addressInformation: true,
+					},
+				}, 
+				additionalInformation: true,
+				referrer: true,
+				emergencyContact: true,
+				communication: true,
+				medical: true,
+				disability: true,
+				consent: true,
+			},
+		});
+
+		if (referrals.length === 0) {
+			return res.status(404).json({ message: "No referrals found" });
+		};
+
+		return res.status(200).json({ data: referrals });
+	}
+	catch (error) {
+		res.status(500).json({ error: "Failed to get referrals" });
+	};
+	};
+export { createReferralForm, getUserReferrals, getAllReferrals };

@@ -15,9 +15,11 @@ import { DialogTitle } from "@radix-ui/react-dialog";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import { SignedIn, useAuth, UserButton } from "@clerk/clerk-react";
+import { OrganizationSwitcher } from "@clerk/clerk-react";
 
 const NavBar = () => {
-	const { userId } = useAuth();
+	const { userId, orgRole } = useAuth();
+	
 
 	return (
 		<section className="flex h-20 w-full shrink-0 items-center px-4 shadow-md md:px-6">
@@ -28,7 +30,7 @@ const NavBar = () => {
 						Navigation menu
 					</SheetDescription>
 					<NavBarLogo />
-					<section className="flex flex-col h-full">
+					<section className="flex h-full flex-col">
 						<section className={"my-8 flex shadow-sm"}>
 							{Object.entries(navBarDropDownRoutes).map(([key, value]) =>
 								// if user only show dashboard
@@ -52,29 +54,30 @@ const NavBar = () => {
 						</section>
 
 						<section>
-						{Object.entries(navBarContentRoutes).map(([key, value]) => (
-							<NavItem
-								key={key}
-								routerPath={value.path}
-								routerName={value.name}
-							/>
-						))}
+							{Object.entries(navBarContentRoutes).map(([key, value]) => (
+								<NavItem
+									key={key}
+									routerPath={value.path}
+									routerName={value.name}
+								/>
+							))}
 						</section>
 
 						{userId && (
-    <section className="mt-10">
-      <NavItem
-        routerPath={navBarAuthRoutes.analytics.path}
-        routerName={navBarAuthRoutes.analytics.name}
-      />
-    </section>
-  )}
+							<section className="mt-10">
+								<NavItem
+									routerPath={navBarAuthRoutes.analytics.path}
+									routerName={navBarAuthRoutes.analytics.name}
+								/>
+							</section>
+						)}
 					</section>
 				</SheetContent>
 
 				<nav className="flex w-full items-center justify-between">
 					<NavBarLogo />
 					<section className={"flex gap-4"}>
+						<OrganizationSwitcher />
 						<SignedIn>
 							<UserButton
 								appearance={{

@@ -10,7 +10,8 @@
     "serve": "node dist/index.js",
     "studio": "npx prisma studio",
     "seed": "ts-node prisma/seed.ts",
-    "prisma:rest": "npx prisma generate && npx prisma migrate dev"
+    "generate": "npx prisma generate",
+    "migrate": "npx prisma migrate dev"
   },
   "keywords": [],
   "author": "",
