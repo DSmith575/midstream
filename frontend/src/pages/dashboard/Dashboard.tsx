@@ -13,8 +13,7 @@ import DataTable from "@/components/table/DataTable";
 import UserProfileCard from "@/components/profile/card/UserProfileCard";
 
 const Dashboard = () => {
-	const { isLoaded, userId, orgRole, has } = useAuth();
-	console.log("org", orgRole);
+	const { isLoaded, userId, orgRole } = useAuth();
 	const { isLoading, isError, error, userData } = useUserProfile(userId || "");
 	// const { isLoading: refFormLoading, isError: refFormHasError, error: refFormError, userReferralForms } = useGetReferralForms(userId || "");
 	const { referralForms } = useGetReferralForms(userId || "");
@@ -56,16 +55,10 @@ const Dashboard = () => {
 							)}
 						</>
 					) : (
-						<div className="grid grid-cols-1 items-start gap-2 md:grid-cols-3">
+						<section className="grid grid-cols-1 items-start gap-2 md:grid-cols-3">
 							{/* Profile Card */}
 							<div className="col-span-2 min-h-[300px] rounded-2xl bg-white p-6 shadow-lg">
-								{/* User Information */}
-								{userData.personalInformation && (
-									<>
-										<UserProfileCard userProfile={userData} />
-										
-									</>
-								)}
+								{userData && <UserProfileCard userProfile={userData} />}
 							</div>
 
 							{/* Application Card */}
@@ -123,9 +116,7 @@ const Dashboard = () => {
 									))}
 								</div>
 							</div>
-
-							
-						</div>
+						</section>
 					)}
 				</div>
 			) : null}
