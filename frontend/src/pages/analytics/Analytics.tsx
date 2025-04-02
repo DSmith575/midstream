@@ -30,7 +30,7 @@ const apiKey = import.meta.env.VITE_API_BACKEND_URL;
 
 const getAnalytics = async () => {
 	const response = await fetch(
-		`${apiKey}api/v1/analytics/getAnalytics`,
+		`${apiKey}analytics/getAnalytics`,
 	);
 	const data = await response.json();
 	return data;
