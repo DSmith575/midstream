@@ -25,9 +25,12 @@ ChartJS.register(
 	Legend,
 );
 
+const apiKey = import.meta.env.VITE_API_BACKEND_URL;
+
+
 const getAnalytics = async () => {
 	const response = await fetch(
-		"http://localhost:3000/api/v1/analytics/getAnalytics",
+		`${apiKey}api/v1/analytics/getAnalytics`,
 	);
 	const data = await response.json();
 	return data;
