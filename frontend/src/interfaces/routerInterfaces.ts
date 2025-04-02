@@ -6,6 +6,7 @@ export interface RouterPathProps {
 	about: { path: string; name: string };
 	dashboard: { path: string; name: string };
 	dashboardUser: { path: string; name: string };
+	dashboardProfileSetup: { path: string; name: string };
 	dashboardUserEdit: { path: string; name: string };
 	dashboardNewReferral: { path: string; name: string };
 	analytics: { path: string; name: string };

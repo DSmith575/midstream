@@ -140,14 +140,11 @@ const createReferralForm = async (
 			}
 		});
 
-		console.log('here');
-
 		return res.status(201).json({
 			message: "Referral form created successfully",
 			data: result,
 		});
 
-		// console.log(consentInfo);
 	} catch (error) {
 		res.status(500).json({ error: "Failed to create referral form" });
 	}

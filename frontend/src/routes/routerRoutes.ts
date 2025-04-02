@@ -24,6 +24,10 @@ export const routerRoutes: RouterPathProps = {
 		path: routerConstants.dashboardUser.path,
 		name: routerConstants.dashboardUser.name,
 	},
+	dashboardProfileSetup: {
+		path: routerConstants.dashboardProfileSetup.path,
+		name: routerConstants.dashboardProfileSetup.name,
+	},
 	dashboardUserEdit: {
 		path: routerConstants.dashboardUserEdit.path,
 		name: routerConstants.dashboardUserEdit.name,
