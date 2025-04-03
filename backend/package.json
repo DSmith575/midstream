@@ -12,7 +12,7 @@
     "seed": "ts-node prisma/seed.ts",
     "generate": "npx prisma generate",
     "deploy": "npx prisma migrate deploy",
-    "migrate": "npx prisma migrate dev --force"
+    "migrate": "npx prisma migrate reset && npx prisma migrate dev"
   },
   "keywords": [],
   "author": "",
