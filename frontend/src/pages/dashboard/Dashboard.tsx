@@ -40,6 +40,13 @@ const Dashboard = () => {
 
 			const organizationId = data.organization.id;
 
+			// ?????????
+			if (orgRole === "org:admin" && setActive) {
+				// set org to orgId and return out of function
+				await setActive({ organization: orgRole });
+				return;
+			}
+
 			if (organizationId && setActive) {
 				// Set the active organization to the one returned from the API
 				await setActive({ organization: organizationId });
@@ -71,7 +78,7 @@ const Dashboard = () => {
 				</div>
 			)}
 
-			{!orgRole && (
+			{!orgRole && !isLoading && !userData && (
 				<div className="mt-12 flex flex-col items-center justify-center">
 					<p className="text-red-500">Just a few more steps!</p>
 					<Button
