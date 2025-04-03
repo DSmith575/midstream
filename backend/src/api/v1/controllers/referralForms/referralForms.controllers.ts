@@ -132,7 +132,6 @@ const createReferralForm = async (
 						additionalInformationId: referralAdditionalData.id,
 					},
 				});
-				console.log("here");
 				return referralData;
 			} catch (error) {
 				// UPDATE THIS
@@ -146,7 +145,6 @@ const createReferralForm = async (
 			data: result,
 		});
 
-		// console.log(consentInfo);
 	} catch (error) {
 		res.status(500).json({ error: "Failed to create referral form" });
 	}
@@ -162,12 +160,12 @@ const getUserReferrals = async (req: Request, res: Response): Promise<any> => {
 			},
 		});
 
+
 		if (!userExists) {
 			return res.status(400).json({ message: "User does not exist" });
 		};
 
 		const userId = userExists.id;
-
 		const referrals = await prisma.referralForm.findMany({
 			where: { userId: Number(userId) },
 			
@@ -182,6 +180,7 @@ const getUserReferrals = async (req: Request, res: Response): Promise<any> => {
 		});
 
 
+
 		if (referrals.length === 0) {
 			return res.status(404).json({ message: "No referrals found" });
 		};
@@ -192,4 +191,35 @@ const getUserReferrals = async (req: Request, res: Response): Promise<any> => {
 	};
 }
 
-export { createReferralForm, getUserReferrals };
+const getAllReferrals = async (req: Request, res: Response): Promise<any> => {
+	try {
+		const referrals = await prisma.referralForm.findMany({
+			include: {
+				user: {
+					include: {
+						contactInformation: true,
+						personalInformation: true,
+						addressInformation: true,
+					},
+				}, 
+				additionalInformation: true,
+				referrer: true,
+				emergencyContact: true,
+				communication: true,
+				medical: true,
+				disability: true,
+				consent: true,
+			},
+		});
+
+		if (referrals.length === 0) {
+			return res.status(404).json({ message: "No referrals found" });
+		};
+
+		return res.status(200).json({ data: referrals });
+	}
+	catch (error) {
+		res.status(500).json({ error: "Failed to get referrals" });
+	};
+	};
+export { createReferralForm, getUserReferrals, getAllReferrals };

@@ -121,7 +121,6 @@ const createUserProfile = async (req: Request, res: Response): Promise<any> => {
 const getUserProfile = async (req: Request, res: Response): Promise<any> => {
 	try {
 		const { googleId } = req.query;
-		console.log(googleId);
 
 		const user = await prisma.user.findUnique({
 			where: {
@@ -150,11 +149,10 @@ const getUserProfile = async (req: Request, res: Response): Promise<any> => {
 			return res.status(400).json({ message: "User not found" });
 		}
 
-		console.log(user);
 
 		return res.status(200).json({ user });
 	} catch (error) {
-		console.log(error);
+		console.error(error);
 		return res.status(500).json({
 			message: "Something went wrong",
 		});

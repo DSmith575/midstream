@@ -11,6 +11,7 @@ const useUserProfile = (userId: string) => {
     retry: 2, // Retry fetch on failure up to 2 times
   });
 
+
   // Handle error state
   if (isError) {
     return { isError, error };

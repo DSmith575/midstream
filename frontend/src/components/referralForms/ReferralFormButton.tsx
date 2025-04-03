@@ -19,7 +19,7 @@ const ReferralFormButton = ({ referralForm }: any) => {
 			<nav>
 				<SheetTrigger asChild>
 					<Button variant="outline" size="lg" className="">
-						{referralForm.createdAt}
+						{new Date(referralForm.createdAt).toLocaleString()}
 					</Button>
 				</SheetTrigger>
 			</nav>

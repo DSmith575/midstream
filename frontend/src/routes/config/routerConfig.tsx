@@ -6,6 +6,7 @@ import HomePage from "@/pages/home/HomePage";
 import RegisterPage from "@/pages/auth/RegisterPage";
 import AnalyticsPage from "@/pages/analytics/Analytics";
 import ReferralForm from "@/components/forms/referralForm/ReferralForm";
+import ProfileForm from "@/components/forms/profileForm/ProfileForm";
 
 interface RouterConfigProps {
 	path?: string;
@@ -84,6 +85,10 @@ export const routerConfig: RouterConfigProps[] = [
 			{
 				path: routerRoutes.dashboardNewReferral.path,
 				element: <ReferralForm />,
+			},
+			{
+				path: routerRoutes.dashboardProfileSetup.path,
+				element: <ProfileForm/>
 			}
 		],
 	},
