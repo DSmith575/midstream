@@ -8,35 +8,51 @@ import ReferralFormButton from "@/components/referralForms/ReferralFormButton";
 import { Link } from "react-router";
 import DataTable from "@/components/table/DataTable";
 import UserProfileCard from "@/components/profile/card/UserProfileCard";
-import { createClerkClient } from "@clerk/backend";
+import { useOrganizationList } from "@clerk/clerk-react";
 
-const orgId = import.meta.env.VITE_CLERK_ORG_ID;
-const sKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+const apiKey = import.meta.env.VITE_API_BACKEND_URL;
 
 const Dashboard = () => {
 	const { isLoaded, userId, orgRole } = useAuth();
 	const { isLoading, isError, error, userData } = useUserProfile(userId || "");
 	const { referralForms } = useGetReferralForms(userId || "");
-	const clerkClient = createClerkClient({
-		secretKey: sKey,
-	});
+	const { setActive } = useOrganizationList();
 
 	const handleJoin = async () => {
 		try {
 			if (!userId) return;
-			const x = await clerkClient.organizations.createOrganizationMembership({
-				organizationId: orgId,
-				userId: userId,
-				role: "org:member",
-			});
-			console.log(x);
+			const addUserToMembership = await fetch(
+				`${apiKey}clerk/createMembershipInvite`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ userId }),
+				},
+			);
+
+			if (!addUserToMembership.ok) {
+				throw new Error("Failed to add user to membership");
+			}
+			const data = await addUserToMembership.json();
+			console.log(data.organization.id);
+
+			const organizationId = data.organization.id;
+
+			if (organizationId && setActive) {
+				// Set the active organization to the one returned from the API
+				await setActive({ organization: organizationId });
+			}
+
+			//
+			console.log("User added to membership:", data);
 		} catch (error) {
 			console.error("Error joining organization:", error);
 		}
-	}
+	};
 
 	if (!isLoaded || !userId) return null;
-
 
 	return (
 		<section>
@@ -57,23 +73,25 @@ const Dashboard = () => {
 
 			{!orgRole && (
 				<div className="mt-12 flex flex-col items-center justify-center">
-					<p className="text-red-500">Sign in to get started!</p>
+					<p className="text-red-500">Just a few more steps!</p>
+					<Button
+						onClick={handleJoin}
+						className="my-2"
+						variant="outline"
+						size="lg">
+						Click to join
+					</Button>
 					<p className="text-sm text-muted-foreground">
 						Please contact your organization admin.
 					</p>
-					<Button onClick={handleJoin} className="mt-4" variant="outline" size="lg">
-						Click to join
-					</Button>
 				</div>
 			)}
 
-			{orgRole === "org:member" && (
-				<div className="mt-12 flex flex-col items-center justify-center">
-					<p className="text-red-500">You are not authorized to view this page.</p>
-					<p className="text-sm text-muted-foreground">
-						Please contact your organization admin.
-					</p>
-				</div>
+						{/* Profile Setup or Form */}
+						{!isLoading && !isError && !userData && orgRole && (
+				<>
+					<ProfileSetup userGoogleId={userId} />
+				</>
 			)}
 
 			{!isLoading && !isError && userData ? (
@@ -158,13 +176,6 @@ const Dashboard = () => {
 					)}
 				</div>
 			) : null}
-
-			{/* Profile Setup or Form */}
-			{!isLoading && !isError && !userData && (
-				<>
-					<ProfileSetup userGoogleId={userId} />
-				</>
-			)}
 		</section>
 	);
 };

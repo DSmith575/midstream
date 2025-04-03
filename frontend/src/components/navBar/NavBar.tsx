@@ -15,7 +15,6 @@ import { DialogTitle } from "@radix-ui/react-dialog";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import { SignedIn, useAuth, UserButton } from "@clerk/clerk-react";
-import { OrganizationSwitcher } from "@clerk/clerk-react";
 
 const NavBar = () => {
 	const { userId } = useAuth();
@@ -77,9 +76,6 @@ const NavBar = () => {
 				<nav className="flex w-full items-center justify-between">
 					<NavBarLogo />
 					<section className={"flex gap-4"}>
-						{/* {!orgRole && ( */}
-							<OrganizationSwitcher hidePersonal={true} />
-						{/* )} */}
 						<SignedIn>
 							<UserButton
 								appearance={{
