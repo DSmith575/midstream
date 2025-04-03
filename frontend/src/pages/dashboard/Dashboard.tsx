@@ -8,13 +8,35 @@ import ReferralFormButton from "@/components/referralForms/ReferralFormButton";
 import { Link } from "react-router";
 import DataTable from "@/components/table/DataTable";
 import UserProfileCard from "@/components/profile/card/UserProfileCard";
+import { createClerkClient } from "@clerk/backend";
+
+const orgId = import.meta.env.VITE_CLERK_ORG_ID;
+const sKey = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
 const Dashboard = () => {
 	const { isLoaded, userId, orgRole } = useAuth();
 	const { isLoading, isError, error, userData } = useUserProfile(userId || "");
 	const { referralForms } = useGetReferralForms(userId || "");
+	const clerkClient = createClerkClient({
+		secretKey: sKey,
+	});
+
+	const handleJoin = async () => {
+		try {
+			if (!userId) return;
+			const x = await clerkClient.organizations.createOrganizationMembership({
+				organizationId: orgId,
+				userId: userId,
+				role: "org:member",
+			});
+			console.log(x);
+		} catch (error) {
+			console.error("Error joining organization:", error);
+		}
+	}
 
 	if (!isLoaded || !userId) return null;
+
 
 	return (
 		<section>
@@ -30,6 +52,27 @@ const Dashboard = () => {
 					{error && (
 						<p className="text-sm text-muted-foreground">{error.message}</p>
 					)}
+				</div>
+			)}
+
+			{!orgRole && (
+				<div className="mt-12 flex flex-col items-center justify-center">
+					<p className="text-red-500">Sign in to get started!</p>
+					<p className="text-sm text-muted-foreground">
+						Please contact your organization admin.
+					</p>
+					<Button onClick={handleJoin} className="mt-4" variant="outline" size="lg">
+						Click to join
+					</Button>
+				</div>
+			)}
+
+			{orgRole === "org:member" && (
+				<div className="mt-12 flex flex-col items-center justify-center">
+					<p className="text-red-500">You are not authorized to view this page.</p>
+					<p className="text-sm text-muted-foreground">
+						Please contact your organization admin.
+					</p>
 				</div>
 			)}
 
@@ -49,39 +92,41 @@ const Dashboard = () => {
 						</>
 					) : (
 						<section className="grid grid-cols-1 items-start gap-2 md:grid-cols-3">
-							{/* Profile Card */}
-							<div className="col-span-2 min-h-[300px] rounded-2xl bg-white p-6 shadow-lg">
-								{userData && <UserProfileCard userProfile={userData} />}
-							</div>
+							<>
+								{/* Profile Card */}
+								<div className="col-span-2 min-h-[300px] rounded-2xl bg-white p-6 shadow-lg">
+									{userData && <UserProfileCard userProfile={userData} />}
+								</div>
 
-							{/* Application Card */}
-							<div className="col-span-3 row-start-3 flex flex-col rounded-2xl bg-white p-6 shadow-lg md:col-start-1 md:row-start-3 lg:col-start-1">
-								<div className="flex items-center justify-between">
-									<h3 className="text-lg font-semibold">My Applications</h3>
-									<Button asChild>
-										<Link to={`/dashboard/${userId}/referral`}>New Form</Link>
-									</Button>
+								{/* Application Card */}
+								<div className="col-span-3 row-start-3 flex flex-col rounded-2xl bg-white p-6 shadow-lg md:col-start-1 md:row-start-3 lg:col-start-1">
+									<div className="flex items-center justify-between">
+										<h3 className="text-lg font-semibold">My Applications</h3>
+										<Button asChild>
+											<Link to={`/dashboard/${userId}/referral`}>New Form</Link>
+										</Button>
+									</div>
+									<div className="mt-4 max-h-[300px] space-y-2 overflow-y-auto">
+										{/* map referralForms */}
+										{referralForms &&
+											referralForms.map((form: any, idx: number) => (
+												<div
+													key={idx}
+													className="flex items-center justify-between pr-4 text-sm">
+													<ReferralFormButton referralForm={form} />
+													<p
+														className={`rounded-full px-3 py-1 ${
+															form.status === "SUBMITTED"
+																? "bg-green-100"
+																: "bg-red-100"
+														}`}>
+														{form.status}
+													</p>
+												</div>
+											))}
+									</div>
 								</div>
-								<div className="mt-4 max-h-[300px] space-y-2 overflow-y-auto">
-									{/* map referralForms */}
-									{referralForms &&
-										referralForms.map((form: any, idx: number) => (
-											<div
-												key={idx}
-												className="flex items-center justify-between pr-4 text-sm">
-												<ReferralFormButton referralForm={form} />
-												<p
-													className={`rounded-full px-3 py-1 ${
-														form.status === "SUBMITTED"
-															? "bg-green-100"
-															: "bg-red-100"
-													}`}>
-													{form.status}
-												</p>
-											</div>
-										))}
-								</div>
-							</div>
+							</>
 
 							{/* Bills Card */}
 							<div className="col-start-1 max-h-[300px] min-h-[300px] space-y-2 overflow-y-auto rounded-2xl bg-white p-6 shadow-lg md:col-start-3">

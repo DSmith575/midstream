@@ -139,7 +139,7 @@ const stepReducer = (
 const ReferralForm = () => {
 	const { isLoaded, userId } = useAuth();
 	const { isLoading, isError, error, userData } = useUserProfile(userId || "");
-	const { mutate, isPending } = useCreateReferralForm();
+	const { mutate, isPending } = useCreateReferralForm(userId || "");
 	const preLoadData = useMemo(() => preLoadedData(userData), [userData]);
 	const navigate = useNavigate();
 

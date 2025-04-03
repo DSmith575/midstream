@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import cors from 'cors';
 import userProfileRouter from '@/api/v1/routes/userProfiles/userProfiles.routes';
 import analyticsRouter from '@/api/v1/routes/analytics/analytics.routes';

@@ -27,8 +27,10 @@ type FieldName = keyof Inputs;
 
 const ProfileForm = () => {
 	const user = useUser();
-	const { mutate, isPending } = useCreateUserProfile();
+	const { mutate, isPending } = useCreateUserProfile(user.user?.id || "");
 	const navigate = useNavigate();
+
+
 
 	const form = useForm<Inputs>({
 		resolver: zodResolver(profileFormSchema),

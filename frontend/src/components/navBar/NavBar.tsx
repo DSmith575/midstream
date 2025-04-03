@@ -18,11 +18,11 @@ import { SignedIn, useAuth, UserButton } from "@clerk/clerk-react";
 import { OrganizationSwitcher } from "@clerk/clerk-react";
 
 const NavBar = () => {
-	const { userId, orgRole } = useAuth();
+	const { userId } = useAuth();
 	
 
 	return (
-		<section className="flex h-20 w-full shrink-0 items-center px-4 shadow-md md:px-6">
+		<section className="flex h-20 w-full shrink-0 items-center px-4 shadow-md md:px-6 bg-white">
 			<Sheet>
 				<SheetContent side="right">
 					<DialogTitle className="sr-only">Menu</DialogTitle>
@@ -77,7 +77,9 @@ const NavBar = () => {
 				<nav className="flex w-full items-center justify-between">
 					<NavBarLogo />
 					<section className={"flex gap-4"}>
-						<OrganizationSwitcher />
+						{/* {!orgRole && ( */}
+							<OrganizationSwitcher hidePersonal={true} />
+						{/* )} */}
 						<SignedIn>
 							<UserButton
 								appearance={{

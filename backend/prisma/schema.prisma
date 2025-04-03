@@ -9,8 +9,8 @@ generator client {
 }
 
 datasource db {
-  // provider = "sqlite"
-  provider = "postgresql"
+  provider = "sqlite"
+  // provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -37,9 +37,9 @@ model User {
   contactInformation  ContactInformation?
   personalInformation PersonalInformation?
   addressInformation  AddressInformation?
-  createdReferrals           ReferralForm[] @relation("CreatedReferrals")
-  assignedReferrals          ReferralForm[] @relation("AssignedReferrals")
-  casesCompleted     Int?                  @default(0)
+  createdReferrals    ReferralForm[]       @relation("CreatedReferrals")
+  assignedReferrals   ReferralForm[]       @relation("AssignedReferrals")
+  casesCompleted      Int?                 @default(0)
 }
 
 model ContactInformation {
@@ -80,58 +80,56 @@ model AddressInformation {
 }
 
 model ReferralForm {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  assignedToWorkerId Int?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
-  status   String   @default("SUBMITTED")
-
-  communicationId    Int                   @unique
-  medicalId          Int                   @unique
-  disabilityId       Int                   @unique
-  referrerId         Int                   @unique
-  emergencyContactId Int                   @unique
-  consentId          Int                   @unique
-  additionalInformationId Int              @unique
-  user               User                  @relation("CreatedReferrals", fields: [userId], references: [id])
-  assignedToWorker   User?                 @relation("AssignedReferrals", fields: [assignedToWorkerId], references: [id])
-  
-  referrer           Referrer              @relation(fields: [referrerId], references: [id])
-  emergencyContact   EmergencyContact      @relation(fields: [emergencyContactId], references: [id])
-  communication      ReferralCommunication @relation(fields: [communicationId], references: [id])
-  medical            ReferralMedical       @relation(fields: [medicalId], references: [id])
-  disability         ReferralDisability    @relation(fields: [disabilityId], references: [id])
-  consent            ReferralConsent       @relation(fields: [consentId], references: [id])
-  additionalInformation AdditionalInformation? @relation(fields: [additionalInformationId], references: [id])
+  id                      Int                    @id @default(autoincrement())
+  userId                  Int
+  assignedToWorkerId      Int?
+  createdAt               DateTime               @default(now())
+  updatedAt               DateTime               @default(now()) @updatedAt
+  status                  String                 @default("SUBMITTED")
+  communicationId         Int                    @unique
+  medicalId               Int                    @unique
+  disabilityId            Int                    @unique
+  referrerId              Int                    @unique
+  emergencyContactId      Int                    @unique
+  consentId               Int                    @unique
+  additionalInformationId Int                    @unique
+  user                    User                   @relation("CreatedReferrals", fields: [userId], references: [id])
+  assignedToWorker        User?                  @relation("AssignedReferrals", fields: [assignedToWorkerId], references: [id])
+  referrer                Referrer               @relation(fields: [referrerId], references: [id])
+  emergencyContact        EmergencyContact       @relation(fields: [emergencyContactId], references: [id])
+  communication           ReferralCommunication  @relation(fields: [communicationId], references: [id])
+  medical                 ReferralMedical        @relation(fields: [medicalId], references: [id])
+  disability              ReferralDisability     @relation(fields: [disabilityId], references: [id])
+  consent                 ReferralConsent        @relation(fields: [consentId], references: [id])
+  additionalInformation   AdditionalInformation? @relation(fields: [additionalInformationId], references: [id])
 }
 
 model ReferralCommunication {
-  id                 Int           @id @default(autoincrement())
-  firstLanguage      String
-  interpreter        Boolean
-  culturalSupport    Boolean?
-  communicationNeeds Boolean?
+  id                        Int           @id @default(autoincrement())
+  firstLanguage             String
+  interpreter               Boolean
+  culturalSupport           Boolean?
+  communicationNeeds        Boolean?
   communicationNeedsDetails String?
-  referral           ReferralForm?
+  referral                  ReferralForm?
 }
 
 model AdditionalInformation {
-  id Int @id @default(autoincrement())
-  safety String
+  id                        Int           @id @default(autoincrement())
+  safety                    String
   otherImportantInformation String?
-  referral ReferralForm?
+  referral                  ReferralForm?
 }
 
 model ReferralMedical {
-  id             Int           @id @default(autoincrement())
-  doctorName     String
-  doctorPhone    String
-  doctorAddress  String
-  doctorSuburb   String
-  doctorCity     String
-  nhiNumber      String
-  referral       ReferralForm?
+  id            Int           @id @default(autoincrement())
+  doctorName    String
+  doctorPhone   String
+  doctorAddress String
+  doctorSuburb  String
+  doctorCity    String
+  nhiNumber     String
+  referral      ReferralForm?
 }
 
 model ReferralDisability {

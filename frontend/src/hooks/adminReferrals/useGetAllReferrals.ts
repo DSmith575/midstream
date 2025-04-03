@@ -7,6 +7,7 @@ const useGetAllReferrals = () => {
     queryFn: () => fetchAllReferrals(),
     staleTime: 5 * 60 * 1000, // Cache the data for 5 minutes
     retry: 2, // Retry fetch on failure up to 2 times
+    refetchInterval: 2 * 60 * 1000, // Refetch every 10 minutes
   });
 
   // Handle error state

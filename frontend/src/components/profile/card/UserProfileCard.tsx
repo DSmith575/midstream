@@ -27,7 +27,7 @@ const UserProfileCard = ({ userProfile }: CardProps) => {
 			</section>
 			{/* Update Button */}
 			<button className="rounded-lg bg-green-500 px-8 py-2 text-white shadow">
-				Edit
+				Edit (Disabled)
 			</button>
 		</section>
 	);

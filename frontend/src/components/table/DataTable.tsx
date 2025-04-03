@@ -29,6 +29,7 @@ const DataTable = () => {
 
 			{referrals && (
 				<Table>
+					{/* <TableCaption>Data will update every 2 minutes</TableCaption> */}
 					<TableHeader>
 						<TableRow>
 							<TableHead>ID</TableHead>
@@ -42,7 +43,7 @@ const DataTable = () => {
 					</TableHeader>
 					<TableBody>
 						{referrals.map((referral: any) => (
-							<TableRow key={referral.id} className={"hover:bg-green-500"}>
+							<TableRow key={referral.id} className={"hover:bg-green-500"} onClick={() => alert("test")}>
 								<TableCell>{referral.id}</TableCell>
 								<TableCell>{`${referral.user.personalInformation.firstName} ${referral.user.personalInformation.lastName}`}</TableCell>
 								<TableCell>{`${referral.user.addressInformation.city}`}</TableCell>
