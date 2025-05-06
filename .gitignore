@@ -1,0 +1,42 @@
+# Python bytecode files
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+
+# Virtual environments (ignore all, including nested)
+*/.venv
+*/venv
+.venv/*
+venv/*
+
+./pyApi/venv/*
+./pyApi/.venv/*
+# Environment variable files
+
+*/.env
+*/.env.local
+.env
+.env.local
+./pyApi/.env
+
+# IDE/editor folders and settings (e.g., VSCode, PyCharm, etc.)
+.vscode/
+.idea/
+
+# OS-specific files (e.g., Mac, Windows)
+.DS_Store       # macOS specific
+Thumbs.db       # Windows specific
+
+# Log files
+*.log
+
+# Other common files to ignore
+*.sqlite3
+*.db
+*.pkl            # Pickle files
+*.egg-info/
+*.eggs/
+
+# FastAPI-related files
+*.db

@@ -1,0 +1,19 @@
+{
+  "framework": "react",
+  "typescript": true,
+  "projectName": "frontend",
+  "mode": "file-router",
+  "tailwind": true,
+  "packageManager": "npm",
+  "toolchain": "eslint+prettier",
+  "variableValues": {},
+  "git": true,
+  "version": 1,
+  "existingAddOns": [
+    "clerk",
+    "form",
+    "shadcn",
+    "table",
+    "tanstack-query"
+  ]
+}
