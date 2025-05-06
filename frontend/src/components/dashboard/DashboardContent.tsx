@@ -16,6 +16,8 @@ const DashboardContent = ({ userId }: DashBoardContentProps) => {
 
   const userType: UserType = 'CLIENT'
 
+  
+
   if (error) {
     return (
       <div className="mt-12 flex flex-col items-center justify-center">
