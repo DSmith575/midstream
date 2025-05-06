@@ -2,7 +2,7 @@ import type { UserProfileProps } from '@/lib/interfaces'
 import PersonalInformation from '@/components/profile/card/userCard/UserProfilePersonal'
 import AddressInformation from '@/components/profile/card/userCard/UserProfileAddress'
 import ContactInformation from '@/components/profile/card/userCard/UserProfileContact'
-import CaseStatSection from '@/components/card/caseStat/CaseStat'
+// import CaseStatSection from '@/components/card/caseStat/CaseStat'
 import { Button } from '@/components/ui/button'
 import { UserCog } from 'lucide-react'
 

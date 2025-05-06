@@ -1,5 +1,5 @@
 import type { AddressInformationProps } from "@/lib/interfaces";
-import TextParagraph from "@/components/text/TextParagraph";
+import TextParagraph from "@/components/text/textParagraph";
 
 interface AddressProps {
   addressInfo?: AddressInformationProps;
@@ -8,7 +8,8 @@ interface AddressProps {
 const AddressInformation = ({ addressInfo }: AddressProps) => {
   if (!addressInfo) return null;
 
-  const { address, suburb, city, postCode, country } = addressInfo;
+  const { address,  country } = addressInfo;
+  // suburb, city, postCode,
 
   return (
     <>

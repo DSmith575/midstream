@@ -1,26 +1,26 @@
 import NavBarLogo from '@/components/links/NavBarLogoLink'
 import LinkComponent from '@/components/links/LinkComponent'
-import { useLocation } from '@tanstack/react-router'
+// import { useLocation } from '@tanstack/react-router'
 import { Menu } from 'lucide-react'
-import { SignedIn, SignIn, useAuth, UserButton } from '@clerk/clerk-react'
+import { SignedIn, useAuth, UserButton } from '@clerk/clerk-react'
 import {
   Sheet,
   SheetTrigger,
   SheetContent,
   SheetDescription,
-  SheetClose,
+  // SheetClose,
 } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
-import HeaderUser from '@/integrations/clerk/header-user'
+// import HeaderUser from '@/integrations/clerk/header-user'
 
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
+  // Dialog,
+  // DialogContent,
+  // DialogDescription,
+  // DialogFooter,
+  // DialogHeader,
   DialogTitle,
-  DialogTrigger,
+  // DialogTrigger,
 } from '@/components/ui/dialog'
 
 const Header = () => {

@@ -1,5 +1,5 @@
 import type { ContactInformationProps } from "@/lib/interfaces";
-import TextParagraph from "@/components/text/TextParagraph";
+import TextParagraph from "@/components/text/textParagraph";
 import { Phone, Mail } from "lucide-react";
 
 interface ContactProps {

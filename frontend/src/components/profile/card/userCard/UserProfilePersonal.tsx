@@ -1,5 +1,5 @@
 import type { UserInformationProps } from "@/lib/interfaces";
-import TextParagraph from "@/components/text/TextParagraph";
+import TextParagraph from "@/components/text/textParagraph";
 import { getUserAge } from "@/lib/functions/functions";
 
 interface PersonalInformationProps {
