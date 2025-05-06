@@ -28,6 +28,8 @@ const useUserProfile = (userId: string) => {
       contactInformation: contactInformation,
       casesCompleted: data.casesCompleted,
       casesAssigned: data.casesAssigned,
+      role: data.role,
+      
     }
     
 

@@ -40,6 +40,7 @@ export interface UserProfileProps {
 	contactInformation?: ContactInformationProps;
 	casesCompleted?: number;
 	casesAssigned?: number;
+	role?: string;
 }
 
 export interface CreateUserProps {

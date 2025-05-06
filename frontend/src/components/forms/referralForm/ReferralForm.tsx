@@ -183,6 +183,7 @@ const ReferralForm = () => {
         statisticalInformation: values.statisticalInformation,
         correctInformationProvided: values.correctInformationProvided,
       },
+      companyId: 1,
     };
 
     try {

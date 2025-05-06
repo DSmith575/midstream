@@ -9,12 +9,10 @@ interface DashBoardContentProps {
   orgRole?: string | null
 }
 
-type UserType = 'CLIENT' | 'WORKER' | 'ADMIN';
 
 const DashboardContent = ({ userId }: DashBoardContentProps) => {
-  let { userData, error } = useUserProfile(userId)
+  const { userData, error } = useUserProfile(userId)
 
-  const userType: UserType = 'CLIENT'
 
   
 
@@ -35,11 +33,12 @@ const DashboardContent = ({ userId }: DashBoardContentProps) => {
     )
   }
 
+
   return (
     <main className="min-h-[90vh] bg-gray-100 p-4">
       <div className="grid grid-cols-1 items-start gap-2 lg:grid-cols-3 ">
         <>
-          {userType === 'CLIENT' ? (
+          {userData.role === 'CLIENT' ? (
             <>
                 <UserProfileCard userProfile={userData} />
               <ApplicationCard userId={userId} />
