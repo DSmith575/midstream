@@ -164,6 +164,14 @@ CREATE TABLE "ReferralConsent" (
 CREATE TABLE "Company" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
+    "city" TEXT NOT NULL,
+    "address" TEXT NOT NULL,
+    "suburb" TEXT NOT NULL,
+    "postCode" INTEGER NOT NULL,
+    "country" TEXT NOT NULL,
+    "phone" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "website" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -205,6 +213,9 @@ CREATE UNIQUE INDEX "ReferralForm_consentId_key" ON "ReferralForm"("consentId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "ReferralForm_additionalInformationId_key" ON "ReferralForm"("additionalInformationId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Company_email_key" ON "Company"("email");
 
 -- AddForeignKey
 ALTER TABLE "User" ADD CONSTRAINT "User_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE SET NULL ON UPDATE CASCADE;
