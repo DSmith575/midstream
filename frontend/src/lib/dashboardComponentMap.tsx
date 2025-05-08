@@ -1,4 +1,3 @@
-// map.tsx
 import UserProfileCard from "@/components/profile/card/userCard/UserProfileCard";
 import BillsCard from "@/components/profile/card/bills/BillsCard";
 import ApplicationCard from "@/components/profile/card/applicationCard/ApplicationCard";
@@ -20,7 +19,7 @@ export const getComponentMapUser = (
 
 export const getComponentMapWorker = (
   userData: UserProfileProps,
-  userId: string
+  // userId: string
 ): Record<CardKeyWorker, () => JSX.Element> => ({
   Account: () => <UserProfileCard userProfile={userData} />,
   Referrals: () => <p>Worker referrals</p>,

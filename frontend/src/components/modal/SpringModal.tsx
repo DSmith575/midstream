@@ -19,7 +19,7 @@ const SpringModal = ({
 
   const joinCompanyHandler = async (companyId: number, userId: string) => {
     try {
-      const response = await fetch(`${apiKey}company/joinCompany`, {
+      await fetch(`${apiKey}company/joinCompany`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -27,7 +27,6 @@ const SpringModal = ({
         body: JSON.stringify({ companyId: companyId, userId: userId }),
       })
 
-      const data = await response.json()
     } catch (error) {
       if (error instanceof Error) {
         console.error('Error joining company:', error.message)

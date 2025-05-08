@@ -2,7 +2,7 @@ import useUserProfile from '@/hooks/userProfile/useUserProfile'
 import ProfileForm from '../forms/referralForm/profileForm/ProfileForm'
 import CompanyList from '../companyList/CompanyList'
 import ProfileHoverCards from '@/components/profile/ProfileHoverCards'
-import { getComponentMapUser, getComponentMapWorker } from '@/lib/dashboardComponentMap'
+import { getComponentMapUser } from '@/lib/dashboardComponentMap'
 import { roleConstants } from '@/lib/constants'
 
 interface DashBoardContentProps {
