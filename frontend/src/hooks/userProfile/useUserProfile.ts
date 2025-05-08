@@ -29,6 +29,7 @@ const useUserProfile = (userId: string) => {
       casesCompleted: data.casesCompleted,
       casesAssigned: data.casesAssigned,
       role: data.role,
+      company: data.company,
       
     }
     

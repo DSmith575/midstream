@@ -2,9 +2,10 @@ import type { UserProfileProps } from '@/lib/interfaces'
 import PersonalInformation from '@/components/profile/card/userCard/UserProfilePersonal'
 import AddressInformation from '@/components/profile/card/userCard/UserProfileAddress'
 import ContactInformation from '@/components/profile/card/userCard/UserProfileContact'
-// import CaseStatSection from '@/components/card/caseStat/CaseStat'
+import CaseStatSection from '@/components/card/caseStat/CaseStat'
 import { Button } from '@/components/ui/button'
 import { UserCog } from 'lucide-react'
+import { roleConstants } from '@/lib/constants'
 
 interface CardProps {
   userProfile?: UserProfileProps
@@ -22,8 +23,10 @@ const UserProfileCard = ({ userProfile }: CardProps) => {
     personalInformation,
     addressInformation,
     contactInformation,
-    // casesCompleted,
-    // casesAssigned,
+    casesCompleted,
+    casesAssigned,
+    role,
+    company
   } = userProfile
 
   return (
@@ -57,14 +60,20 @@ const UserProfileCard = ({ userProfile }: CardProps) => {
       <section className="flex flex-col items-center">
         <ContactInformation contactInfo={contactInformation} />
       </section>
+      <section className="absolute left-4 top-4 z-10">
+        <p>{role}</p>
+        <p>{company && company.name}</p>
+      </section>
 
       {/* Cases Summary */}
-      {/* <section className="flex flex-col items-center">
-        <CaseStatSection
-          casesCompleted={casesCompleted}
-          casesAssigned={casesAssigned}
-        />
-      </section> */}
+      {role === roleConstants.worker && (
+        <section className="flex flex-col items-center">
+          <CaseStatSection
+            casesCompleted={casesCompleted}
+            casesAssigned={casesAssigned}
+          />
+        </section>
+      )}
     </main>
   )
 }

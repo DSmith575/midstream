@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "UserRole" AS ENUM ('CLIENT', 'WORKER', 'ADMIN');
+CREATE TYPE "UserRole" AS ENUM ('CLIENT', 'WORKER', 'ADMIN', 'MIDSTREAM');
 
 -- CreateTable
 CREATE TABLE "User" (
@@ -213,6 +213,9 @@ CREATE UNIQUE INDEX "ReferralForm_consentId_key" ON "ReferralForm"("consentId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "ReferralForm_additionalInformationId_key" ON "ReferralForm"("additionalInformationId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Company_name_key" ON "Company"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Company_email_key" ON "Company"("email");

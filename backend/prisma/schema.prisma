@@ -33,6 +33,7 @@ enum UserRole {
   CLIENT
   WORKER
   ADMIN
+  MIDSTREAM
 }
 
 model User {
@@ -186,7 +187,7 @@ model ReferralConsent {
 
 model Company {
   id        Int            @id @default(autoincrement())
-  name      String
+  name      String         @unique
   city      String
   address   String
   suburb    String
@@ -194,7 +195,7 @@ model Company {
   country   String
   phone     String
   email     String         @unique
-  website   String?
+  website   String?        
   createdAt DateTime       @default(now())
   updatedAt DateTime       @default(now()) @updatedAt
   users     User[] // one company has many users

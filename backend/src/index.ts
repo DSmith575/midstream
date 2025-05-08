@@ -7,12 +7,12 @@ import clerkRouter from '@/api/v1/routes/clerk/clerk.routes';
 import { clerkMiddleware } from '@clerk/express';
 import dotenv from 'dotenv';
 import assignCasesRouter from '@/api/v1/routes/assignCases/assignCases.routes';
+import companyRouter from '@/api/v1/routes/company/company.routes';
 
 
 dotenv.config();
 const app = express();
 const port = process.env.PORT || 3001;
-
 
 const CURRENT_VERSION = 'v1';
 const API_BASE_URL = `/api/${CURRENT_VERSION}`;
@@ -32,6 +32,7 @@ app.use(`${API_BASE_URL}/analytics`, analyticsRouter);
 app.use(`${API_BASE_URL}/referralForms`, referralFormRouter);
 app.use(`${API_BASE_URL}/clerk`, clerkRouter);
 app.use(`${API_BASE_URL}/assignCases`, assignCasesRouter);
+app.use(`${API_BASE_URL}/company`, companyRouter);
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);

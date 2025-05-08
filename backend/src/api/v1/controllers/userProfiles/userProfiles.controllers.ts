@@ -130,6 +130,7 @@ const getUserProfile = async (req: Request, res: Response): Promise<any> => {
 				personalInformation: true,
 				contactInformation: true,
 				addressInformation: true,
+				company: true,
 			},
 		});
 

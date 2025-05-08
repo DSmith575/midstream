@@ -41,6 +41,7 @@ export interface UserProfileProps {
 	casesCompleted?: number;
 	casesAssigned?: number;
 	role?: string;
+	company?: CompanyProps;
 }
 
 export interface CreateUserProps {
@@ -124,3 +125,15 @@ export interface ReferralConsentProps {
 	correctInformationProvided: string;
 }
 
+export interface CompanyProps {
+	id: number;
+	name: string;
+	address: string;
+	suburb: string;
+	city: string;
+	postCode: number;
+	country: string;
+	phone: string;
+	email: string;
+	website?: string | null;
+}

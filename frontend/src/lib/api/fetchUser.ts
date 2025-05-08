@@ -20,8 +20,6 @@ const fetchUserProfile = async (userId: string): Promise<UserProfileProps | null
 
 		const data = await response.json();
 
-		console.log(data);
-
 		return data.user;
 	} catch (error) {
 		console.log(error);
