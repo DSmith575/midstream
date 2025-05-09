@@ -40,8 +40,6 @@ const createReferralForm = async (
 			companyId,
 		} = req.body;
 
-		let testCompany;
-
 		const checkCompany = await prisma.company.findUnique({
 			where: {
 				id: Number(companyId),
@@ -49,29 +47,7 @@ const createReferralForm = async (
 		});
 
 		if (!checkCompany) {
-			testCompany = await prisma.company.create({
-				data: {
-					name: "MidStream",
-					address: "Test Address",
-					suburb: "Test Suburb",
-					city: "Test City",
-					postCode: 1234,
-					country: "New Zealand",
-					phone: "123456789",
-					email: "company@test.com",
-					website: "https://test.com",
-				},
-			});
-		}
-
-		const getCompany = await prisma.company.findUnique({
-			where: {
-				id: Number(testCompany?.id),
-			},
-		});
-
-		if (!getCompany) {
-			return res.status(400).json({ message: "Company not created" });
+			return res.status(400).json({ message: "Company does not exist" });
 		}
 
 		const result = await prisma.$transaction(async (prisma) => {
@@ -165,7 +141,7 @@ const createReferralForm = async (
 						emergencyContactId: referralEmergencyContactData.id,
 						consentId: consentData.id,
 						additionalInformationId: referralAdditionalData.id,
-						companyId: getCompany.id,
+						companyId: companyId,
 					},
 				});
 
@@ -222,6 +198,7 @@ const getUserReferrals = async (req: Request, res: Response): Promise<any> => {
 						personalInformation: true,
 						addressInformation: true,
 						contactInformation: true,
+						company: true,
 					},
 				},
 			},
@@ -239,8 +216,14 @@ const getUserReferrals = async (req: Request, res: Response): Promise<any> => {
 
 const getAllReferrals = async (req: Request, res: Response): Promise<any> => {
 	try {
+		const { companyId } = req.params;
+
+		
 		const referrals = await prisma.referralForm.findMany({
-			where: { assignedToWorkerId: null },
+			where: {
+				assignedToWorkerId: null,
+				companyId: Number(companyId),
+			},
 			include: {
 				user: {
 					include: {
@@ -261,6 +244,7 @@ const getAllReferrals = async (req: Request, res: Response): Promise<any> => {
 						personalInformation: true,
 						addressInformation: true,
 						contactInformation: true,
+						company: true,
 					},
 				},
 			},

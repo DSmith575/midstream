@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.post('/createReferralForm', createReferralForm);
 router.get('/user/getReferralForm/:googleId', getUserReferrals)
-router.get('/getAllReferralForms', getAllReferrals);
+router.get('/getAllReferralForms/:companyId', getAllReferrals);
 router.get('/caseWorker/getReferralForm/:googleId', getCaseWorkerReferrals);
 
 export default router;

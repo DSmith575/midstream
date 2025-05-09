@@ -1,6 +1,5 @@
 import NavBarLogo from '@/components/links/NavBarLogoLink'
 import LinkComponent from '@/components/links/LinkComponent'
-// import { useLocation } from '@tanstack/react-router'
 import { Menu } from 'lucide-react'
 import { SignedIn, useAuth, UserButton } from '@clerk/clerk-react'
 import {
@@ -8,20 +7,10 @@ import {
   SheetTrigger,
   SheetContent,
   SheetDescription,
-  // SheetClose,
 } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
-// import HeaderUser from '@/integrations/clerk/header-user'
 
-import {
-  // Dialog,
-  // DialogContent,
-  // DialogDescription,
-  // DialogFooter,
-  // DialogHeader,
-  DialogTitle,
-  // DialogTrigger,
-} from '@/components/ui/dialog'
+import { DialogTitle } from '@/components/ui/dialog'
 
 const Header = () => {
   const { userId } = useAuth()

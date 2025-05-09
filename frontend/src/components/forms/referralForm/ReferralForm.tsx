@@ -117,6 +117,8 @@ const ReferralForm = () => {
     if (!googleUserId) {
       return;
     }
+
+    const companyId = userData?.company?.id || 1; // Default to 1 if companyId is not available
     const referralDetails = {
       googleId: userId,
       userProfile: {
@@ -183,7 +185,7 @@ const ReferralForm = () => {
         statisticalInformation: values.statisticalInformation,
         correctInformationProvided: values.correctInformationProvided,
       },
-      companyId: 1,
+      companyId: companyId,
     };
 
     try {

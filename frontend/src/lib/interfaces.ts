@@ -42,6 +42,7 @@ export interface UserProfileProps {
 	casesAssigned?: number;
 	role?: string;
 	company?: CompanyProps;
+	companyId?: number;
 }
 
 export interface CreateUserProps {

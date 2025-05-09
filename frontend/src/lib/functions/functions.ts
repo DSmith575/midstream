@@ -21,7 +21,7 @@ export const getIconForKey = (key: string): React.ComponentType => {
     Account: User,
     Applications: FileUser,
     Bills: CreditCard,
-    Schedule: CalendarRange,
+    Schedule: CalendarRange, 
     // Add other keys and icons as needed
   };
 
