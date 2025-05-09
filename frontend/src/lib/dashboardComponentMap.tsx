@@ -4,7 +4,7 @@ import ApplicationCard from "@/components/profile/card/applicationCard/Applicati
 import type { UserProfileProps } from "@/lib/interfaces";
 import type { JSX } from "react";
 import type { CardKeyUser, CardKeyWorker } from "@/lib/types";
-import WorkerReferralTable from "@/components/dashboard/WorkerReferralTable";
+// import WorkerReferralTable from "@/components/dashboard/WorkerReferralTable";
 
 export const getComponentMapUser = (
   userData: UserProfileProps,
@@ -18,13 +18,13 @@ export const getComponentMapUser = (
   ),
 });
 
-export const getComponentMapWorker = (
-  userData: UserProfileProps,
-): Record<CardKeyWorker, () => JSX.Element> => ({
-  Account: () => <UserProfileCard userProfile={userData} />,
-  Referrals: () => <WorkerReferralTable userData={userData}/>,
-  NewReferrals: () => <p>Referral Form List </p>,
-  Schedule: () => (
-    <div className="p-4 bg-white rounded-lg shadow">Schedule Component</div>
-  ),
-});
+// export const getComponentMapWorker = (
+//   userData: UserProfileProps,
+// ): Record<CardKeyWorker, () => JSX.Element> => ({
+//   Account: () => <UserProfileCard userProfile={userData} />,
+//   Referrals: () => <WorkerReferralTable userData={userData}/>,
+//   NewReferrals: () => <p>Referral Form List </p>,
+//   Schedule: () => (
+//     <div className="p-4 bg-white rounded-lg shadow">Schedule Component</div>
+//   ),
+// });

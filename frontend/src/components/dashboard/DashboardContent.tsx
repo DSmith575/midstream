@@ -2,7 +2,7 @@ import useUserProfile from '@/hooks/userProfile/useUserProfile'
 import ProfileForm from '../forms/referralForm/profileForm/ProfileForm'
 import CompanyList from '../companyList/CompanyList'
 import ProfileHoverCards from '@/components/profile/ProfileHoverCards'
-import { getComponentMapUser, getComponentMapWorker } from '@/lib/dashboardComponentMap'
+import { getComponentMapUser } from '@/lib/dashboardComponentMap'
 import { roleConstants } from '@/lib/constants'
 
 interface DashBoardContentProps {
@@ -45,7 +45,7 @@ const DashboardContent = ({ userId }: DashBoardContentProps) => {
             </>
           ) : (
             <div className="grid grid-cols-1 items-start gap-2 lg:grid-cols-3">
-            <ProfileHoverCards componentMap={getComponentMapWorker(userData, userId)} />
+            {/* <ProfileHoverCards componentMap={getComponentMapWorker(userData, userId)} /> */}
             </div>
           )}
         </>
