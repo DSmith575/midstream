@@ -3,7 +3,7 @@ import BillsCard from "@/components/profile/card/bills/BillsCard";
 import ApplicationCard from "@/components/profile/card/applicationCard/ApplicationCard";
 import type { UserProfileProps } from "@/lib/interfaces";
 import type { JSX } from "react";
-import type { CardKeyUser, CardKeyWorker } from "@/lib/types";
+import type { CardKeyUser } from "@/lib/types";
 // import WorkerReferralTable from "@/components/dashboard/WorkerReferralTable";
 
 export const getComponentMapUser = (
