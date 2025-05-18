@@ -28,7 +28,6 @@ const ProfileHoverCards = ({ componentMap }: HoverDevCardsProps) => {
         </div>
       </div>
 
-      {/* Selected component rendered OUTSIDE and BELOW the card box */}
       {SelectedComponent && (
         <div className="mt-2 col-start-1">{<SelectedComponent />}</div>
       )}

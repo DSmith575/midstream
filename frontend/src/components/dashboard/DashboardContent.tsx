@@ -2,12 +2,11 @@ import useUserProfile from '@/hooks/userProfile/useUserProfile'
 import ProfileForm from '../forms/referralForm/profileForm/ProfileForm'
 import CompanyList from '../companyList/CompanyList'
 import ProfileHoverCards from '@/components/profile/ProfileHoverCards'
-import { getComponentMapUser } from '@/lib/dashboardComponentMap'
+import { getComponentMapUser, getComponentMapWorker } from '@/lib/dashboardComponentMap'
 import { roleConstants } from '@/lib/constants'
 
 interface DashBoardContentProps {
   userId: string
-  orgRole?: string | null
 }
 
 const DashboardContent = ({ userId }: DashBoardContentProps) => {
@@ -33,7 +32,7 @@ const DashboardContent = ({ userId }: DashBoardContentProps) => {
   return (
     <main className="min-h-[90vh] bg-[#eff0f0] px-2.5">
         <>
-          {userData.role === roleConstants.client ? (
+          {userData.role === roleConstants.worker ? (
             <>
               {!userData.company && userData.addressInformation ? (
                 <CompanyList userId={userId} userCity={userData.addressInformation.city} />
@@ -44,9 +43,13 @@ const DashboardContent = ({ userId }: DashBoardContentProps) => {
               )}
             </>
           ) : (
-            <div className="grid grid-cols-1 items-start gap-2 lg:grid-cols-3">
-            {/* <ProfileHoverCards componentMap={getComponentMapWorker(userData, userId)} /> */}
-            </div>
+            <>
+            {userData.companyId && (
+              <div className="grid grid-cols-1 items-start gap-2 lg:grid-cols-3">
+              <ProfileHoverCards componentMap={getComponentMapWorker(userData, userId, userData.companyId!)} />
+              </div>
+            )}
+            </>
           )}
         </>
     </main>

@@ -1,9 +1,9 @@
 const apiKey = import.meta.env.VITE_API_BACKEND_URL;
 
-const fetchCompanyReferrals = async ({companyId}: {companyId: number}) => {
+const fetchCompanyReferrals = async (companyId:number) => {
   try {
     const response = await fetch(
-      `${apiKey}referralForms/getAllReferralForms?companyId=${companyId}`,
+      `${apiKey}referralForms/getAllReferralForms/${companyId}`,
       {
         method: "GET",
         headers: {

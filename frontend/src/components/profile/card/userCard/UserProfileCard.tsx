@@ -29,6 +29,7 @@ const UserProfileCard = ({ userProfile }: CardProps) => {
     company
   } = userProfile
 
+
   return (
     <main className="w-full min-h-[300px] col-span-1 max-h-[300px] rounded-2xl bg-white shadow-lg  mx-auto p-6 sm:p-8 space-y-6 relative">
       {/* Cog Button */}

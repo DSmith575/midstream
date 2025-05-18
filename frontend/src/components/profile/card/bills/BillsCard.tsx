@@ -1,7 +1,7 @@
 const BillsCard = () => {
   return (
     <div className="col-start-1 md:row-start-3 max-h-[300px] min-h-[300px] space-y-2 overflow-y-auto rounded-2xl bg-white p-6 shadow-lg md:col-start-1">
-    <h3 className="text-lg font-semibold">My Bills</h3>
+    <h3 className="text-lg font-semibold">Budget</h3>
     <div className="mt-4 space-y-2">
       {[
         { name: "Phone bill", status: "paid" },

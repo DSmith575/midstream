@@ -30,6 +30,7 @@ const useUserProfile = (userId: string) => {
       casesAssigned: data.casesAssigned,
       role: data.role,
       company: data.company,
+      companyId: data.companyId,
       
     }
     

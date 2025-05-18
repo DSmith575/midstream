@@ -35,6 +35,7 @@ export interface ContactInformationProps {
 // }
 
 export interface UserProfileProps {
+	id?: number;
 	personalInformation?: UserInformationProps ;
 	addressInformation?: AddressInformationProps;
 	contactInformation?: ContactInformationProps;
