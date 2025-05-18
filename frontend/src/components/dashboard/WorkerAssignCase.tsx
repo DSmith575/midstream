@@ -3,7 +3,6 @@ import {
 	DialogContent,
 	DialogDescription,
 	DialogHeader,
-	DialogTrigger,
 	DialogTitle,
 	DialogFooter,
 } from "@/components/ui/dialog";

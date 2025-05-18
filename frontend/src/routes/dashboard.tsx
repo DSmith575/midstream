@@ -12,7 +12,7 @@ const RouteComponent = () => {
 
   return (
     <Suspense fallback={<div className={'mt-12 flex justify-center'}><Spinner/></div>}>
-        <DashboardContent userId={userId} orgRole={orgRole} />
+        <DashboardContent userId={userId} />
     </Suspense>
   )
 }

@@ -27,7 +27,7 @@ export const generateFormSections = (
       if (topKey === "user") {
         return Object.entries(topValue)
           .filter(
-            ([subKey, subValue]) =>
+            ([_, subValue]) =>
               typeof subValue === "object" && subValue !== null
           )
           .map(([subKey, subValue]) => ({
