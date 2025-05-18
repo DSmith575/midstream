@@ -32,7 +32,7 @@ const DashboardContent = ({ userId }: DashBoardContentProps) => {
   return (
     <main className="min-h-[90vh] bg-[#eff0f0] px-2.5">
         <>
-          {userData.role === roleConstants.worker ? (
+          {userData.role === roleConstants.client ? (
             <>
               {!userData.company && userData.addressInformation ? (
                 <CompanyList userId={userId} userCity={userData.addressInformation.city} />
