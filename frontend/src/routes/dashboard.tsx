@@ -6,7 +6,7 @@ import DashboardContent from '@/components/dashboard/DashboardContent';
 
 
 const RouteComponent = () => {
-  const { isLoaded, userId, orgRole } = useAuth();
+  const { isLoaded, userId } = useAuth();
 
   if (!isLoaded || !userId) return null;
 
