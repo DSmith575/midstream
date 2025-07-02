@@ -218,7 +218,6 @@ const getAllReferrals = async (req: Request, res: Response): Promise<any> => {
 	try {
 		const { companyId } = req.params;
 
-		
 		const referrals = await prisma.referralForm.findMany({
 			where: {
 				assignedToWorkerId: null,
