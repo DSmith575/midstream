@@ -1,5 +1,8 @@
 import { Request, Response } from "express";
 import { clerkClient } from "@clerk/express";
+import { orgRoles } from "@/constants";
+
+// Not currently using
 
 const createMembershipInvite = async (
 	req: Request,
@@ -19,7 +22,7 @@ const createMembershipInvite = async (
 			await clerkClient.organizations.createOrganizationMembership({
 				organizationId: orgId, // Use the correct variable name
 				userId,
-				role: "org:member", // Specify the role for the user
+				role: orgRoles.organizationMember, // Specify the role for the user
 			});
 
 		// Return the membership object in the response

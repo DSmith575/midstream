@@ -20,12 +20,8 @@ const API_BASE_URL = `/api/${CURRENT_VERSION}`;
 app.use(express.json());
 app.use(cors());
 app.use(clerkMiddleware({
-  secretKey: process.env.CLERK_SECRET_KEY, // Use the Clerk Publishable Key
+  secretKey: process.env.CLERK_SECRET_KEY,
 }));
-
-// app.get('/', (req: Request, res: Response) => {
-//   res.send('Hello, TypeScript Express!');
-// });
 
 app.use(`${API_BASE_URL}/userProfiles`, userProfileRouter);
 app.use(`${API_BASE_URL}/analytics`, analyticsRouter);

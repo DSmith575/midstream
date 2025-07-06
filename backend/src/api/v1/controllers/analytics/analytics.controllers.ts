@@ -23,12 +23,11 @@ const getAnalytics = async (req: Request, res: Response): Promise<any> => {
 			const personalInfo = user.personalInformation;
 			const addressInfo = user.addressInformation;
 
-			// Calculate age
 			const age = personalInfo?.dateOfBirth
 				? dayjs().diff(dayjs(personalInfo.dateOfBirth), "year")
 				: null;
 
-			// Group by age ranges
+			// Update later
 			if (age !== null) {
 				const ageRange =
 					age < 18

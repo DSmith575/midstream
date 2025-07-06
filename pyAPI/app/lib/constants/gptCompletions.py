@@ -46,6 +46,4 @@ GPT_COMPLETION_SECTIONS = {
         'Community participation', 'Educational support', 'Specialist Teachers',
         'Family life', ' Socialization', 'Vocational support',
     ],
-
-    # Add other sections accordingly
 }

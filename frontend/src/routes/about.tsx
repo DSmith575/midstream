@@ -12,10 +12,6 @@ const RouteComponent = () => {
 		"MidStream is also designed to improve collaboration across workers, providers, and decision-makers, ensuring that everyone can work seamlessly to support whānau.",
 	];
 
-  // const decisionText = ["See uptake, equity, and system gaps in real time.",
-  //   "Track outcomes and measure return on investment.",
-  //   "Strategy built on lived experience, not guesswork."];
-
   const standForText = [
     "Support should come to you.",
     "Your time matters.",

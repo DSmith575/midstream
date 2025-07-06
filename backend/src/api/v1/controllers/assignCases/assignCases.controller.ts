@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
+import { orgRoles } from "@/constants";
 
 const prisma = new PrismaClient();
 
@@ -14,7 +15,7 @@ const updateReferralForm = async (
 
 		const { referralId, caseWorkerId, orgRole } = req.body;
 
-		if (orgRole !== "org:admin") {
+		if (orgRole !== orgRoles.organizationAdmin) {
 			return res.status(403).json({ message: "Forbidden" });
 		}
 
