@@ -52,7 +52,7 @@ model User {
 
 model ContactInformation {
   id        String   @id @default(uuid())
-  userId    Int      @unique
+  userId    String   @unique
   email     String   @unique
   phone     String
   createdAt DateTime @default(now())
@@ -62,7 +62,7 @@ model ContactInformation {
 
 model PersonalInformation {
   id            String   @id @default(uuid())
-  userId        Int      @unique
+  userId        String   @unique
   firstName     String
   lastName      String
   title         String?
@@ -76,7 +76,7 @@ model PersonalInformation {
 
 model AddressInformation {
   id        String   @id @default(uuid())
-  userId    Int      @unique
+  userId        String   @unique
   address   String
   suburb    String
   city      String
@@ -188,7 +188,7 @@ model Company {
   city      String
   address   String
   suburb    String
-  postCode  Int
+  postCode  String
   country   String
   phone     String
   email     String         @unique
