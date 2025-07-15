@@ -24,7 +24,7 @@ const createCompany = async (req: Request, res: Response): Promise<void> => {
 			website,
 		} = req.body;
 
-		const checkCompanyName = await prisma.company.findUnique({
+		const checkCompanyName = await prisma.company.findFirst({
 			where: { name: companyName },
 		});
 
@@ -94,7 +94,7 @@ const getCompanyList = async (req: Request, res: Response): Promise<void> => {
 
 const joinCompany = async (req: Request, res: Response): Promise<void> => {
 	try {
-		const companyId = Number(req.body.companyId);
+		const companyId = String(req.body.companyId);
 		const userId = String(req.body.userId);
 
 		if (!companyId || !userId) {

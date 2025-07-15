@@ -28,17 +28,15 @@ const CompanyList = ({ userId, userCity}: { userId: string, userCity: string }) 
     <div>
       {companies && (
         <div className="grid grid-cols-1 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {/* Companies filtered by users city */}
             {companies
-              .filter((company) => company.city === userCity) // Filter first
+              .filter((company) => company.city === userCity)
               .map(
                 (
-                  company, // Then map over the filtered results
+                  company,
                 ) => (
                     <div key={company.id} className={'mt-2 mx-auto'}>
-                      {/* <button className="bg-blue-500 text-white px-4 py-2 mt-2 rounded" onClick={() => joinCompanyHandler(company.id, userId)}>Join</button> */}
-                      <>
                       <CompanyCard company={company} userId={userId} />
-                      </>
                     </div>
                 ),
               )}

@@ -59,7 +59,7 @@ const createUserProfile = async (req: Request, res: Response): Promise<any> => {
 
 		const checkUserProfile = await prisma.personalInformation.findUnique({
 			where: {
-				id: Number(newProfile.id),
+				id: String(newProfile.id),
 			},
 		});
 
@@ -77,7 +77,7 @@ const createUserProfile = async (req: Request, res: Response): Promise<any> => {
 
 		const checkContact = await prisma.contactInformation.findUnique({
 			where: {
-				id: Number(newContact.id),
+				id: String(newContact.id),
 			},
 		});
 
@@ -98,7 +98,7 @@ const createUserProfile = async (req: Request, res: Response): Promise<any> => {
 
 		const checkAddress = await prisma.addressInformation.findUnique({
 			where: {
-				id: Number(newAddress.id),
+				id: String(newAddress.id),
 			},
 		});
 
@@ -133,6 +133,8 @@ const getUserProfile = async (req: Request, res: Response): Promise<any> => {
 				company: true,
 			},
 		});
+
+		console.log("User Profile:", user);
 
 		// const genderCounts = await prisma.personalInformation.groupBy({
 		// 	by: ["gender"],

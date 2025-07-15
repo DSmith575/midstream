@@ -18,6 +18,7 @@ datasource db {
 enum ReferralStatus {
   SUBMITTED
   VIEWED
+  ASSIGNED
   REVIEWED
   APPROVED
   REJECTED
@@ -31,23 +32,20 @@ enum UserRole {
 }
 
 model User {
-  id                    String               @id @default(uuid())
-  googleId              String               @unique
-  createdAt             DateTime             @default(now())
-  updatedAt             DateTime             @default(now()) @updatedAt
-  contactInformation    ContactInformation?  @relation(fields: [contactInformationId], references: [id])
-  personalInformation   PersonalInformation? @relation(fields: [personalInformationId], references: [id])
-  addressInformation    AddressInformation?  @relation(fields: [addressInformationId], references: [id])
-  createdReferrals      ReferralForm[]       @relation("CreatedReferrals")
-  assignedReferrals     ReferralForm[]       @relation("AssignedReferrals")
-  casesCompleted        Int?                 @default(0)
-  casesAssigned         Int?                 @default(0)
-  role                  UserRole             @default(CLIENT)
-  company               Company?             @relation(fields: [companyInformationId], references: [id])
-  companyInformationId  String?              @unique
-  personalInformationId String?              @unique
-  contactInformationId  String?              @unique
-  addressInformationId  String?              @unique
+  id                  String               @id @default(uuid())
+  googleId            String               @unique
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @default(now()) @updatedAt
+  contactInformation  ContactInformation?
+  personalInformation PersonalInformation?
+  addressInformation  AddressInformation?
+  companyId           String?              @unique
+  company             Company?             @relation(fields: [companyId], references: [id])
+  createdReferrals    ReferralForm[]       @relation("CreatedReferrals")
+  assignedReferrals   ReferralForm[]       @relation("AssignedReferrals")
+  casesCompleted      Int?                 @default(0)
+  casesAssigned       Int?                 @default(0)
+  role                UserRole             @default(CLIENT)
 }
 
 model ContactInformation {
@@ -57,7 +55,7 @@ model ContactInformation {
   phone     String
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
-  user      User[]
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model PersonalInformation {
@@ -71,12 +69,12 @@ model PersonalInformation {
   dateOfBirth   DateTime
   createdAt     DateTime @default(now())
   updatedAt     DateTime @default(now()) @updatedAt
-  user          User[]
+  user          User     @relation(fields: [userId], references: [id])
 }
 
 model AddressInformation {
   id        String   @id @default(uuid())
-  userId        String   @unique
+  userId    String   @unique
   address   String
   suburb    String
   city      String
@@ -84,7 +82,7 @@ model AddressInformation {
   country   String
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
-  user      User[]
+  user      User     @relation(fields: [userId], references: [id])
 }
 
 model ReferralForm {
@@ -184,14 +182,14 @@ model ReferralConsent {
 
 model Company {
   id        String         @id @default(uuid())
-  name      String         @unique
+  name      String
   city      String
   address   String
   suburb    String
   postCode  String
   country   String
   phone     String
-  email     String         @unique
+  email     String
   website   String?
   createdAt DateTime       @default(now())
   updatedAt DateTime       @default(now()) @updatedAt
