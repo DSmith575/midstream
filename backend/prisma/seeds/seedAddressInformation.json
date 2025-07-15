@@ -7,7 +7,7 @@
     "address": "1234 Elm Street",
     "suburb": "Sunnyvale",
     "city": "Auckland",
-    "postCode": 1111,
+    "postCode": "0000",
     "country": "New Zealand"
   },
   {
@@ -16,7 +16,7 @@
     "address": "5678 Oak Street",
     "suburb": "Sunnyvale",
     "city": "Auckland",
-    "postCode": 2222,
+    "postCode": "1234",
     "country": "New Zealand"
   },
   {
@@ -25,7 +25,7 @@
     "address": "9101 Pine Street",
     "suburb": "Sunnyvale",
     "city": "Christchurch",
-    "postCode": 3333,
+    "postCode": "3333",
     "country": "New Zealand"
   }, {
     "id": 5,
@@ -33,7 +33,7 @@
     "address": "1123 Maple Street",
     "suburb": "Sunnyvale",
     "city": "Wellington",
-    "postCode": 4444,
+    "postCode": "4444",
     "country": "New Zealand"
   }, {
     "id": 6,
@@ -41,7 +41,7 @@
     "address": "4567 Cedar Street",
     "suburb": "Sunnyvale",
     "city": "Hamilton",
-    "postCode": 5555,
+    "postCode": "5555",
     "country": "New Zealand"
   }, {
     "id": 7,
@@ -49,7 +49,7 @@
     "address": "8910 Birch Street",
     "suburb": "Sunnyvale",
     "city": "Tauranga",
-    "postCode": 6666,
+    "postCode": "6666",
     "country": "New Zealand"
   }, {
     "id": 8,
@@ -57,7 +57,7 @@
     "address": "1112 Spruce Street",
     "suburb": "Sunnyvale",
     "city": "Dunedin",
-    "postCode": 6666,
+    "postCode": "6666",
     "country": "New Zealand"
   }, {
     "id": 9,
@@ -65,7 +65,7 @@
     "address": "3456 Fir Street",
     "suburb": "Sunnyvale",
     "city": "Palmerston North",
-    "postCode": 6666,
+    "postCode": "6666",
     "country": "New Zealand"
   }, {
     "id": 10,
