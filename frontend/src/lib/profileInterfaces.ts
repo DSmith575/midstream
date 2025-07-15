@@ -54,7 +54,7 @@ export interface CreateUserProps {
 	address: string;
 	suburb: string;
 	city: string;
-	postCode: number;
+	postCode: string;
 	country: string;
 }
 export interface CreateReferralProps {

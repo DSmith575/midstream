@@ -1,13 +1,16 @@
 -- CreateEnum
+CREATE TYPE "ReferralStatus" AS ENUM ('SUBMITTED', 'VIEWED', 'ASSIGNED', 'REVIEWED', 'APPROVED', 'REJECTED');
+
+-- CreateEnum
 CREATE TYPE "UserRole" AS ENUM ('CLIENT', 'WORKER', 'ADMIN', 'MIDSTREAM');
 
 -- CreateTable
 CREATE TABLE "User" (
-    "id" SERIAL NOT NULL,
-    "companyId" INTEGER,
+    "id" TEXT NOT NULL,
     "googleId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "companyId" TEXT,
     "casesCompleted" INTEGER DEFAULT 0,
     "casesAssigned" INTEGER DEFAULT 0,
     "role" "UserRole" NOT NULL DEFAULT 'CLIENT',
@@ -17,8 +20,8 @@ CREATE TABLE "User" (
 
 -- CreateTable
 CREATE TABLE "ContactInformation" (
-    "id" SERIAL NOT NULL,
-    "userId" INTEGER NOT NULL,
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "phone" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -29,8 +32,8 @@ CREATE TABLE "ContactInformation" (
 
 -- CreateTable
 CREATE TABLE "PersonalInformation" (
-    "id" SERIAL NOT NULL,
-    "userId" INTEGER NOT NULL,
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
     "firstName" TEXT NOT NULL,
     "lastName" TEXT NOT NULL,
     "title" TEXT,
@@ -45,12 +48,12 @@ CREATE TABLE "PersonalInformation" (
 
 -- CreateTable
 CREATE TABLE "AddressInformation" (
-    "id" SERIAL NOT NULL,
-    "userId" INTEGER NOT NULL,
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
     "address" TEXT NOT NULL,
     "suburb" TEXT NOT NULL,
     "city" TEXT NOT NULL,
-    "postCode" INTEGER NOT NULL,
+    "postCode" TEXT NOT NULL,
     "country" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -60,27 +63,27 @@ CREATE TABLE "AddressInformation" (
 
 -- CreateTable
 CREATE TABLE "ReferralForm" (
-    "id" SERIAL NOT NULL,
-    "companyId" INTEGER NOT NULL,
-    "userId" INTEGER NOT NULL,
-    "assignedToWorkerId" INTEGER,
+    "id" TEXT NOT NULL,
+    "companyId" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "assignedToWorkerId" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "status" TEXT NOT NULL DEFAULT 'SUBMITTED',
-    "communicationId" INTEGER NOT NULL,
-    "medicalId" INTEGER NOT NULL,
-    "disabilityId" INTEGER NOT NULL,
-    "referrerId" INTEGER NOT NULL,
-    "emergencyContactId" INTEGER NOT NULL,
-    "consentId" INTEGER NOT NULL,
-    "additionalInformationId" INTEGER NOT NULL,
+    "status" "ReferralStatus" NOT NULL DEFAULT 'SUBMITTED',
+    "communicationId" TEXT NOT NULL,
+    "medicalId" TEXT NOT NULL,
+    "disabilityId" TEXT NOT NULL,
+    "referrerId" TEXT NOT NULL,
+    "emergencyContactId" TEXT NOT NULL,
+    "consentId" TEXT NOT NULL,
+    "additionalInformationId" TEXT NOT NULL,
 
     CONSTRAINT "ReferralForm_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "ReferralCommunication" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "firstLanguage" TEXT NOT NULL,
     "interpreter" BOOLEAN NOT NULL,
     "culturalSupport" BOOLEAN,
@@ -92,7 +95,7 @@ CREATE TABLE "ReferralCommunication" (
 
 -- CreateTable
 CREATE TABLE "AdditionalInformation" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "safety" TEXT NOT NULL,
     "otherImportantInformation" TEXT,
 
@@ -101,7 +104,7 @@ CREATE TABLE "AdditionalInformation" (
 
 -- CreateTable
 CREATE TABLE "ReferralMedical" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "doctorName" TEXT NOT NULL,
     "doctorPhone" TEXT NOT NULL,
     "doctorAddress" TEXT NOT NULL,
@@ -114,7 +117,7 @@ CREATE TABLE "ReferralMedical" (
 
 -- CreateTable
 CREATE TABLE "ReferralDisability" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "disabilityType" TEXT NOT NULL,
     "disabilityDetails" TEXT,
     "disabilitySupportDetails" TEXT,
@@ -126,7 +129,7 @@ CREATE TABLE "ReferralDisability" (
 
 -- CreateTable
 CREATE TABLE "Referrer" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "firstName" TEXT NOT NULL,
     "lastName" TEXT NOT NULL,
     "email" TEXT,
@@ -138,7 +141,7 @@ CREATE TABLE "Referrer" (
 
 -- CreateTable
 CREATE TABLE "EmergencyContact" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "firstName" TEXT NOT NULL,
     "lastName" TEXT NOT NULL,
     "phone" TEXT NOT NULL,
@@ -150,7 +153,7 @@ CREATE TABLE "EmergencyContact" (
 
 -- CreateTable
 CREATE TABLE "ReferralConsent" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "provideInformationConsent" BOOLEAN NOT NULL,
     "provideSharedInformationConsent" BOOLEAN NOT NULL,
     "provideContactConsent" BOOLEAN NOT NULL,
@@ -162,12 +165,12 @@ CREATE TABLE "ReferralConsent" (
 
 -- CreateTable
 CREATE TABLE "Company" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "city" TEXT NOT NULL,
     "address" TEXT NOT NULL,
     "suburb" TEXT NOT NULL,
-    "postCode" INTEGER NOT NULL,
+    "postCode" TEXT NOT NULL,
     "country" TEXT NOT NULL,
     "phone" TEXT NOT NULL,
     "email" TEXT NOT NULL,
@@ -180,6 +183,9 @@ CREATE TABLE "Company" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_googleId_key" ON "User"("googleId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "User_companyId_key" ON "User"("companyId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "ContactInformation_userId_key" ON "ContactInformation"("userId");
@@ -213,9 +219,6 @@ CREATE UNIQUE INDEX "ReferralForm_consentId_key" ON "ReferralForm"("consentId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "ReferralForm_additionalInformationId_key" ON "ReferralForm"("additionalInformationId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "Company_name_key" ON "Company"("name");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Company_email_key" ON "Company"("email");

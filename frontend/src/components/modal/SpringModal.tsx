@@ -16,7 +16,6 @@ const SpringModal = ({
   company: CompanyProps
   userId: string
 }) => {
-
   const joinCompanyHandler = async (companyId: number, userId: string) => {
     try {
       await fetch(`${apiKey}company/joinCompany`, {

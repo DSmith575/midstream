@@ -47,7 +47,7 @@ const ProfileForm = () => {
       address: '',
       suburb: '',
       city: '',
-      postCode: 0,
+      postCode: "0",
       country: '',
     },
   })
@@ -236,7 +236,7 @@ const ProfileForm = () => {
                 fieldName={'postCode'}
                 formLabel={'Post Code'}
                 placeholder={'1234'}
-                type={'number'}
+                type={'string'}
               />
 
               <FormInput
