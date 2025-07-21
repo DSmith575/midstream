@@ -25,4 +25,4 @@ const HoverCard = ({ title, subtitle, Icon, onClick }: HoverCardProps) => {
   );
 };
 
-export default HoverCard;
+export { HoverCard };

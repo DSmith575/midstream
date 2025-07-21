@@ -1,4 +1,4 @@
-import TextSpan from '@/components/text/TextSpan';
+import {TextSpan} from '@/components/text/TextSpan';
 import {type JSX } from 'react';
 
 interface TextParagraphProps {
@@ -14,4 +14,4 @@ const TextParagraph = ({span, text}: TextParagraphProps) => {
   );
 };
 
-export default TextParagraph;
+export { TextParagraph };

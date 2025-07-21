@@ -16,7 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import WorkerReferralFormClientView from "@/components/referralForms/WorkerReferralFormClientView";
+import {WorkerReferralFormClientView} from "@/components/referralForms/WorkerReferralFormClientView";
 import { generateFormSections } from "@/lib/functions/formFunctions";
 
 interface AssignWorkerProps {

@@ -36,4 +36,4 @@ const WorkerReferralFormClientView = ({ refField }: ReferralFormFieldsProps) => 
 	);
 };
 
-export default WorkerReferralFormClientView;
+export { WorkerReferralFormClientView };

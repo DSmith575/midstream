@@ -86,4 +86,4 @@ const SpringModal = ({
   )
 }
 
-export default SpringModal
+export { SpringModal }

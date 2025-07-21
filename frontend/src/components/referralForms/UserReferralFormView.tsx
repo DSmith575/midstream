@@ -61,4 +61,4 @@ const UserReferralFormView = ({ referralForm }: any) => {
 	);
 };
 
-export default UserReferralFormView;
+export { UserReferralFormView };

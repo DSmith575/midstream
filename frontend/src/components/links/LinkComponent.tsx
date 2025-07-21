@@ -15,4 +15,4 @@ const LinkComponent = ({ linkRef, linkName }: LinkComponentProps) => {
   )
 }
 
-export default LinkComponent;
+export { LinkComponent }

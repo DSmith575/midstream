@@ -1,7 +1,7 @@
 import useUserProfile from '@/hooks/userProfile/useUserProfile'
 import ProfileForm from '@/components/forms/profileForm/ProfileForm'
 import {CompanyList} from '@/components/companyList/CompanyList'
-import ProfileHoverCards from '@/components/profile/ProfileHoverCards'
+import {ProfileHoverCards} from '@/components/profile/ProfileHoverCards'
 import { getComponentMapUser, getComponentMapWorker } from '@/lib/dashboardComponentMap'
 import { roleConstants } from '@/lib/constants'
 
@@ -32,7 +32,7 @@ const DashboardContent = ({ userId }: DashBoardContentProps) => {
   return (
     <main className="min-h-[90vh] bg-[#eff0f0] px-2.5">
         <>
-          {userData.role === roleConstants.worker ? (
+          {userData.role === roleConstants.client ? (
             <>
               {!userData.company && userData.addressInformation ? (
                 <CompanyList userId={userId} userCity={userData.addressInformation.city} />

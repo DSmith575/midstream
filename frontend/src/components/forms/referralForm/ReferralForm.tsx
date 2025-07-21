@@ -8,7 +8,7 @@ import { z } from 'zod'
 import { referralFormSteps } from '@/lib/formOptions/referralFormOptions'
 import useCreateReferralForm from '@/hooks/userProfile/useCreateReferralForm'
 import useUserProfile from '@/hooks/userProfile/useUserProfile'
-import Spinner from '@/components/spinner/Spinner'
+import {Spinner} from '@/components/spinner/Spinner'
 import {FormStepButtons, FormStepNavigation} from '@/components/forms/formComponents/index'
 import { useNavigate } from '@tanstack/react-router'
 import {

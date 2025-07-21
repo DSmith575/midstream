@@ -15,4 +15,4 @@ const AboutUsHero = () => {
   );
 };
 
-export default AboutUsHero;
+export { AboutUsHero };

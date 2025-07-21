@@ -1,6 +1,6 @@
 import type { JSX } from "react";
 import { useState } from "react";
-import HoverCard from "@/components/profile/card/hoverCard/HoverCard";
+import {HoverCard} from "@/components/profile/card/hoverCard/HoverCard";
 import { formatPascalCase, getIconForKey } from "@/lib/functions/functions";
 
 interface HoverDevCardsProps {
@@ -36,4 +36,4 @@ const ProfileHoverCards = ({ componentMap }: HoverDevCardsProps) => {
 
 
 
-export default ProfileHoverCards;
+export { ProfileHoverCards };

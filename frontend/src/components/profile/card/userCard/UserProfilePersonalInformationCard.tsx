@@ -1,12 +1,12 @@
 import type { UserInformationProps } from "@/lib/interfaces";
-import TextParagraph from "@/components/text/textParagraph";
+import {TextParagraph} from "@/components/text/textParagraph";
 import { getUserAge } from "@/lib/functions/functions";
 
 interface PersonalInformationProps {
 	personalInfo?: UserInformationProps;
 }
 
-const PersonalInformation = ({ personalInfo }: PersonalInformationProps) => {
+const UserProfilePersonalInformationCard = ({ personalInfo }: PersonalInformationProps) => {
 	if (!personalInfo) return null;
 
 	const { firstName, lastName, preferredName, dateOfBirth } =
@@ -24,4 +24,4 @@ const PersonalInformation = ({ personalInfo }: PersonalInformationProps) => {
 	);
 };
 
-export default PersonalInformation;
+export { UserProfilePersonalInformationCard };

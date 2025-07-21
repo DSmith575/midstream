@@ -1,5 +1,5 @@
-import NavBarLogo from '@/components/links/NavBarLogoLink'
-import LinkComponent from '@/components/links/LinkComponent'
+import {NavBarLogo} from '@/components/links/NavBarLogoLink'
+import {LinkComponent} from '@/components/links/LinkComponent'
 import { Menu } from 'lucide-react'
 import { SignedIn, useAuth, UserButton } from '@clerk/clerk-react'
 import {
@@ -64,4 +64,4 @@ const Header = () => {
   )
 }
 
-export default Header
+export { Header }

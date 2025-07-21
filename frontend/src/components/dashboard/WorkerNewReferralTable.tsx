@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import Spinner from '@/components/spinner/Spinner'
+import {Spinner} from '@/components/spinner/Spinner'
 import {
   Table,
   TableBody,
