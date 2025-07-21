@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useAuth } from '@clerk/clerk-react'
 import { Suspense } from 'react';
-import Spinner from '@/components/spinner/Spinner';
-import DashboardContent from '@/components/dashboard/DashboardContent';
+import {Spinner} from '@/components/spinner/Spinner';
+import {DashboardContent} from '@/components/dashboard/DashboardContent';
 
 
 const RouteComponent = () => {

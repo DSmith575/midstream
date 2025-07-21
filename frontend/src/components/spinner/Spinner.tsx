@@ -19,4 +19,4 @@ const Spinner = ({ className, children }: SpinnerProps) => {
 	);
 };
 
-export default Spinner;
+export { Spinner };

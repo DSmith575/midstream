@@ -41,7 +41,7 @@ const columns: ColumnDef<DataProps>[] = [
 	},
 ];
 
-export default columns;
+export { columns };
 
 // {
 //   accessorKey: 'lastUpdate',

@@ -1,12 +1,12 @@
 import type { ContactInformationProps } from "@/lib/interfaces";
-import TextParagraph from "@/components/text/textParagraph";
+import {TextParagraph} from "@/components/text/textParagraph";
 import { Phone, Mail } from "lucide-react";
 
 interface ContactProps {
 	contactInfo?: ContactInformationProps;
 }
 
-const ContactInformation = ({ contactInfo }: ContactProps) => {
+const UserProfileContactCard = ({ contactInfo }: ContactProps) => {
 	if (!contactInfo) return null;
 
 	const { email, phone } = contactInfo;
@@ -19,4 +19,4 @@ const ContactInformation = ({ contactInfo }: ContactProps) => {
 	);
 };
 
-export default ContactInformation;
+export { UserProfileContactCard };

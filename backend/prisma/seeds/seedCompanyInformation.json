@@ -1,0 +1,114 @@
+{
+  "data": [
+    {
+      "id": "6f8c9b1e-2d3a-4f5b-8c6d-7e8f9a0b1c2d",
+      "name": "MidStream",
+      "address": "123 Fake Street",
+      "suburb": "Central Dunedin",
+      "city": "Dunedin",
+      "postCode": "1234",
+      "country": "New Zealand",
+      "phone": "123456789",
+      "email": "MidStream6@test.com"
+    },
+    {
+      "id": "7a8b9c1d-2e3f-4g5h-6i7j-8k9l0m1n2o3p",
+      "name": "Tech Innovations",
+      "address": "456 Innovation Drive",
+      "suburb": "Tech Park",
+      "city": "Dunedin",
+      "postCode": "5678",
+      "country": "New Zealand",
+      "phone": "987654321",
+      "email": "Test@test.com"
+    },
+    {
+      "id": "8b9c1d2e-3f4g-5h6i-7j8k-9l0m1n2o3p4q",
+      "name": "Green Solutions",
+      "address": "789 Greenway Lane",
+      "suburb": "Eco City",
+      "city": "Dunedin",
+      "postCode": "9101",
+      "country": "New Zealand",
+      "phone": "123123123",
+      "email": "Green@test.com"
+    },
+    {
+      "id": "b1234567-89ab-4cde-f012-3456789abcde",
+      "name": "CloudSync Ltd.",
+      "address": "101 Sky Tower Rd",
+      "suburb": "Cloud District",
+      "city": "Dunedin",
+      "postCode": "1023",
+      "country": "New Zealand",
+      "phone": "0211234567",
+      "email": "contact@cloudsync.nz"
+    },
+    {
+      "id": "c2345678-90bc-5def-a123-456789abcdef",
+      "name": "KiwiSoft",
+      "address": "202 Kiwi Lane",
+      "suburb": "Featherston",
+      "city": "Wellington",
+      "postCode": "6011",
+      "country": "New Zealand",
+      "phone": "0222345678",
+      "email": "info@kiwisoft.nz"
+    },
+    {
+      "id": "d3456789-01cd-6efa-b234-56789abcdef0",
+      "name": "HealthTech NZ",
+      "address": "303 Wellness Blvd",
+      "suburb": "Medical Mile",
+      "city": "Christchurch",
+      "postCode": "8041",
+      "country": "New Zealand",
+      "phone": "0203456789",
+      "email": "hello@healthtech.co.nz"
+    },
+    {
+      "id": "e4567890-12de-7fab-c345-6789abcdef01",
+      "name": "Pacific IT",
+      "address": "404 Ocean View Dr",
+      "suburb": "Seaside",
+      "city": "Napier",
+      "postCode": "4110",
+      "country": "New Zealand",
+      "phone": "0274567890",
+      "email": "support@pacificit.co.nz"
+    },
+    {
+      "id": "f5678901-23ef-8abc-d456-789abcdef012",
+      "name": "Future Farms",
+      "address": "505 AgriTech Way",
+      "suburb": "Innovation Plains",
+      "city": "Hamilton",
+      "postCode": "3204",
+      "country": "New Zealand",
+      "phone": "0295678901",
+      "email": "contact@futurefarms.nz"
+    },
+    {
+      "id": "a6789012-34f0-9bcd-e567-89abcdef0123",
+      "name": "Aotearoa Robotics",
+      "address": "606 Mechatronics Rd",
+      "suburb": "Tech Hills",
+      "city": "Tauranga",
+      "postCode": "3112",
+      "country": "New Zealand",
+      "phone": "0286789012",
+      "email": "admin@arobotics.nz"
+    },
+    {
+      "id": "b7890123-45f1-0cde-f678-9abcdef01234",
+      "name": "Mana Energy",
+      "address": "707 Solar Crescent",
+      "suburb": "Brighton",
+      "city": "New Plymouth",
+      "postCode": "4310",
+      "country": "New Zealand",
+      "phone": "0267890123",
+      "email": "energy@mana.nz"
+    }
+  ]
+}

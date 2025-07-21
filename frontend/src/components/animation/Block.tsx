@@ -38,4 +38,4 @@ const Block = ({ className, ...rest }: BlockProps) => {
 	);
 };
 
-export default Block;
+export { Block };

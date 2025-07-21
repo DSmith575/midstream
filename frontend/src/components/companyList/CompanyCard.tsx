@@ -1,15 +1,26 @@
 import { motion } from 'framer-motion'
 import { useState } from 'react'
-import SpringModal from '../modal/SpringModal'
+import {SpringModal} from '@/components/modal/SpringModal'
 import type { CompanyProps } from '@/lib/interfaces'
 
-const CompanyCard = ({company, userId}: {company: CompanyProps, userId: string}) => {
+const CompanyCard = ({
+  company,
+  userId,
+}: {
+  company: CompanyProps
+  userId: string
+}) => {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
     <div className="mx-auto sm:mx-0 w-fit">
       <Card company={company} onClick={() => setIsOpen(true)} />
-      <SpringModal isOpen={isOpen} setIsOpen={setIsOpen} company={company} userId={userId} />
+      <SpringModal
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        company={company}
+        userId={userId}
+      />
     </div>
   )
 }
@@ -56,4 +67,4 @@ const Card = ({
   )
 }
 
-export default CompanyCard
+export { CompanyCard }

@@ -30,4 +30,4 @@ const MotionContainer = ({
 	);
 };
 
-export default MotionContainer;
+export { MotionContainer };

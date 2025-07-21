@@ -1,6 +1,6 @@
 import type { JSX } from "react";
 import { useState } from "react";
-import HoverCard from "@/components/profile/card/hoverCard/HoverCard";
+import {HoverCard} from "@/components/profile/card/hoverCard/HoverCard";
 import { formatPascalCase, getIconForKey } from "@/lib/functions/functions";
 
 interface HoverDevCardsProps {
@@ -11,7 +11,6 @@ const ProfileHoverCards = ({ componentMap }: HoverDevCardsProps) => {
   const [selectedCard, setSelectedCard] = useState<string | null>("Account");
 
   const SelectedComponent = selectedCard ? componentMap[selectedCard] : null;
-
   return (
     <>
       <div className="min-h-[150px] max-h-full flex flex-col rounded-2xl  py-4 md:col-span-full">
@@ -37,4 +36,4 @@ const ProfileHoverCards = ({ componentMap }: HoverDevCardsProps) => {
 
 
 
-export default ProfileHoverCards;
+export { ProfileHoverCards };

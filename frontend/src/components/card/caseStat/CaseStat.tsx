@@ -29,4 +29,4 @@ const CaseStatSection = ({
   )
 };
 
-export default CaseStatSection;
+export { CaseStat, CaseStatSection };

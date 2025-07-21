@@ -28,4 +28,4 @@ const BillsCard = () => {
   )
 };
 
-export default BillsCard;
+export { BillsCard };

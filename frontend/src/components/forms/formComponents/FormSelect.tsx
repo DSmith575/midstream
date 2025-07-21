@@ -41,4 +41,4 @@ const FormSelect = <T extends FieldValues>({control, fieldName, formLabel, selec
   )
 };
 
-export default FormSelect;
+export { FormSelect };

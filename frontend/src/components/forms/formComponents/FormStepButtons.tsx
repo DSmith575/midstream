@@ -39,4 +39,4 @@ const FormStepButtons = ({currentStep, profileFormStepsLength, prevButtonType, n
   )
 };
 
-export default FormStepButtons;
+export { FormStepButtons };

@@ -1,7 +1,7 @@
 import useUserProfile from '@/hooks/userProfile/useUserProfile'
-import ProfileForm from '../forms/referralForm/profileForm/ProfileForm'
-import CompanyList from '../companyList/CompanyList'
-import ProfileHoverCards from '@/components/profile/ProfileHoverCards'
+import ProfileForm from '@/components/forms/profileForm/ProfileForm'
+import {CompanyList} from '@/components/companyList/CompanyList'
+import {ProfileHoverCards} from '@/components/profile/ProfileHoverCards'
 import { getComponentMapUser, getComponentMapWorker } from '@/lib/dashboardComponentMap'
 import { roleConstants } from '@/lib/constants'
 
@@ -56,4 +56,4 @@ const DashboardContent = ({ userId }: DashBoardContentProps) => {
   )
 }
 
-export default DashboardContent
+export { DashboardContent }

@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -21,13 +15,14 @@ datasource db {
 //   PREFER_NOT_TO_SAY
 // }
 
-// enum ReferralStatus {
-//   SUBMITTED
-//   VIEWED
-//   REVIEWED
-//   APPROVED
-//   REJECTED
-// }
+enum ReferralStatus {
+  SUBMITTED
+  VIEWED
+  ASSIGNED
+  REVIEWED
+  APPROVED
+  REJECTED
+}
 
 enum UserRole {
   CLIENT
@@ -37,25 +32,25 @@ enum UserRole {
 }
 
 model User {
-  id                  Int                  @id @default(autoincrement())
-  companyId           Int?
+  id                  String               @id @default(uuid())
   googleId            String               @unique
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @default(now()) @updatedAt
   contactInformation  ContactInformation?
   personalInformation PersonalInformation?
   addressInformation  AddressInformation?
+  companyId           String?
+  company             Company?             @relation(fields: [companyId], references: [id])
   createdReferrals    ReferralForm[]       @relation("CreatedReferrals")
   assignedReferrals   ReferralForm[]       @relation("AssignedReferrals")
   casesCompleted      Int?                 @default(0)
   casesAssigned       Int?                 @default(0)
   role                UserRole             @default(CLIENT)
-  company             Company?             @relation(fields: [companyId], references: [id])
 }
 
 model ContactInformation {
-  id        Int      @id @default(autoincrement())
-  userId    Int      @unique
+  id        String   @id @default(uuid())
+  userId    String   @unique
   email     String   @unique
   phone     String
   createdAt DateTime @default(now())
@@ -64,8 +59,8 @@ model ContactInformation {
 }
 
 model PersonalInformation {
-  id            Int      @id @default(autoincrement())
-  userId        Int      @unique
+  id            String   @id @default(uuid())
+  userId        String   @unique
   firstName     String
   lastName      String
   title         String?
@@ -78,12 +73,12 @@ model PersonalInformation {
 }
 
 model AddressInformation {
-  id        Int      @id @default(autoincrement())
-  userId    Int      @unique
+  id        String   @id @default(uuid())
+  userId    String   @unique
   address   String
   suburb    String
   city      String
-  postCode  Int
+  postCode  String
   country   String
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -91,20 +86,20 @@ model AddressInformation {
 }
 
 model ReferralForm {
-  id                      Int                    @id @default(autoincrement())
-  companyId               Int // new field!
-  userId                  Int
-  assignedToWorkerId      Int?
+  id                      String                 @id @default(uuid())
+  companyId               String
+  userId                  String
+  assignedToWorkerId      String?
   createdAt               DateTime               @default(now())
   updatedAt               DateTime               @default(now()) @updatedAt
-  status                  String                 @default("SUBMITTED")
-  communicationId         Int                    @unique
-  medicalId               Int                    @unique
-  disabilityId            Int                    @unique
-  referrerId              Int                    @unique
-  emergencyContactId      Int                    @unique
-  consentId               Int                    @unique
-  additionalInformationId Int                    @unique
+  status                  ReferralStatus         @default(SUBMITTED)
+  communicationId         String                 @unique
+  medicalId               String                 @unique
+  disabilityId            String                 @unique
+  referrerId              String                 @unique
+  emergencyContactId      String                 @unique
+  consentId               String                 @unique
+  additionalInformationId String                 @unique
   user                    User                   @relation("CreatedReferrals", fields: [userId], references: [id])
   assignedToWorker        User?                  @relation("AssignedReferrals", fields: [assignedToWorkerId], references: [id])
   referrer                Referrer               @relation(fields: [referrerId], references: [id])
@@ -114,11 +109,11 @@ model ReferralForm {
   disability              ReferralDisability     @relation(fields: [disabilityId], references: [id])
   consent                 ReferralConsent        @relation(fields: [consentId], references: [id])
   additionalInformation   AdditionalInformation? @relation(fields: [additionalInformationId], references: [id])
-  company                 Company?               @relation(fields: [companyId], references: [id]) // new relation
+  company                 Company?               @relation(fields: [companyId], references: [id])
 }
 
 model ReferralCommunication {
-  id                        Int           @id @default(autoincrement())
+  id                        String        @id @default(uuid())
   firstLanguage             String
   interpreter               Boolean
   culturalSupport           Boolean?
@@ -128,14 +123,14 @@ model ReferralCommunication {
 }
 
 model AdditionalInformation {
-  id                        Int           @id @default(autoincrement())
+  id                        String        @id @default(uuid())
   safety                    String
   otherImportantInformation String?
   referral                  ReferralForm?
 }
 
 model ReferralMedical {
-  id            Int           @id @default(autoincrement())
+  id            String        @id @default(uuid())
   doctorName    String
   doctorPhone   String
   doctorAddress String
@@ -146,7 +141,7 @@ model ReferralMedical {
 }
 
 model ReferralDisability {
-  id                          Int           @id @default(autoincrement())
+  id                          String        @id @default(uuid())
   disabilityType              String
   disabilityDetails           String?
   disabilitySupportDetails    String?
@@ -156,7 +151,7 @@ model ReferralDisability {
 }
 
 model Referrer {
-  id           Int            @id @default(autoincrement())
+  id           String         @id @default(uuid())
   firstName    String
   lastName     String
   email        String?
@@ -166,7 +161,7 @@ model Referrer {
 }
 
 model EmergencyContact {
-  id           Int            @id @default(autoincrement())
+  id           String         @id @default(uuid())
   firstName    String
   lastName     String
   phone        String
@@ -176,7 +171,7 @@ model EmergencyContact {
 }
 
 model ReferralConsent {
-  id                              Int           @id @default(autoincrement())
+  id                              String        @id @default(uuid())
   provideInformationConsent       Boolean
   provideSharedInformationConsent Boolean
   provideContactConsent           Boolean
@@ -186,18 +181,18 @@ model ReferralConsent {
 }
 
 model Company {
-  id        Int            @id @default(autoincrement())
-  name      String         @unique
+  id        String         @id @default(uuid())
+  name      String
   city      String
   address   String
   suburb    String
-  postCode  Int
+  postCode  String
   country   String
   phone     String
-  email     String         @unique
-  website   String?        
+  email     String
+  website   String?
   createdAt DateTime       @default(now())
   updatedAt DateTime       @default(now()) @updatedAt
-  users     User[] // one company has many users
+  users     User[]
   referrals ReferralForm[]
 }

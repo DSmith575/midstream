@@ -42,7 +42,7 @@ const caseWorkerColumns: ColumnDef<DataProps>[] = [
     },
 ];
 
-export default caseWorkerColumns;
+export { caseWorkerColumns };
 
 // {
 //   accessorKey: 'lastUpdate',

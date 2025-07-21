@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, ReferralStatus } from "@prisma/client";
 import { Request, Response } from "express";
 import { orgRoles } from "@/constants";
 
@@ -33,7 +33,7 @@ const updateReferralForm = async (
 
 		const referralExists = await prisma.referralForm.findUnique({
 			where: {
-				id: Number(referralId),
+				id: String(referralId),
 			},
 		});
 
@@ -43,11 +43,11 @@ const updateReferralForm = async (
 
 		const referral = await prisma.referralForm.update({
 			where: {
-				id: Number(referralId),
+				id: String(referralId),
 			},
 			data: {
 				assignedToWorkerId: caseWorker,
-				status: "ASSIGNED",
+				status: ReferralStatus.ASSIGNED,
 			},
 		});
 

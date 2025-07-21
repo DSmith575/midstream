@@ -1,9 +1,8 @@
 import type { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { referralFormSchema } from "@/lib/schemas/referralFormSchema";
-import MotionContainer from "@/components/animation/MotionContainer";
-import FormInput from "@/components/forms/formComponents/FormInput";
-import FormSelect from "@/components/forms/formComponents/FormSelect";
+import {MotionContainer} from "@/components/animation/MotionContainer";
+import { FormSelect, FormInput } from "@/components/forms/formComponents/index";;
 import { referralFormDisabilityOptions } from "@/lib/formOptions/referralFormOptions";
 import { SelectItem } from "@/components/ui/select";
 
@@ -41,4 +40,4 @@ const StepDisabilityInfo = ({
 	);
 };
 
-export default StepDisabilityInfo;
+export { StepDisabilityInfo };

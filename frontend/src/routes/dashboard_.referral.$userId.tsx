@@ -1,4 +1,4 @@
-import ReferralForm from '@/components/forms/referralForm/ReferralForm';
+import {ReferralForm} from '@/components/forms/referralForm/ReferralForm';
 import { createFileRoute } from '@tanstack/react-router'
 
 

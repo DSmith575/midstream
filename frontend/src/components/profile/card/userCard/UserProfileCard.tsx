@@ -1,8 +1,11 @@
 import type { UserProfileProps } from '@/lib/interfaces'
-import PersonalInformation from '@/components/profile/card/userCard/UserProfilePersonal'
-import AddressInformation from '@/components/profile/card/userCard/UserProfileAddress'
-import ContactInformation from '@/components/profile/card/userCard/UserProfileContact'
-import CaseStatSection from '@/components/card/caseStat/CaseStat'
+import {
+  UserProfilePersonalInformationCard,
+  UserProfileAddressCard,
+  UserProfileContactCard,
+} from '@/components/profile/card/userCard/index'
+
+import { CaseStatSection } from '@/components/card/caseStat/CaseStat'
 import { Button } from '@/components/ui/button'
 import { UserCog } from 'lucide-react'
 import { roleConstants } from '@/lib/constants'
@@ -26,9 +29,8 @@ const UserProfileCard = ({ userProfile }: CardProps) => {
     casesCompleted,
     casesAssigned,
     role,
-    company
+    company,
   } = userProfile
-
 
   return (
     <main className="w-full min-h-[300px] col-span-1 max-h-[300px] rounded-2xl bg-white shadow-lg  mx-auto p-6 sm:p-8 space-y-6 relative">
@@ -45,21 +47,23 @@ const UserProfileCard = ({ userProfile }: CardProps) => {
 
       {/* Personal Info */}
       <section className="flex flex-col items-center">
-        <PersonalInformation personalInfo={personalInformation} />
+        <UserProfilePersonalInformationCard
+          personalInfo={personalInformation}
+        />
       </section>
 
       <hr className="border-gray-200" />
 
       {/* Address Info */}
       <section className="flex flex-col items-center">
-        <AddressInformation addressInfo={addressInformation} />
+        <UserProfileAddressCard addressInfo={addressInformation} />
       </section>
 
       <hr className="border-gray-200" />
 
       {/* Contact Info */}
       <section className="flex flex-col items-center">
-        <ContactInformation contactInfo={contactInformation} />
+        <UserProfileContactCard contactInfo={contactInformation} />
       </section>
       <section className="absolute left-4 top-4 z-10">
         <p>{role}</p>
@@ -79,4 +83,4 @@ const UserProfileCard = ({ userProfile }: CardProps) => {
   )
 }
 
-export default UserProfileCard
+export { UserProfileCard }
