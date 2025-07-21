@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { useState } from 'react'
-import SpringModal from '../modal/SpringModal'
+import SpringModal from '@/components/modal/SpringModal'
 import type { CompanyProps } from '@/lib/interfaces'
 
 const CompanyCard = ({
@@ -67,4 +67,4 @@ const Card = ({
   )
 }
 
-export default CompanyCard
+export { CompanyCard }

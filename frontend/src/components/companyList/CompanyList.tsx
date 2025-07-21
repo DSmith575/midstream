@@ -1,6 +1,6 @@
 import type { CompanyProps } from '@/lib/interfaces'
 import { useEffect, useState } from 'react'
-import CompanyCard from '@/components/companyList/CompanyCard'
+import {CompanyCard} from '@/components/companyList/CompanyCard'
 
 const apiKey = import.meta.env.VITE_API_BACKEND_URL
 
@@ -46,4 +46,4 @@ const CompanyList = ({ userId, userCity}: { userId: string, userCity: string }) 
   )
 }
 
-export default CompanyList
+export { CompanyList };

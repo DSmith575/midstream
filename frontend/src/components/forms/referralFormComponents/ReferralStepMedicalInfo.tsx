@@ -1,8 +1,8 @@
 import type { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { referralFormSchema } from "@/lib/schemas/referralFormSchema";
-import MotionContainer from "@/components/animation/MotionContainer";
-import FormInput from "@/components/forms/formComponents/FormInput";
+import {MotionContainer} from "@/components/animation/MotionContainer";
+import { FormInput } from "@/components/forms/formComponents/index";;
 
 type Inputs = z.infer<typeof referralFormSchema>;
 
@@ -59,4 +59,4 @@ const StepMedicalInfo = ({
 	);
 };
 
-export default StepMedicalInfo;
+export { StepMedicalInfo };

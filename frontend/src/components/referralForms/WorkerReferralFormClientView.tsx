@@ -7,7 +7,7 @@ interface ReferralFormFieldsProps {
 	// header: string;
 }
 
-const ReferralFormFields = ({ refField }: ReferralFormFieldsProps) => {
+const WorkerReferralFormClientView = ({ refField }: ReferralFormFieldsProps) => {
 	return (
 		<section className={"grid grid-cols-2 gap-1 overflow-y-auto"}>
 						{/* <Label className={"text-md mb-1.5"}>{header}</Label> */}
@@ -36,4 +36,4 @@ const ReferralFormFields = ({ refField }: ReferralFormFieldsProps) => {
 	);
 };
 
-export default ReferralFormFields;
+export default WorkerReferralFormClientView;

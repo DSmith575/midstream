@@ -34,4 +34,4 @@ const FormTextArea = <T extends FieldValues>({control, fieldName, formLabel, pla
   )
 };
 
-export default FormTextArea;
+export { FormTextArea };

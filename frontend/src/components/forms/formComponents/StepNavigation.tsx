@@ -3,7 +3,7 @@ interface StepNavigationProps {
   currentStep: number
 }
 
-const StepNavigation = ({ steps, currentStep }: StepNavigationProps) => {
+const FormStepNavigation = ({ steps, currentStep }: StepNavigationProps) => {
   return (
     <nav aria-label="Progress">
       <ol role="list" className="space-y-4 md:flex md:space-x-8 md:space-y-0">
@@ -41,4 +41,4 @@ const StepNavigation = ({ steps, currentStep }: StepNavigationProps) => {
   )
 }
 
-export default StepNavigation
+export { FormStepNavigation }

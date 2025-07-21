@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 // } from "@/components/ui/accordion";
 // import ReferralFormFields from "@/components/referralForms/ReferralFormFields";
 
-const ReferralFormApplication = ({ referralForm }: any) => {
+const UserReferralFormView = ({ referralForm }: any) => {
 	return (
 		<Dialog>
 			<Button variant="outline" size="lg" className="" asChild>
@@ -61,4 +61,4 @@ const ReferralFormApplication = ({ referralForm }: any) => {
 	);
 };
 
-export default ReferralFormApplication;
+export default UserReferralFormView;

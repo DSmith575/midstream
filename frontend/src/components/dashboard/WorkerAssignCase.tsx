@@ -16,7 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import ReferralFormFields from "@/components/referralForms/ReferralFormFields";
+import WorkerReferralFormClientView from "@/components/referralForms/WorkerReferralFormClientView";
 import { generateFormSections } from "@/lib/functions/formFunctions";
 
 interface AssignWorkerProps {
@@ -82,7 +82,7 @@ const WorkerAssignCase = ({
 							<AccordionItem key={index} value={`item-${index}`}>
 								<AccordionTrigger>{section.title}</AccordionTrigger>
 								<AccordionContent>
-									<ReferralFormFields refField={section.field} />
+									<WorkerReferralFormClientView refField={section.field} />
 								</AccordionContent>
 							</AccordionItem>
 						))}
@@ -149,4 +149,4 @@ const WorkerAssignCase = ({
 	);
 };
 
-export default WorkerAssignCase;
+export { WorkerAssignCase };

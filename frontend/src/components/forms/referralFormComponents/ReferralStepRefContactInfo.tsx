@@ -2,9 +2,8 @@ import type { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { referralFormSchema } from "@/lib/schemas/referralFormSchema";
 import { referrerRelationshipOptions } from "@/lib/formOptions/referralFormOptions";
-import MotionContainer from "@/components/animation/MotionContainer";
-import FormInput from "@/components/forms/formComponents/FormInput";
-import FormSelect from "@/components/forms/formComponents/FormSelect";
+import {MotionContainer} from "@/components/animation/MotionContainer";
+import { FormInput, FormSelect } from "@/components/forms/formComponents/index";;
 import { SelectItem } from "@/components/ui/select";
 
 type Inputs = z.infer<typeof referralFormSchema>;
@@ -32,4 +31,4 @@ const StepReferralContactInfo = ({ form, delta, header, subtitle }: { form: UseF
 };
 
 
-export default StepReferralContactInfo;
+export { StepReferralContactInfo };

@@ -1,27 +1,28 @@
-import { useMemo, useReducer } from 'react';
-import { Form } from "@/components/ui/form";
-import { referralFormSchema } from '@/lib/schemas/referralFormSchema';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { useAuth } from '@clerk/clerk-react';
-import { z } from 'zod';
-import { referralFormSteps } from "@/lib/formOptions/referralFormOptions";
-import useCreateReferralForm from '@/hooks/userProfile/useCreateReferralForm';
-import useUserProfile from '@/hooks/userProfile/useUserProfile';
-import Spinner from '@/components/spinner/Spinner';
-import StepNavigation from '@/components/forms/formComponents/StepNavigation';
-import FormStepButtons from '@/components/forms/formComponents/FormStepButtons';
-import { useNavigate } from '@tanstack/react-router';
-import StepPersonalInfo from '@/components/forms/referralForm/referralFormComponents/ReferralStepPersonalInfo';
-import StepLanguageInfo from '@/components/forms/referralForm/referralFormComponents/ReferralStepLanguageInfo';
-import StepMedicalInfo from '@/components/forms/referralForm/referralFormComponents/ReferralStepMedicalInfo';
-import StepDisabilityInfo from '@/components/forms/referralForm/referralFormComponents/ReferralStepDisabilityInfo';
-import StepAdditionalInfo from '@/components/forms/referralForm/referralFormComponents/ReferralStepAdditionalInfo';
-import StepReferralContactInfo from '@/components/forms/referralForm/referralFormComponents/ReferralStepRefContactInfo';
-import StepEmergencyContactInfo from '@/components/forms/referralForm/referralFormComponents/ReferralStepEmergencyInfo';
-import StepConsentInfo from '@/components/forms/referralForm/referralFormComponents/ReferralStepConsentInfo';
+import { useMemo, useReducer } from 'react'
+import { Form } from '@/components/ui/form'
+import { referralFormSchema } from '@/lib/schemas/referralFormSchema'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import { useAuth } from '@clerk/clerk-react'
+import { z } from 'zod'
+import { referralFormSteps } from '@/lib/formOptions/referralFormOptions'
+import useCreateReferralForm from '@/hooks/userProfile/useCreateReferralForm'
+import useUserProfile from '@/hooks/userProfile/useUserProfile'
+import Spinner from '@/components/spinner/Spinner'
+import {FormStepButtons, FormStepNavigation} from '@/components/forms/formComponents/index'
+import { useNavigate } from '@tanstack/react-router'
+import {
+  StepPersonalInfo,
+  StepLanguageInfo,
+  StepMedicalInfo,
+  StepDisabilityInfo,
+  StepAdditionalInfo,
+  StepReferralContactInfo,
+  StepEmergencyContactInfo,
+  StepConsentInfo,
+} from '@/components/forms/referralFormComponents/index'
 
-type Inputs = z.infer<typeof referralFormSchema>;
+type Inputs = z.infer<typeof referralFormSchema>
 
 const preLoadedData = (userData: any) => ({
   firstName: userData?.personalInformation?.firstName ?? '',
@@ -29,7 +30,9 @@ const preLoadedData = (userData: any) => ({
   title: userData?.personalInformation?.title ?? '',
   preferredName: userData?.personalInformation?.preferredName ?? '',
   dateOfBirth: userData?.personalInformation?.dateOfBirth
-    ? new Date(userData.personalInformation.dateOfBirth).toISOString().split('T')[0]
+    ? new Date(userData.personalInformation.dateOfBirth)
+        .toISOString()
+        .split('T')[0]
     : '',
   gender: userData?.personalInformation?.gender ?? '',
   email: userData?.contactInformation?.email ?? '',
@@ -70,56 +73,60 @@ const preLoadedData = (userData: any) => ({
   contactedForAdditionalInformation: '',
   statisticalInformation: '',
   correctInformationProvided: '',
-});
+})
 
-const stepReducer = (state: { current: number; previous: number }, action: 'next' | 'prev') => {
-  const newStep = action === 'next' ? state.current + 1 : state.current - 1;
-  return { current: newStep, previous: state.current };
-};
+const stepReducer = (
+  state: { current: number; previous: number },
+  action: 'next' | 'prev',
+) => {
+  const newStep = action === 'next' ? state.current + 1 : state.current - 1
+  return { current: newStep, previous: state.current }
+}
 
 const ReferralForm = () => {
-  const { userId } = useAuth();
-  const { isLoading, isError, userData } = useUserProfile(userId as string);
-  const navigate = useNavigate();
+  const { userId } = useAuth()
+  const { isLoading, isError, userData } = useUserProfile(userId as string)
+  const navigate = useNavigate()
   const { mutate, isPending } = useCreateReferralForm(userId as string, () => {
-    navigate({ to: `/dashboard` });
-  });
-  
-  const preLoadData = useMemo(() => preLoadedData(userData), [userData]);
+    navigate({ to: `/dashboard` })
+  })
 
+  const preLoadData = useMemo(() => preLoadedData(userData), [userData])
 
   const form = useForm<Inputs>({
     resolver: zodResolver(referralFormSchema),
     values: preLoadData,
-  });
+  })
 
-  const communicationNeedsValue = form.watch('communicationNeeds');
-  const { trigger } = form;
+  const communicationNeedsValue = form.watch('communicationNeeds')
+  const { trigger } = form
 
   const next = async () => {
-    const fields = referralFormSteps[step.current]?.fields;
-    const isValid = await trigger(fields as (keyof Inputs)[], { shouldFocus: true });
+    const fields = referralFormSteps[step.current]?.fields
+    const isValid = await trigger(fields as (keyof Inputs)[], {
+      shouldFocus: true,
+    })
     if (isValid && step.current < referralFormSteps.length - 1) {
-      dispatch('next');
+      dispatch('next')
     }
-  };
+  }
 
   const prev = () => {
     if (step.current > 0) {
-      dispatch('prev');
+      dispatch('prev')
     }
-  };
+  }
 
-  const [step, dispatch] = useReducer(stepReducer, { current: 0, previous: 0 });
-  const delta = step.current - step.previous;
+  const [step, dispatch] = useReducer(stepReducer, { current: 0, previous: 0 })
+  const delta = step.current - step.previous
 
   const onSubmit = async (values: Inputs) => {
-    const googleUserId = userId;
+    const googleUserId = userId
     if (!googleUserId) {
-      return;
+      return
     }
 
-    const companyId = userData?.company?.id || 1; // Default to 1 if companyId is not available
+    const companyId = userData?.company?.id || 1 // Default to 1 if companyId is not available
     const referralDetails = {
       googleId: userId,
       userProfile: {
@@ -182,131 +189,132 @@ const ReferralForm = () => {
       consentInfo: {
         provideInformation: values.provideInformation,
         shareInformation: values.shareInformation,
-        contactedForAdditionalInformation: values.contactedForAdditionalInformation,
+        contactedForAdditionalInformation:
+          values.contactedForAdditionalInformation,
         statisticalInformation: values.statisticalInformation,
         correctInformationProvided: values.correctInformationProvided,
       },
       companyId: companyId,
-    };
+    }
 
     try {
-       mutate(referralDetails);
-
+      mutate(referralDetails)
     } catch (error) {
-      console.error(error);
+      console.error(error)
     }
-  };
+  }
 
   return (
-		<section className="flex flex-col justify-between px-10 pt-10">
-			{/* Loading State */}
-			{isLoading && (
-				<div className="mt-12 flex items-center justify-center">
-					<Spinner />
-				</div>
-			)}
+    <section className="flex flex-col justify-between px-10 pt-10">
+      {/* Loading State */}
+      {isLoading && (
+        <div className="mt-12 flex items-center justify-center">
+          <Spinner />
+        </div>
+      )}
 
-			{!isLoading && !isError && userData && (
-				<>
-					<StepNavigation
-						steps={referralFormSteps}
-						currentStep={step.current}
-					/>
-					<Form {...form}>
-						<form
-							onSubmit={form.handleSubmit(onSubmit)}
-							className="mt-4 space-y-2 py-4">
-							{step.current === 0 && (
-								<StepPersonalInfo
-									form={form}
-									delta={delta}
-									header={referralFormSteps[step.current].name}
-									subtitle={referralFormSteps[step.current].subtitle}
-								/>
-							)}
+      {!isLoading && !isError && userData && (
+        <>
+          <FormStepNavigation
+            steps={referralFormSteps}
+            currentStep={step.current}
+          />
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="mt-4 space-y-2 py-4"
+            >
+              {step.current === 0 && (
+                <StepPersonalInfo
+                  form={form}
+                  delta={delta}
+                  header={referralFormSteps[step.current].name}
+                  subtitle={referralFormSteps[step.current].subtitle}
+                />
+              )}
 
-							{step.current === 1 && (
-								<StepLanguageInfo
-									form={form}
-									delta={delta}
-									communicationNeedsValue={communicationNeedsValue}
-									header={referralFormSteps[step.current].name}
-									subtitle={referralFormSteps[step.current].subtitle}
-								/>
-							)}
+              {step.current === 1 && (
+                <StepLanguageInfo
+                  form={form}
+                  delta={delta}
+                  communicationNeedsValue={communicationNeedsValue}
+                  header={referralFormSteps[step.current].name}
+                  subtitle={referralFormSteps[step.current].subtitle}
+                />
+              )}
 
-							{step.current === 2 && (
-								<StepMedicalInfo
-									form={form}
-									delta={delta}
-									header={referralFormSteps[step.current].name}
-									subtitle={referralFormSteps[step.current].subtitle}
-								/>
-							)}
+              {step.current === 2 && (
+                <StepMedicalInfo
+                  form={form}
+                  delta={delta}
+                  header={referralFormSteps[step.current].name}
+                  subtitle={referralFormSteps[step.current].subtitle}
+                />
+              )}
 
-							{step.current === 3 && (
-								<StepDisabilityInfo
-									form={form}
-									delta={delta}
-									header={referralFormSteps[step.current].name}
-									subtitle={referralFormSteps[step.current].subtitle}
-								/>
-							)}
+              {step.current === 3 && (
+                <StepDisabilityInfo
+                  form={form}
+                  delta={delta}
+                  header={referralFormSteps[step.current].name}
+                  subtitle={referralFormSteps[step.current].subtitle}
+                />
+              )}
 
-							{step.current === 4 && (
-								<StepAdditionalInfo
-									form={form}
-									delta={delta}
-									header={referralFormSteps[step.current].name}
-									subtitle={referralFormSteps[step.current].subtitle}
-								/>
-							)}
+              {step.current === 4 && (
+                <StepAdditionalInfo
+                  form={form}
+                  delta={delta}
+                  header={referralFormSteps[step.current].name}
+                  subtitle={referralFormSteps[step.current].subtitle}
+                />
+              )}
 
-							{step.current === 5 && (
-								<StepReferralContactInfo
-									form={form}
-									delta={delta}
-									header={referralFormSteps[step.current].name}
-									subtitle={referralFormSteps[step.current].subtitle}
-								/>
-							)}
+              {step.current === 5 && (
+                <StepReferralContactInfo
+                  form={form}
+                  delta={delta}
+                  header={referralFormSteps[step.current].name}
+                  subtitle={referralFormSteps[step.current].subtitle}
+                />
+              )}
 
-							{step.current === 6 && (
-								<StepEmergencyContactInfo
-									form={form}
-									delta={delta}
-									header={referralFormSteps[step.current].name}
-									subtitle={referralFormSteps[step.current].subtitle}
-								/>
-							)}
+              {step.current === 6 && (
+                <StepEmergencyContactInfo
+                  form={form}
+                  delta={delta}
+                  header={referralFormSteps[step.current].name}
+                  subtitle={referralFormSteps[step.current].subtitle}
+                />
+              )}
 
-							{step.current === 7 && (
-								<StepConsentInfo
-									form={form}
-									delta={delta}
-									header={referralFormSteps[step.current].name}
-									subtitle={referralFormSteps[step.current].subtitle}
-								/>
-							)}
+              {step.current === 7 && (
+                <StepConsentInfo
+                  form={form}
+                  delta={delta}
+                  header={referralFormSteps[step.current].name}
+                  subtitle={referralFormSteps[step.current].subtitle}
+                />
+              )}
 
-							<FormStepButtons
-								currentStep={step.current}
-								profileFormStepsLength={referralFormSteps.length}
-								prevButtonType={"button"}
-								nextButtonType={"button"}
-								prevButtonText={"Previous"}
-								nextButtonText={"Next"}
-								onClickPrev={prev}
-								onClickNext={next}
-								submitButtonText={isPending ? "Submitting..." : "Submit"}
-								submitButtonType={"submit"}
-							/>
-						</form>
-					</Form>
-				</>
-			)}
-		</section>
-	);
-};
+              <FormStepButtons
+                currentStep={step.current}
+                profileFormStepsLength={referralFormSteps.length}
+                prevButtonType={'button'}
+                nextButtonType={'button'}
+                prevButtonText={'Previous'}
+                nextButtonText={'Next'}
+                onClickPrev={prev}
+                onClickNext={next}
+                submitButtonText={isPending ? 'Submitting...' : 'Submit'}
+                submitButtonType={'submit'}
+              />
+            </form>
+          </Form>
+        </>
+      )}
+    </section>
+  )
+}
 
-export default ReferralForm;
+export { ReferralForm }

@@ -2,8 +2,8 @@ import type { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { referralFormSchema } from "@/lib/schemas/referralFormSchema";
 import { yesOrNo } from "@/lib/formOptions/referralFormOptions";
-import MotionContainer from "@/components/animation/MotionContainer";
-import FormSelect from "@/components/forms/formComponents/FormSelect";
+import {MotionContainer} from "@/components/animation/MotionContainer";
+import { FormSelect } from "@/components/forms/formComponents/index";;
 import { SelectItem } from "@/components/ui/select";
 
 type Inputs = z.infer<typeof referralFormSchema>;
@@ -72,4 +72,4 @@ const StepConsentInfo = ({ form, delta, header, subtitle }: { form: UseFormRetur
 };
 
 
-export default StepConsentInfo;
+export { StepConsentInfo };

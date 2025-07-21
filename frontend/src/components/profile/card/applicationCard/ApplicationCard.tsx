@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button'
 import { Link } from '@tanstack/react-router'
-import ReferralFormApplication from '@/components/referralForms/ReferralFormApplication'
+import UserReferralFormView from '@/components/referralForms/UserReferralFormView'
 import useGetReferralForms from '@/hooks/userProfile/useGetReferralForms'
 import Spinner from '@/components/spinner/Spinner'
 
@@ -39,7 +39,7 @@ const ApplicationCard = ({ userId }: ApplicationCardProps) => {
               key={idx}
               className="flex items-center justify-between text-sm"
             >
-              <ReferralFormApplication referralForm={form} />
+              <UserReferralFormView referralForm={form} />
               <p
                 className={`rounded-full px-3 py-1 ${
                   form.status === 'SUBMITTED' ? 'bg-[#84e984]' : 'bg-red-100'

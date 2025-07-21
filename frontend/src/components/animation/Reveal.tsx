@@ -63,4 +63,4 @@ const Reveal = ({ children, width = 'fit-content' }: Props) => {
   )
 }
 
-export default Reveal
+export { Reveal }

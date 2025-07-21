@@ -8,16 +8,18 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { useUser } from '@clerk/clerk-react'
 
-import MotionContainer from '@/components/animation/MotionContainer'
-import StepNavigation from '@/components/forms/formComponents/StepNavigation'
-import FormInput from '@/components/forms/formComponents/FormInput'
-import FormSelect from '@/components/forms/formComponents/FormSelect'
+import { MotionContainer } from '@/components/animation/MotionContainer'
 import {
   titleSelectOptions,
   genderSelectOptions,
   profileFormSteps,
 } from '@/lib/formOptions/profileFormOptions'
-import FormStepButtons from '@/components/forms/formComponents/FormStepButtons'
+import {
+  FormStepButtons,
+  FormInput,
+  FormSelect,
+  FormStepNavigation,
+} from '@/components/forms/formComponents/index'
 import useCreateUserProfile from '@/hooks/userProfile/useCreateUserProfile'
 import type { CreateUserProps } from '@/lib/profileInterfaces'
 import { useNavigate } from '@tanstack/react-router'
@@ -27,11 +29,13 @@ type FieldName = keyof Inputs
 
 const ProfileForm = () => {
   const user = useUser()
-  const navigate = useNavigate();
-  const { mutate, isPending, isSuccess } = useCreateUserProfile(user.user?.id as string,() => {
-    navigate({ to: `/dashboard` });
-  });
-  
+  const navigate = useNavigate()
+  const { mutate, isPending, isSuccess } = useCreateUserProfile(
+    user.user?.id as string,
+    () => {
+      navigate({ to: `/dashboard` })
+    },
+  )
 
   const form = useForm<Inputs>({
     resolver: zodResolver(profileFormSchema),
@@ -47,7 +51,7 @@ const ProfileForm = () => {
       address: '',
       suburb: '',
       city: '',
-      postCode: "0",
+      postCode: '0',
       country: '',
     },
   })
@@ -85,7 +89,6 @@ const ProfileForm = () => {
       if (isSuccess) {
         navigate({ to: '/dashboard' })
       }
-
     } catch (error) {
       console.error(error)
     }
@@ -112,7 +115,7 @@ const ProfileForm = () => {
 
   return (
     <section className="flex flex-col justify-between px-10 py-10">
-      <StepNavigation steps={profileFormSteps} currentStep={currentStep} />
+      <FormStepNavigation steps={profileFormSteps} currentStep={currentStep} />
 
       {/* Form */}
       <Form {...form}>
