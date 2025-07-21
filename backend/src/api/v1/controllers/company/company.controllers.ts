@@ -25,11 +25,13 @@ const createCompany = async (req: Request, res: Response): Promise<void> => {
 		} = req.body;
 
 		const checkCompanyName = await prisma.company.findFirst({
-			where: { name: companyName },
+			where: { name: companyName, address: address },
 		});
 
 		if (checkCompanyName) {
-			res.status(400).json({ message: "Company already exists" });
+			res
+				.status(400)
+				.json({ message: "Company with this name and address already exists" });
 			return;
 		}
 
@@ -50,12 +52,10 @@ const createCompany = async (req: Request, res: Response): Promise<void> => {
 		res.status(200).json(result);
 		return;
 	} catch (error) {
-		res
-			.status(500)
-			.json({
-				statusCode: res.statusCode,
-				message: error instanceof Error ? error.message : "Unknown error",
-			});
+		res.status(500).json({
+			statusCode: res.statusCode,
+			message: error instanceof Error ? error.message : "Unknown error",
+		});
 		return;
 	}
 };
@@ -82,12 +82,10 @@ const getCompanyList = async (req: Request, res: Response): Promise<void> => {
 		res.status(200).json(companies);
 		return;
 	} catch (error) {
-		res
-			.status(500)
-			.json({
-				statusCode: res.statusCode,
-				message: error instanceof Error ? error.message : "Unknown error",
-			});
+		res.status(500).json({
+			statusCode: res.statusCode,
+			message: error instanceof Error ? error.message : "Unknown error",
+		});
 		return;
 	}
 };

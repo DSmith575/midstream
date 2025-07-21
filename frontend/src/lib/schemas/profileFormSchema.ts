@@ -20,6 +20,6 @@ export const profileFormSchema = z.object({
     .string()
     .min(4, { message: 'Postcode must be at least 4 characters' })
     .regex(/^\d+$/, { message: 'Postcode must contain only digits' })
-    .max(9999, 'Postcode must be at most 4 digits'),
+    .max(4, 'Postcode must be at most 4 digits'),
   country: z.string().nonempty(),
 })

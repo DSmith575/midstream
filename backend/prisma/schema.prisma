@@ -39,7 +39,7 @@ model User {
   contactInformation  ContactInformation?
   personalInformation PersonalInformation?
   addressInformation  AddressInformation?
-  companyId           String?              @unique
+  companyId           String?
   company             Company?             @relation(fields: [companyId], references: [id])
   createdReferrals    ReferralForm[]       @relation("CreatedReferrals")
   assignedReferrals   ReferralForm[]       @relation("AssignedReferrals")
