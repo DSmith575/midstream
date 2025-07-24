@@ -18,7 +18,7 @@ export interface AddressInformationProps {
 	address: string;
 	suburb: string;
 	city: string;
-	postCode: number;
+	postCode: string;
 	country: string;
 }
 
@@ -26,13 +26,6 @@ export interface ContactInformationProps {
 	email: string;
 	phone: string;
 }
-
-// export interface UserProfileProps {
-// 	personalInformation?: UserInformationProps | null;
-// 	addressInformation?: AddressInformationProps | null;
-// 	contactInformation?: ContactInformationProps | null;
-// 	casesCompleted?: number;
-// }
 
 export interface UserProfileProps {
 	id?: number;

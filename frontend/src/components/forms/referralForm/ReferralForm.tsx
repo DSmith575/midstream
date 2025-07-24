@@ -1,16 +1,8 @@
-import { useMemo, useReducer } from 'react'
-import { Form } from '@/components/ui/form'
-import { referralFormSchema } from '@/lib/schemas/referralFormSchema'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import { useAuth } from '@clerk/clerk-react'
+import { useForm, FormProvider } from 'react-hook-form'
 import { z } from 'zod'
+import { referralFormSchema } from '@/lib/schemas/referralFormSchema'
 import { referralFormSteps } from '@/lib/formOptions/referralFormOptions'
-import useCreateReferralForm from '@/hooks/userProfile/useCreateReferralForm'
-import useUserProfile from '@/hooks/userProfile/useUserProfile'
-import {Spinner} from '@/components/spinner/Spinner'
-import {FormStepButtons, FormStepNavigation} from '@/components/forms/formComponents/index'
-import { useNavigate } from '@tanstack/react-router'
 import {
   StepPersonalInfo,
   StepLanguageInfo,
@@ -20,67 +12,102 @@ import {
   StepReferralContactInfo,
   StepEmergencyContactInfo,
   StepConsentInfo,
-} from '@/components/forms/referralFormComponents/index'
+} from '@/components/forms/referralForm/referralFormComponents/index'
+import useUserProfile from '@/hooks/userProfile/useUserProfile'
+import useCreateReferralForm from '@/hooks/userProfile/useCreateReferralForm'
+import { useNavigate } from '@tanstack/react-router'
+import { referralFormStore } from '@/lib/store/referralFormStore'
+import { Store, useStore } from '@tanstack/react-store'
 
-type Inputs = z.infer<typeof referralFormSchema>
+import { useAuth } from '@clerk/clerk-react'
+import { Form } from '@/components/ui/form'
+import { Button } from '@/components/ui/button'
+import type {
+  UserProfileProps,
+  UserInformationProps,
+  ContactInformationProps,
+  AddressInformationProps,
+} from '@/lib/interfaces'
 
-const preLoadedData = (userData: any) => ({
-  firstName: userData?.personalInformation?.firstName ?? '',
-  lastName: userData?.personalInformation?.lastName ?? '',
-  title: userData?.personalInformation?.title ?? '',
-  preferredName: userData?.personalInformation?.preferredName ?? '',
-  dateOfBirth: userData?.personalInformation?.dateOfBirth
-    ? new Date(userData.personalInformation.dateOfBirth)
-        .toISOString()
-        .split('T')[0]
-    : '',
-  gender: userData?.personalInformation?.gender ?? '',
-  email: userData?.contactInformation?.email ?? '',
-  phone: userData?.contactInformation?.phone ?? '',
-  address: userData?.addressInformation?.address ?? '',
-  suburb: userData?.addressInformation?.suburb ?? '',
-  city: userData?.addressInformation?.city ?? '',
-  postCode: userData?.addressInformation?.postCode ?? '',
-  country: userData?.addressInformation?.country ?? '',
-  firstLanguage: '',
-  interpreter: '',
-  culturalSupport: '',
-  communicationNeeds: '',
-  doctorName: '',
-  doctorPhone: '',
-  doctorAddress: '',
-  doctorSuburb: '',
-  doctorCity: '',
-  nationalHealthIndex: '',
-  disabilityType: '',
-  disabilityDetails: '',
-  disabilityReasonForReferral: '',
-  disabilitySupportRequired: '',
-  safety: '',
-  otherImportantInformation: '',
-  referrerFirstName: '',
-  referrerLastName: '',
-  referrerEmail: '',
-  referrerPhone: '',
-  referrerRelationship: '',
-  emergencyContactFirstName: '',
-  emergencyContactLastName: '',
-  emergencyContactPhone: '',
-  emergencyContactEmail: '',
-  emergencyContactRelationship: '',
-  provideInformation: '',
-  shareInformation: '',
-  contactedForAdditionalInformation: '',
-  statisticalInformation: '',
-  correctInformationProvided: '',
+import { useEffect } from 'react'
+import { buildReferralDetails } from '@/lib/functions/formFunctions'
+
+const stepComponents = [
+  StepPersonalInfo,
+  StepLanguageInfo,
+  StepMedicalInfo,
+  StepDisabilityInfo,
+  StepAdditionalInfo,
+  StepReferralContactInfo,
+  StepEmergencyContactInfo,
+  StepConsentInfo,
+] as const
+
+const stepStore = new Store({
+  stepIndex: 0,
 })
 
-const stepReducer = (
-  state: { current: number; previous: number },
-  action: 'next' | 'prev',
-) => {
-  const newStep = action === 'next' ? state.current + 1 : state.current - 1
-  return { current: newStep, previous: state.current }
+type ReferralFormType = z.infer<typeof referralFormSchema>
+
+export const preloadReferralFormData = (
+  userData?: UserProfileProps,
+): ReferralFormType => {
+  const personal = userData?.personalInformation ?? ({} as UserInformationProps)
+  const contact =
+    userData?.contactInformation ?? ({} as ContactInformationProps)
+  const address =
+    userData?.addressInformation ?? ({} as AddressInformationProps)
+  return {
+    firstName: personal.firstName ?? '',
+    lastName: personal.lastName ?? '',
+    title: personal.title ?? '',
+    preferredName: personal.preferredName ?? '',
+    gender: personal.gender ?? '',
+    dateOfBirth: personal.dateOfBirth
+      ? new Date(personal.dateOfBirth).toISOString().split('T')[0]
+      : '',
+
+    email: contact.email ?? '',
+    phone: contact.phone ?? '',
+
+    address: address.address ?? '',
+    suburb: address.suburb ?? '',
+    city: address.city ?? '',
+    postCode: address.postCode ?? '',
+    country: address.country ?? '',
+
+    firstLanguage: '',
+    interpreter: '',
+    culturalSupport: '',
+    communicationNeeds: '',
+    doctorName: '',
+    doctorPhone: '',
+    doctorAddress: '',
+    doctorSuburb: '',
+    doctorCity: '',
+    nationalHealthIndex: '',
+    disabilityType: '',
+    disabilityDetails: '',
+    disabilityReasonForReferral: '',
+    disabilitySupportRequired: '',
+    safety: '',
+    otherImportantInformation: '',
+    referrerFirstName: '',
+    referrerLastName: '',
+    referrerEmail: '',
+    referrerPhone: '',
+    referrerRelationship: '',
+    emergencyContactFirstName: '',
+    emergencyContactLastName: '',
+    emergencyContactPhone: '',
+    emergencyContactEmail: '',
+    emergencyContactRelationship: '',
+    provideInformation: '',
+    shareInformation: '',
+    contactedForAdditionalInformation: '',
+    statisticalInformation: '',
+    correctInformationProvided: '',
+  }
 }
 
 const ReferralForm = () => {
@@ -91,229 +118,95 @@ const ReferralForm = () => {
     navigate({ to: `/dashboard` })
   })
 
-  const preLoadData = useMemo(() => preLoadedData(userData), [userData])
+  if (isLoading) return <div>Loading...</div>
+  useEffect(() => {
+    if (userData) {
+      const mapped = preloadReferralFormData(userData)
+      referralFormStore.setState((state) => ({
+        ...state,
+        referralFormData: mapped,
+      }))
+    }
+  }, [userData])
 
-  const form = useForm<Inputs>({
+  const form = useForm<z.infer<typeof referralFormSchema>>({
     resolver: zodResolver(referralFormSchema),
-    values: preLoadData,
+    values: referralFormStore.state.referralFormData,
+    mode: 'onBlur',
   })
 
-  const communicationNeedsValue = form.watch('communicationNeeds')
-  const { trigger } = form
+  const stepIndex = useStore(stepStore, (s) => s.stepIndex)
+  const CurrentStep = stepComponents[stepIndex]
+  const currentStepFields = referralFormSteps[stepIndex]
+    .fields as (keyof z.infer<typeof referralFormSchema>)[]
 
-  const next = async () => {
-    const fields = referralFormSteps[step.current]?.fields
-    const isValid = await trigger(fields as (keyof Inputs)[], {
-      shouldFocus: true,
-    })
-    if (isValid && step.current < referralFormSteps.length - 1) {
-      dispatch('next')
-    }
+  const onNext = async () => {
+    const valid = await form.trigger(
+      currentStepFields as (keyof z.infer<typeof referralFormSchema>)[],
+    )
+    if (!valid) return
+    stepStore.setState((s) => ({ ...s, stepIndex: s.stepIndex + 1 }))
   }
 
-  const prev = () => {
-    if (step.current > 0) {
-      dispatch('prev')
-    }
+  const onPrev = () => {
+    stepStore.setState((s) => ({ ...s, stepIndex: s.stepIndex - 1 }))
   }
 
-  const [step, dispatch] = useReducer(stepReducer, { current: 0, previous: 0 })
-  const delta = step.current - step.previous
+  const onSubmit = (values: z.infer<typeof referralFormSchema>) => {
+    if (!userId) return
 
-  const onSubmit = async (values: Inputs) => {
-    const googleUserId = userId
-    if (!googleUserId) {
-      return
-    }
-
-    const companyId = userData?.company?.id || 1 // Default to 1 if companyId is not available
-    const referralDetails = {
-      googleId: userId,
-      userProfile: {
-        firstName: values.firstName,
-        lastName: values.lastName,
-        title: values.title,
-        preferredName: values.preferredName,
-        gender: values.gender,
-        dateOfBirth: values.dateOfBirth,
-      },
-      addressInformation: {
-        address: values.address,
-        suburb: values.suburb,
-        city: values.city,
-        postCode: values.postCode,
-        country: values.country,
-      },
-      contactInformation: {
-        email: values.email,
-        phone: values.phone,
-      },
-      languageInfo: {
-        firstLanguage: values.firstLanguage,
-        interpreter: values.interpreter,
-        culturalSupport: values.culturalSupport,
-        communicationNeeds: values.communicationNeeds,
-      },
-      doctorInfo: {
-        doctorName: values.doctorName,
-        doctorPhone: values.doctorPhone,
-        doctorAddress: values.doctorAddress,
-        doctorSuburb: values.doctorSuburb,
-        doctorCity: values.doctorCity,
-        nationalHealthIndex: values.nationalHealthIndex,
-      },
-      disabilityInfo: {
-        disabilityType: values.disabilityType,
-        disabilityDetails: values.disabilityDetails,
-        disabilityReasonForReferral: values.disabilityReasonForReferral,
-        disabilitySupportRequired: values.disabilitySupportRequired,
-      },
-      additionalInfo: {
-        safety: values.safety,
-        otherImportantInformation: values.otherImportantInformation,
-      },
-      referrerInfo: {
-        referrerFirstName: values.referrerFirstName,
-        referrerLastName: values.referrerLastName,
-        referrerEmail: values.referrerEmail,
-        referrerPhone: values.referrerPhone,
-        referrerRelationship: values.referrerRelationship,
-      },
-      emergencyContactInfo: {
-        emergencyContactFirstName: values.emergencyContactFirstName,
-        emergencyContactLastName: values.emergencyContactLastName,
-        emergencyContactPhone: values.emergencyContactPhone,
-        emergencyContactEmail: values.emergencyContactEmail,
-        emergencyContactRelationship: values.emergencyContactRelationship,
-      },
-      consentInfo: {
-        provideInformation: values.provideInformation,
-        shareInformation: values.shareInformation,
-        contactedForAdditionalInformation:
-          values.contactedForAdditionalInformation,
-        statisticalInformation: values.statisticalInformation,
-        correctInformationProvided: values.correctInformationProvided,
-      },
-      companyId: companyId,
-    }
+    const referralDetails = buildReferralDetails(
+      userId,
+      userData?.company?.id,
+      values,
+    )
 
     try {
       mutate(referralDetails)
+      console.log('Referral form submitted:', referralDetails)
     } catch (error) {
       console.error(error)
     }
   }
 
+  const isFormComplete = referralFormStore.subscribe(() => {
+    const data = referralFormStore.state.referralFormData
+    return Object.values(data).every((value) => value !== '')
+  })
+
   return (
-    <section className="flex flex-col justify-between px-10 pt-10">
-      {/* Loading State */}
-      {isLoading && (
-        <div className="mt-12 flex items-center justify-center">
-          <Spinner />
-        </div>
-      )}
-
-      {!isLoading && !isError && userData && (
-        <>
-          <FormStepNavigation
-            steps={referralFormSteps}
-            currentStep={step.current}
+    <FormProvider {...form}>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <CurrentStep
+            form={form}
+            delta={1}
+            header={referralFormSteps[stepIndex].name}
+            subtitle={referralFormSteps[stepIndex].subtitle}
+            communicationNeedsValue={form.watch('communicationNeeds') || ''}
           />
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="mt-4 space-y-2 py-4"
+          <div className="flex justify-between mx-4">
+            <Button
+              type="button"
+              onClick={onPrev}
+              disabled={stepIndex === 0}
+              variant="secondary"
             >
-              {step.current === 0 && (
-                <StepPersonalInfo
-                  form={form}
-                  delta={delta}
-                  header={referralFormSteps[step.current].name}
-                  subtitle={referralFormSteps[step.current].subtitle}
-                />
-              )}
-
-              {step.current === 1 && (
-                <StepLanguageInfo
-                  form={form}
-                  delta={delta}
-                  communicationNeedsValue={communicationNeedsValue}
-                  header={referralFormSteps[step.current].name}
-                  subtitle={referralFormSteps[step.current].subtitle}
-                />
-              )}
-
-              {step.current === 2 && (
-                <StepMedicalInfo
-                  form={form}
-                  delta={delta}
-                  header={referralFormSteps[step.current].name}
-                  subtitle={referralFormSteps[step.current].subtitle}
-                />
-              )}
-
-              {step.current === 3 && (
-                <StepDisabilityInfo
-                  form={form}
-                  delta={delta}
-                  header={referralFormSteps[step.current].name}
-                  subtitle={referralFormSteps[step.current].subtitle}
-                />
-              )}
-
-              {step.current === 4 && (
-                <StepAdditionalInfo
-                  form={form}
-                  delta={delta}
-                  header={referralFormSteps[step.current].name}
-                  subtitle={referralFormSteps[step.current].subtitle}
-                />
-              )}
-
-              {step.current === 5 && (
-                <StepReferralContactInfo
-                  form={form}
-                  delta={delta}
-                  header={referralFormSteps[step.current].name}
-                  subtitle={referralFormSteps[step.current].subtitle}
-                />
-              )}
-
-              {step.current === 6 && (
-                <StepEmergencyContactInfo
-                  form={form}
-                  delta={delta}
-                  header={referralFormSteps[step.current].name}
-                  subtitle={referralFormSteps[step.current].subtitle}
-                />
-              )}
-
-              {step.current === 7 && (
-                <StepConsentInfo
-                  form={form}
-                  delta={delta}
-                  header={referralFormSteps[step.current].name}
-                  subtitle={referralFormSteps[step.current].subtitle}
-                />
-              )}
-
-              <FormStepButtons
-                currentStep={step.current}
-                profileFormStepsLength={referralFormSteps.length}
-                prevButtonType={'button'}
-                nextButtonType={'button'}
-                prevButtonText={'Previous'}
-                nextButtonText={'Next'}
-                onClickPrev={prev}
-                onClickNext={next}
-                submitButtonText={isPending ? 'Submitting...' : 'Submit'}
-                submitButtonType={'submit'}
-              />
-            </form>
-          </Form>
-        </>
-      )}
-    </section>
+              Back
+            </Button>
+            {stepIndex === stepComponents.length - 1 ? (
+              <Button type="submit" disabled={!isFormComplete || isPending}>
+                {isPending ? 'Submitting...' : 'Submit'}
+              </Button>
+            ) : (
+              <Button type="button" onClick={onNext}>
+                Next
+              </Button>
+            )}
+          </div>
+        </form>
+      </Form>
+    </FormProvider>
   )
 }
 
