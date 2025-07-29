@@ -16,10 +16,6 @@ export const profileFormSchema = z.object({
   address: z.string({ message: 'Please enter a valid address' }).nonempty(),
   suburb: z.string({ message: 'Please enter a valid suburb' }).nonempty(),
   city: z.string({ message: 'Please enter a valid city' }).nonempty(),
-  postCode: z
-    .string()
-    .min(4, { message: 'Postcode must be at least 4 characters' })
-    .regex(/^\d+$/, { message: 'Postcode must contain only digits' })
-    .max(4, 'Postcode must be at most 4 digits'),
+  postCode: z.string().regex(/^\d{4}$/, { message: 'Invalid postcode' }),
   country: z.string().nonempty(),
 })

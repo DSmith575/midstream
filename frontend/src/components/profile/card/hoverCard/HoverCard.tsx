@@ -1,12 +1,16 @@
-
 interface HoverCardProps {
-  title: string;
-  subtitle: string;
-  Icon: React.ElementType;
-  onClick: () => void;
+  title: string
+  subtitle: string
+  Icon: React.ElementType
+  onClick: () => void
 }
 
-const HoverCard = ({ title, subtitle, Icon, onClick }: HoverCardProps) => {
+export const HoverCard = ({
+  title,
+  subtitle,
+  Icon,
+  onClick,
+}: HoverCardProps) => {
   return (
     <button
       onClick={onClick}
@@ -22,7 +26,5 @@ const HoverCard = ({ title, subtitle, Icon, onClick }: HoverCardProps) => {
         {subtitle}
       </p>
     </button>
-  );
-};
-
-export { HoverCard };
+  )
+}

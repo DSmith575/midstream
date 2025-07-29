@@ -1,36 +1,29 @@
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm, FormProvider } from 'react-hook-form'
-import { z } from 'zod'
-import { referralFormSchema } from '@/lib/schemas/referralFormSchema'
+import { FormProvider } from 'react-hook-form'
+
 import { referralFormSteps } from '@/lib/formOptions/referralFormOptions'
 import {
-  StepPersonalInfo,
+  StepAdditionalInfo,
+  StepConsentInfo,
+  StepDisabilityInfo,
+  StepEmergencyContactInfo,
   StepLanguageInfo,
   StepMedicalInfo,
-  StepDisabilityInfo,
-  StepAdditionalInfo,
+  StepPersonalInfo,
   StepReferralContactInfo,
-  StepEmergencyContactInfo,
-  StepConsentInfo,
-} from '@/components/forms/referralForm/referralFormComponents/index'
-import useUserProfile from '@/hooks/userProfile/useUserProfile'
-import useCreateReferralForm from '@/hooks/userProfile/useCreateReferralForm'
-import { useNavigate } from '@tanstack/react-router'
-import { referralFormStore } from '@/lib/store/referralFormStore'
-import { Store, useStore } from '@tanstack/react-store'
+} from '@/components/forms/referralForm/referralFormComponents'
 
-import { useAuth } from '@clerk/clerk-react'
 import { Form } from '@/components/ui/form'
 import { Button } from '@/components/ui/button'
-import type {
-  UserProfileProps,
-  UserInformationProps,
-  ContactInformationProps,
-  AddressInformationProps,
-} from '@/lib/interfaces'
 
-import { useEffect } from 'react'
-import { buildReferralDetails } from '@/lib/functions/formFunctions'
+import { FormStepNavigation } from '@/components/forms/formComponents'
+
+import {
+  useIsReferralFormComplete,
+  usePreloadedUserReferralData,
+  useReferralForm,
+  useReferralFormSteps,
+  useSubmitReferralForm,
+} from '@/hooks/referralForms/'
 
 const stepComponents = [
   StepPersonalInfo,
@@ -43,159 +36,54 @@ const stepComponents = [
   StepConsentInfo,
 ] as const
 
-const stepStore = new Store({
-  stepIndex: 0,
-})
-
-type ReferralFormType = z.infer<typeof referralFormSchema>
-
-export const preloadReferralFormData = (
-  userData?: UserProfileProps,
-): ReferralFormType => {
-  const personal = userData?.personalInformation ?? ({} as UserInformationProps)
-  const contact =
-    userData?.contactInformation ?? ({} as ContactInformationProps)
-  const address =
-    userData?.addressInformation ?? ({} as AddressInformationProps)
-  return {
-    firstName: personal.firstName ?? '',
-    lastName: personal.lastName ?? '',
-    title: personal.title ?? '',
-    preferredName: personal.preferredName ?? '',
-    gender: personal.gender ?? '',
-    dateOfBirth: personal.dateOfBirth
-      ? new Date(personal.dateOfBirth).toISOString().split('T')[0]
-      : '',
-
-    email: contact.email ?? '',
-    phone: contact.phone ?? '',
-
-    address: address.address ?? '',
-    suburb: address.suburb ?? '',
-    city: address.city ?? '',
-    postCode: address.postCode ?? '',
-    country: address.country ?? '',
-
-    firstLanguage: '',
-    interpreter: '',
-    culturalSupport: '',
-    communicationNeeds: '',
-    doctorName: '',
-    doctorPhone: '',
-    doctorAddress: '',
-    doctorSuburb: '',
-    doctorCity: '',
-    nationalHealthIndex: '',
-    disabilityType: '',
-    disabilityDetails: '',
-    disabilityReasonForReferral: '',
-    disabilitySupportRequired: '',
-    safety: '',
-    otherImportantInformation: '',
-    referrerFirstName: '',
-    referrerLastName: '',
-    referrerEmail: '',
-    referrerPhone: '',
-    referrerRelationship: '',
-    emergencyContactFirstName: '',
-    emergencyContactLastName: '',
-    emergencyContactPhone: '',
-    emergencyContactEmail: '',
-    emergencyContactRelationship: '',
-    provideInformation: '',
-    shareInformation: '',
-    contactedForAdditionalInformation: '',
-    statisticalInformation: '',
-    correctInformationProvided: '',
-  }
-}
-
-const ReferralForm = () => {
-  const { userId } = useAuth()
-  const { isLoading, isError, userData } = useUserProfile(userId as string)
-  const navigate = useNavigate()
-  const { mutate, isPending } = useCreateReferralForm(userId as string, () => {
-    navigate({ to: `/dashboard` })
-  })
-
-  if (isLoading) return <div>Loading...</div>
-  useEffect(() => {
-    if (userData) {
-      const mapped = preloadReferralFormData(userData)
-      referralFormStore.setState((state) => ({
-        ...state,
-        referralFormData: mapped,
-      }))
-    }
-  }, [userData])
-
-  const form = useForm<z.infer<typeof referralFormSchema>>({
-    resolver: zodResolver(referralFormSchema),
-    values: referralFormStore.state.referralFormData,
-    mode: 'onBlur',
-  })
-
-  const stepIndex = useStore(stepStore, (s) => s.stepIndex)
+export const ReferralForm = () => {
+  const { userId, userData } = usePreloadedUserReferralData()
+  const form = useReferralForm()
+  const { stepIndex, next, prev, fields, meta } = useReferralFormSteps()
   const CurrentStep = stepComponents[stepIndex]
-  const currentStepFields = referralFormSteps[stepIndex]
-    .fields as (keyof z.infer<typeof referralFormSchema>)[]
+  const isFormComplete = useIsReferralFormComplete(form)
+  const { submit, isPending } = useSubmitReferralForm(
+    userId as string,
+    userData,
+  )
 
   const onNext = async () => {
-    const valid = await form.trigger(
-      currentStepFields as (keyof z.infer<typeof referralFormSchema>)[],
-    )
-    if (!valid) return
-    stepStore.setState((s) => ({ ...s, stepIndex: s.stepIndex + 1 }))
+    const valid = await form.trigger(fields)
+    if (valid) next()
   }
-
-  const onPrev = () => {
-    stepStore.setState((s) => ({ ...s, stepIndex: s.stepIndex - 1 }))
-  }
-
-  const onSubmit = (values: z.infer<typeof referralFormSchema>) => {
-    if (!userId) return
-
-    const referralDetails = buildReferralDetails(
-      userId,
-      userData?.company?.id,
-      values,
-    )
-
-    try {
-      mutate(referralDetails)
-      console.log('Referral form submitted:', referralDetails)
-    } catch (error) {
-      console.error(error)
-    }
-  }
-
-  const isFormComplete = referralFormStore.subscribe(() => {
-    const data = referralFormStore.state.referralFormData
-    return Object.values(data).every((value) => value !== '')
-  })
 
   return (
     <FormProvider {...form}>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={form.handleSubmit(submit)} className="space-y-6 mx-2">
+          <FormStepNavigation
+            steps={referralFormSteps}
+            currentStep={stepIndex}
+          />
           <CurrentStep
             form={form}
             delta={1}
-            header={referralFormSteps[stepIndex].name}
-            subtitle={referralFormSteps[stepIndex].subtitle}
+            header={meta.name}
+            subtitle={meta.subtitle}
             communicationNeedsValue={form.watch('communicationNeeds') || ''}
           />
           <div className="flex justify-between mx-4">
             <Button
               type="button"
-              onClick={onPrev}
+              onClick={prev}
               disabled={stepIndex === 0}
               variant="secondary"
             >
               Back
             </Button>
             {stepIndex === stepComponents.length - 1 ? (
-              <Button type="submit" disabled={!isFormComplete || isPending}>
+              <Button
+                type="submit"
+                disabled={!isFormComplete || isPending}
+                className={
+                  !isFormComplete ? 'opacity-50 cursor-not-allowed' : ''
+                }
+              >
                 {isPending ? 'Submitting...' : 'Submit'}
               </Button>
             ) : (
@@ -209,5 +97,3 @@ const ReferralForm = () => {
     </FormProvider>
   )
 }
-
-export { ReferralForm }

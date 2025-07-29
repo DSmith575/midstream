@@ -1,14 +1,14 @@
-import type { Steps } from '@/lib/profileInterfaces'
+import type { Steps } from '@/lib/interfaces'
 
-export const titleSelectOptions: string[] = ['Mr', 'Mrs', 'Miss', 'Other']
-export const genderSelectOptions: string[] = [
+export const titleSelectOptions: Array<string> = ['Mr', 'Mrs', 'Miss', 'Other']
+export const genderSelectOptions: Array<string> = [
   'Male',
   'Female',
   'Other',
   'Prefer not to say',
 ]
 
-export const profileFormSteps: Steps[] = [
+export const profileFormSteps: Array<Steps> = [
   {
     id: 'Step 1',
     name: 'Personal Information',

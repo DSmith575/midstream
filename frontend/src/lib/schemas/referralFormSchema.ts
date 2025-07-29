@@ -19,11 +19,7 @@ export const referralFormSchema = z
     address: z.string({ message: 'Please enter a valid address' }).nonempty(),
     suburb: z.string({ message: 'Please enter a valid suburb' }).nonempty(),
     city: z.string({ message: 'Please enter a valid city' }).nonempty(),
-    postCode: z
-      .string()
-      .min(4, { message: 'Postcode must be at least 4 characters' })
-      .regex(/^\d+$/, { message: 'Postcode must contain only digits' })
-      .max(4, 'Postcode must be at most 4 digits'),
+    postCode: z.string().regex(/^\d{4}$/, { message: 'Invalid postcode' }),
     country: z.string().nonempty(),
     firstLanguage: z
       .string()
@@ -61,12 +57,9 @@ export const referralFormSchema = z
       .string()
       .nonempty({ message: 'Please select an option.' }),
     disabilityDetails: z.string().optional(),
-    disabilityReasonForReferral: z
-      .string()
-      .max(150)
-      .nonempty({
-        message: 'Please enter the reason you are filling this application.',
-      }),
+    disabilityReasonForReferral: z.string().max(150).nonempty({
+      message: 'Please enter the reason you are filling this application.',
+    }),
     disabilitySupportRequired: z
       .string()
       .max(150)
@@ -92,27 +85,21 @@ export const referralFormSchema = z
     referrerRelationship: z
       .string()
       .nonempty({ message: "Please enter the referrer's relationship." }),
-    emergencyContactFirstName: z
-      .string()
-      .nonempty({
-        message: "Please enter the emergency contact's first name.",
-      }),
+    emergencyContactFirstName: z.string().nonempty({
+      message: "Please enter the emergency contact's first name.",
+    }),
     emergencyContactLastName: z
       .string()
       .nonempty({ message: "Please enter the emergency contact's last name." }),
-    emergencyContactPhone: z
-      .string()
-      .nonempty({
-        message: "Please enter the emergency contact's phone number.",
-      }),
+    emergencyContactPhone: z.string().nonempty({
+      message: "Please enter the emergency contact's phone number.",
+    }),
     emergencyContactEmail: z
       .string()
       .email({ message: 'Please enter a valid email.' }),
-    emergencyContactRelationship: z
-      .string()
-      .nonempty({
-        message: "Please enter the emergency contact's relationship.",
-      }),
+    emergencyContactRelationship: z.string().nonempty({
+      message: "Please enter the emergency contact's relationship.",
+    }),
     provideInformation: z
       .string()
       .nonempty({ message: 'Please select an option.' }),

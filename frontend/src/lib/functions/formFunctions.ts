@@ -1,58 +1,65 @@
-import { splitAndCapitalize } from "@/lib/functions/functions";
-import type { UserProfileProps, UserInformationProps, ContactInformationProps, AddressInformationProps } from "@/lib/interfaces";
-import { referralFormSchema } from "@/lib/schemas/referralFormSchema";
-import { z } from "zod";
-
+import type {
+  AddressInformationProps,
+  ContactInformationProps,
+  UserInformationProps,
+  UserProfileProps,
+} from '@/lib/interfaces'
+import type { referralFormSchema } from '@/lib/schemas/referralFormSchema'
+import type { z } from 'zod'
+import { splitAndCapitalize } from '@/lib/functions/functions'
 
 interface FormSection {
-  title: string;
-  field: Record<string, any>;
-};
+  title: string
+  field: Record<string, any>
+}
 
 export const generateFormSections = (
   referralForm: Record<string, any>,
   options?: {
-    includeKeys?: string[];
-    excludeKeys?: string[];
-  }
-): FormSection[] => {
-  const { includeKeys, excludeKeys } = options || {};
+    includeKeys?: Array<string>
+    excludeKeys?: Array<string>
+  },
+): Array<FormSection> => {
+  const { includeKeys, excludeKeys } = options || {}
 
-  return Object.entries(referralForm)
-    .flatMap(([topKey, topValue]) => {
-      if (excludeKeys?.includes(topKey)) return [];
+  return Object.entries(referralForm).flatMap(([topKey, topValue]) => {
+    if (excludeKeys?.includes(topKey)) return []
 
-      // Filter by includeKeys if provided
-      if (includeKeys && !includeKeys.includes(topKey)) return [];
+    // Filter by includeKeys if provided
+    if (includeKeys && !includeKeys.includes(topKey)) return []
 
-      if (typeof topValue !== "object" || topValue === null) return [];
+    if (typeof topValue !== 'object' || topValue === null) return []
 
-      // If it's the "user" object, dive deeper
-      if (topKey === "user") {
-        return Object.entries(topValue)
-          .filter(
-            ([_, subValue]) =>
-              typeof subValue === "object" && subValue !== null
-          )
-          .map(([subKey, subValue]) => ({
-            title: splitAndCapitalize(subKey),
-            field: subValue,
-          }));
-      }
+    // If it's the "user" object, dive deeper
+    if (topKey === 'user') {
+      return Object.entries(topValue)
+        .filter(
+          ([_, subValue]) => typeof subValue === 'object' && subValue !== null,
+        )
+        .map(([subKey, subValue]) => ({
+          title: splitAndCapitalize(subKey),
+          field: subValue,
+        }))
+    }
 
-      return [
-        {
-          title: splitAndCapitalize(topKey),
-          field: topValue,
-        },
-      ];
-    });
-};
+    return [
+      {
+        title: splitAndCapitalize(topKey),
+        field: topValue,
+      },
+    ]
+  })
+}
 
-export const preLoadedData = (userData?: UserProfileProps): z.infer<typeof referralFormSchema> => {
-  const personal: Partial<UserInformationProps> = userData?.personalInformation ?? {}
-  const contact: Partial<ContactInformationProps> = userData?.contactInformation ?? {}
-  const address: Partial<AddressInformationProps> = userData?.addressInformation ?? {}
+export const preLoadedData = (
+  userData?: UserProfileProps,
+): z.infer<typeof referralFormSchema> => {
+  const personal: Partial<UserInformationProps> =
+    userData?.personalInformation ?? {}
+  const contact: Partial<ContactInformationProps> =
+    userData?.contactInformation ?? {}
+  const address: Partial<AddressInformationProps> =
+    userData?.addressInformation ?? {}
 
   return {
     firstName: personal.firstName ?? '',
@@ -108,7 +115,7 @@ export const preLoadedData = (userData?: UserProfileProps): z.infer<typeof refer
 export const buildReferralDetails = (
   userId: string,
   companyId: number | undefined,
-  values: z.infer<typeof referralFormSchema>
+  values: z.infer<typeof referralFormSchema>,
 ) => {
   const {
     firstName,

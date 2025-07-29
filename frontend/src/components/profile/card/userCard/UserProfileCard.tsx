@@ -1,20 +1,20 @@
+import { UserCog } from 'lucide-react'
 import type { UserProfileProps } from '@/lib/interfaces'
 import {
-  UserProfilePersonalInformationCard,
   UserProfileAddressCard,
   UserProfileContactCard,
+  UserProfilePersonalInformationCard,
 } from '@/components/profile/card/userCard/index'
 
 import { CaseStatSection } from '@/components/card/caseStat/CaseStat'
 import { Button } from '@/components/ui/button'
-import { UserCog } from 'lucide-react'
 import { roleConstants } from '@/lib/constants'
 
 interface CardProps {
   userProfile?: UserProfileProps
 }
 
-const UserProfileCard = ({ userProfile }: CardProps) => {
+export const UserProfileCard = ({ userProfile }: CardProps) => {
   if (
     !userProfile?.personalInformation ||
     !userProfile?.addressInformation ||
@@ -22,6 +22,14 @@ const UserProfileCard = ({ userProfile }: CardProps) => {
   ) {
     return null
   }
+
+  //   if (
+  //   !userProfile.personalInformation ||
+  //   !userProfile.addressInformation ||
+  //   !userProfile.contactInformation
+  // ) {
+  //   return null
+  // }
   const {
     personalInformation,
     addressInformation,
@@ -82,5 +90,3 @@ const UserProfileCard = ({ userProfile }: CardProps) => {
     </main>
   )
 }
-
-export { UserProfileCard }

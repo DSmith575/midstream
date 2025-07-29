@@ -1,31 +1,33 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { CircleAlert } from 'lucide-react'
+import { useNavigate } from '@tanstack/react-router'
 import type { CompanyProps } from '@/lib/interfaces'
+import { useJoinCompany } from '@/hooks/company/useJoinCompany'
 
-const apiKey = import.meta.env.VITE_API_BACKEND_URL
-
-
-const SpringModal = ({
+export const SpringModal = ({
   isOpen,
   setIsOpen,
   company,
-  userId
+  userId,
 }: {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
   company: CompanyProps
   userId: string
 }) => {
-  const joinCompanyHandler = async (companyId: number, userId: string) => {
-    try {
-      await fetch(`${apiKey}company/joinCompany`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ companyId: companyId, userId: userId }),
-      })
+  const navigate = useNavigate()
+  const { mutate } = useJoinCompany(userId, () => {
+    navigate({ to: `/dashboard` })
+  })
 
+  const joinCompanyHandler = (companyId: number, userId: string) => {
+    try {
+      const data = {
+        companyId: companyId,
+        userId: userId,
+      }
+
+      mutate({ data })
     } catch (error) {
       if (error instanceof Error) {
         console.error('Error joining company:', error.message)
@@ -70,8 +72,7 @@ const SpringModal = ({
                 </button>
                 <button
                   onClick={() => {
-                    joinCompanyHandler(company.id, userId),
-                    setIsOpen(false)
+                    joinCompanyHandler(company.id, userId), setIsOpen(false)
                   }}
                   className="bg-white hover:opacity-90 transition-opacity text-indigo-600 font-semibold w-full py-2 rounded"
                 >
@@ -85,5 +86,3 @@ const SpringModal = ({
     </AnimatePresence>
   )
 }
-
-export { SpringModal }
