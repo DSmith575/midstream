@@ -7,13 +7,35 @@ import {
   getComponentMapWorker,
 } from '@/lib/dashboardComponentMap'
 import { roleConstants } from '@/lib/constants'
+import { DevToolButton } from '@/components/devTools'
+import { postChangeUserRole } from '@/lib/api/devTools/postChangeUserRole'
+
+type UserRoles = 'CLIENT' | 'WORKER'
+
 
 interface DashBoardContentProps {
   userId: string
 }
 
+// Testing
+const onClickSwitchUserRole = async (userId: string, role: UserRoles) => {
+  try {
+    const response = await postChangeUserRole({ userId, role})
+    if (response) {
+      console.log('User role switched successfully:', response)
+      window.location.reload() 
+    } else {
+      console.error('Failed to switch user role')
+    }
+
+  } catch (error) {
+    console.error('Error switching user role:', error)
+  }
+}
+
 export const DashboardContent = ({ userId }: DashBoardContentProps) => {
   const { userData, error } = useUserProfile(userId)
+
 
   if (!!error && !userData) {
     return (
@@ -43,11 +65,21 @@ export const DashboardContent = ({ userId }: DashBoardContentProps) => {
                 userCity={userData.addressInformation.city}
               />
             ) : (
+              <>
               <div className="grid grid-cols-1 items-start gap-2 lg:grid-cols-3">
                 <ProfileHoverCards
                   componentMap={getComponentMapUser(userData, userId)}
                 />
+                <DevToolButton
+                  text="Test - Switch to worker"
+                  onClick={() => {
+                    onClickSwitchUserRole(userId, roleConstants.worker as UserRoles)
+                  }}
+                  buttonText="Switch Role"
+                />
               </div>
+
+              </>
             )}
           </>
         ) : (
@@ -60,6 +92,13 @@ export const DashboardContent = ({ userId }: DashBoardContentProps) => {
                     userId,
                     userData.companyId,
                   )}
+                />
+                <DevToolButton
+                  text="Test - Switch to client"
+                  onClick={() => {
+                    onClickSwitchUserRole(userId, roleConstants.client as UserRoles)
+                  }}
+                  buttonText="Switch Role"
                 />
               </div>
             )}
