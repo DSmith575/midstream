@@ -1,6 +1,14 @@
 import { useMemo, useState } from 'react'
+import {
+  flexRender,
+  getCoreRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from '@tanstack/react-table'
+import type { ColumnDef, SortingState } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
-import {Spinner} from '@/components/spinner/Spinner'
+import { Spinner } from '@/components/spinner/Spinner'
 import {
   Table,
   TableBody,
@@ -10,26 +18,17 @@ import {
   TableRow,
 } from '@/components/ui/table'
 
-import type { SortingState, ColumnDef } from '@tanstack/react-table'
-import {
-  flexRender,
-  getCoreRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from '@tanstack/react-table'
-
-import useGetAllCompanyReferrals from '@/hooks/workerReferrals/useGetAllCompanyReferrals'
-import {WorkerAssignCase} from '@/components/dashboard/WorkerAssignCase'
+import { useGetAllCompanyReferrals } from '@/hooks/workerReferrals/useGetAllCompanyReferrals'
+import { WorkerAssignCase } from '@/components/dashboard/WorkerAssignCase'
 
 interface DataTableProps<TData, TValue> {
   caseWorkerId?: string
   companyId: number
-  columns: ColumnDef<TData, TValue>[]
-  data?: TData[]
+  columns: Array<ColumnDef<TData, TValue>>
+  data?: Array<TData>
 }
 
-const WorkerReferralTable = <TData, TValue>({
+export const WorkerReferralTable = <TData, TValue>({
   caseWorkerId,
   companyId,
   columns,
@@ -40,6 +39,14 @@ const WorkerReferralTable = <TData, TValue>({
   const [sorting, setSorting] = useState<SortingState>([])
   const [open, setOpen] = useState(false)
   const [referralForm, setReferralForm] = useState<any>(null)
+
+  if (!caseWorkerId) {
+    return (
+      <div className="text-red-500">
+        You must be assigned a case worker to view referrals.
+      </div>
+    )
+  }
 
   const memoizedColumns = useMemo(() => columns, [columns])
   const memoizedReferrals = useMemo(() => referrals, [])
@@ -85,7 +92,7 @@ const WorkerReferralTable = <TData, TValue>({
           </TableHeader>
 
           <TableBody>
-            {table.getRowModel().rows?.length ? (
+            {table.getRowModel().rows.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   onClick={() => {
@@ -148,5 +155,3 @@ const WorkerReferralTable = <TData, TValue>({
     </>
   )
 }
-
-export { WorkerReferralTable }

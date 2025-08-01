@@ -1,11 +1,11 @@
 import type { AddressInformationProps } from '@/lib/interfaces'
-import {TextParagraph} from '@/components/text/textParagraph'
+import { TextParagraph } from '@/components/text/textParagraph'
 
 interface AddressProps {
   addressInfo?: AddressInformationProps
 }
 
-const UserProfileAddressCard = ({ addressInfo }: AddressProps) => {
+export const UserProfileAddressCard = ({ addressInfo }: AddressProps) => {
   if (!addressInfo) return null
 
   const { address, country } = addressInfo
@@ -17,5 +17,3 @@ const UserProfileAddressCard = ({ addressInfo }: AddressProps) => {
     </>
   )
 }
-
-export { UserProfileAddressCard }

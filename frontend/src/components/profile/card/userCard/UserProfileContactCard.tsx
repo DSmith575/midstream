@@ -1,22 +1,20 @@
-import type { ContactInformationProps } from "@/lib/interfaces";
-import {TextParagraph} from "@/components/text/textParagraph";
-import { Phone, Mail } from "lucide-react";
+import { Mail, Phone } from 'lucide-react'
+import type { ContactInformationProps } from '@/lib/interfaces'
+import { TextParagraph } from '@/components/text/textParagraph'
 
 interface ContactProps {
-	contactInfo?: ContactInformationProps;
+  contactInfo?: ContactInformationProps
 }
 
-const UserProfileContactCard = ({ contactInfo }: ContactProps) => {
-	if (!contactInfo) return null;
+export const UserProfileContactCard = ({ contactInfo }: ContactProps) => {
+  if (!contactInfo) return null
 
-	const { email, phone } = contactInfo;
+  const { email, phone } = contactInfo
 
-	return (
-		<section className={"flex gap-2"}>
-			<TextParagraph text={email} span={<Mail size={20}/>} />
-			<TextParagraph text={phone} span={<Phone size={20}/>} />
-		</section>
-	);
-};
-
-export { UserProfileContactCard };
+  return (
+    <section className={'flex gap-2'}>
+      <TextParagraph text={email} span={<Mail size={20} />} />
+      <TextParagraph text={phone} span={<Phone size={20} />} />
+    </section>
+  )
+}

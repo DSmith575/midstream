@@ -1,18 +1,30 @@
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Textarea } from "@/components/ui/textarea";
-import type { Control, FieldValues, Path } from "react-hook-form";
+import type { Control, FieldValues, Path } from 'react-hook-form'
+import {
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form'
+import { Textarea } from '@/components/ui/textarea'
 
 interface FormTextAreaProps<T extends FieldValues> {
-  control: Control<T>;
-  fieldName: Path<T>;
-  formLabel: string;
-  placeholder: string;
-  height?: string;
-};
+  control: Control<T>
+  fieldName: Path<T>
+  formLabel: string
+  placeholder: string
+  height?: string
+}
 
-const FormTextArea = <T extends FieldValues>({control, fieldName, formLabel, placeholder, height = "h-32"}: FormTextAreaProps<T>) => {
+export const FormTextArea = <T extends FieldValues>({
+  control,
+  fieldName,
+  formLabel,
+  placeholder,
+  height = 'h-32',
+}: FormTextAreaProps<T>) => {
   return (
-    <div className={"sm:col-span-3"}>
+    <div className={'sm:col-span-3'}>
       <FormField
         control={control}
         name={fieldName}
@@ -20,18 +32,16 @@ const FormTextArea = <T extends FieldValues>({control, fieldName, formLabel, pla
           <FormItem>
             <FormLabel>{formLabel}</FormLabel>
             <FormControl>
-            <Textarea
-            className={`resize-none ${height}`}
-              placeholder={placeholder}
-              {...field}
-            />
+              <Textarea
+                className={`resize-none ${height}`}
+                placeholder={placeholder}
+                {...field}
+              />
             </FormControl>
-            <FormMessage/>
+            <FormMessage />
           </FormItem>
         )}
       />
     </div>
   )
-};
-
-export { FormTextArea };
+}

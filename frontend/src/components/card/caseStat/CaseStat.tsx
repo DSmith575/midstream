@@ -5,14 +5,12 @@ type CaseStatProps = {
 
 const CaseStat = ({ label, value }: CaseStatProps) => (
   <div className="flex flex-col items-center">
-    <h2 className="text-xl font-bold text-muted-foreground">
-      {value ?? '—'}
-    </h2>
+    <h2 className="text-xl font-bold text-muted-foreground">{value ?? '—'}</h2>
     <p className="text-sm text-gray-600">{label}</p>
   </div>
-);
+)
 
-const CaseStatSection = ({
+export const CaseStatSection = ({
   casesCompleted,
   casesAssigned,
 }: {
@@ -27,6 +25,4 @@ const CaseStatSection = ({
       </div>
     </section>
   )
-};
-
-export { CaseStat, CaseStatSection };
+}

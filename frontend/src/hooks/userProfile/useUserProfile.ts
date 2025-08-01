@@ -1,23 +1,18 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
-import fetchUserProfile from '@/lib/api/fetchUser'
 import type { UserProfileProps } from '@/lib/interfaces'
+import { fetchUserProfile } from '@/lib/api/fetchUser'
 
-const useUserProfile = (userId: string) => {
-  const { isLoading, isError, data, error, isFetched } = useSuspenseQuery({
+export const useUserProfile = (userId: string) => {
+  const { isError, data, error, isFetched } = useSuspenseQuery({
     queryKey: ['userProfile', userId],
     queryFn: () => fetchUserProfile(userId),
-    staleTime: 5 * 60 * 1000, // Cache the data for 5 minutes
+    staleTime: 5 * 60 * 1000,
     // enabled: !!userId, // Fetch only when userId is valid
-    retry: 1, // Retry fetch on failure up to 2 times
+    retry: 1,
   })
 
-  // Handle error state
   if (isError) {
     return { isError, error }
-  }
-
-  if (isLoading) {
-    return { isLoading }
   }
 
   if (data && isFetched) {
@@ -31,14 +26,10 @@ const useUserProfile = (userId: string) => {
       role: data.role,
       company: data.company,
       companyId: data.companyId,
-      
     }
-    
 
     return { isFetched, userData }
   }
 
   return {}
 }
-
-export default useUserProfile

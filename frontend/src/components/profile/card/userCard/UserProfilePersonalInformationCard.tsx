@@ -1,27 +1,26 @@
-import type { UserInformationProps } from "@/lib/interfaces";
-import {TextParagraph} from "@/components/text/textParagraph";
-import { getUserAge } from "@/lib/functions/functions";
+import type { UserInformationProps } from '@/lib/interfaces'
+import { TextParagraph } from '@/components/text/textParagraph'
+import { getUserAge } from '@/lib/functions/functions'
 
 interface PersonalInformationProps {
-	personalInfo?: UserInformationProps;
+  personalInfo?: UserInformationProps
 }
 
-const UserProfilePersonalInformationCard = ({ personalInfo }: PersonalInformationProps) => {
-	if (!personalInfo) return null;
+export const UserProfilePersonalInformationCard = ({
+  personalInfo,
+}: PersonalInformationProps) => {
+  if (!personalInfo) return null
 
-	const { firstName, lastName, preferredName, dateOfBirth } =
-		personalInfo;
+  const { firstName, lastName, preferredName, dateOfBirth } = personalInfo
 
-	return (
-		<>
-			<h1 className="text-xl -mt-2">
-				{firstName} {lastName}, {getUserAge(dateOfBirth)}
-			</h1>
-			<div className={'flex'}>
-			{preferredName && <TextParagraph text={preferredName} />}
-			</div>
-		</>
-	);
-};
-
-export { UserProfilePersonalInformationCard };
+  return (
+    <>
+      <h1 className="text-xl -mt-2">
+        {firstName} {lastName}, {getUserAge(dateOfBirth)}
+      </h1>
+      <div className={'flex'}>
+        {preferredName && <TextParagraph text={preferredName} />}
+      </div>
+    </>
+  )
+}

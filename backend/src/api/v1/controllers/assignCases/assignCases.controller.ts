@@ -1,6 +1,6 @@
 import { PrismaClient, ReferralStatus } from "@prisma/client";
 import { Request, Response } from "express";
-import { orgRoles } from "@/constants";
+import { roleConstants } from "@/constants";
 
 const prisma = new PrismaClient();
 
@@ -13,9 +13,16 @@ const updateReferralForm = async (
 			return res.status(400).send({ message: "Content cannot be empty!" });
 		}
 
-		const { referralId, caseWorkerId, orgRole } = req.body;
+		// change orgRole to userRole
+		const { referralId, caseWorkerId, userRole } = req.body;
 
-		if (orgRole !== orgRoles.organizationAdmin) {
+		// TODO
+		// Check that user belongs to company that the referral belongs to
+
+
+
+			
+		if (userRole !== roleConstants.worker) {
 			return res.status(403).json({ message: "Forbidden" });
 		}
 

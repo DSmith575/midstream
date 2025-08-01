@@ -1,18 +1,19 @@
-import {NavBarLogo} from '@/components/links/NavBarLogoLink'
-import {LinkComponent} from '@/components/links/LinkComponent'
 import { Menu } from 'lucide-react'
-import { SignedIn, useAuth, UserButton } from '@clerk/clerk-react'
+import { SignedIn, UserButton, useAuth } from '@clerk/clerk-react'
+import { NavBarLogo } from '@/components/links/NavBarLogoLink'
+import { LinkComponent } from '@/components/links/LinkComponent'
 import {
   Sheet,
-  SheetTrigger,
   SheetContent,
   SheetDescription,
+  SheetTrigger,
 } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
 
 import { DialogTitle } from '@/components/ui/dialog'
+import { routeConstants } from '@/lib/constants'
 
-const Header = () => {
+export const Header = () => {
   const { userId } = useAuth()
   return (
     <header className="bg-white flex h-20 w-full shrink-0 items-center px-4 shadow-md md:px-6">
@@ -27,16 +28,25 @@ const Header = () => {
             <div className={'my-8 flex items-center justify-center'}>
               {!userId ? (
                 <div className={'w-full flex justify-center shadow-sm'}>
-                  <LinkComponent linkRef={'/login'} linkName={'Login'} />
+                  <LinkComponent
+                    linkRef={routeConstants.login}
+                    linkName={'Login'}
+                  />
                 </div>
               ) : (
-                <LinkComponent linkRef="/dashboard" linkName="Dashboard" />
+                <LinkComponent
+                  linkRef={routeConstants.dashboard}
+                  linkName="Dashboard"
+                />
               )}
             </div>
 
-            <LinkComponent linkRef={'/'} linkName={'Home'} />
-            <LinkComponent linkRef={'/features'} linkName={'Features'} />
-            <LinkComponent linkRef={'/about'} linkName={'About'} />
+            <LinkComponent linkRef={routeConstants.home} linkName={'Home'} />
+            <LinkComponent
+              linkRef={routeConstants.features}
+              linkName={'Features'}
+            />
+            <LinkComponent linkRef={routeConstants.about} linkName={'About'} />
           </section>
         </SheetContent>
 
@@ -63,5 +73,3 @@ const Header = () => {
     </header>
   )
 }
-
-export { Header }

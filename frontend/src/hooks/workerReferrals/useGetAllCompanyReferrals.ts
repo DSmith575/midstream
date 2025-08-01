@@ -1,16 +1,20 @@
-import { useQuery } from "@tanstack/react-query";
-import fetchCompanyReferrals from "@/lib/api/fetchCompanyReferrals";
+import { useQuery } from '@tanstack/react-query'
+import { fetchCompanyReferrals } from '@/lib/api/fetchCompanyReferrals'
 
-const useGetAllCompanyReferrals = ({ companyId }: { companyId: number }) => {
+export const useGetAllCompanyReferrals = ({
+  companyId,
+}: {
+  companyId: number
+}) => {
   const query = useQuery({
-    queryKey: ["companyReferrals", companyId], // <- include companyId to avoid stale caching
+    queryKey: ['companyReferrals', companyId], // <- include companyId to avoid stale caching
     queryFn: () => fetchCompanyReferrals(companyId),
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 2,
     refetchInterval: 10 * 60 * 1000, // 10 minutes
-  });
+  })
 
-  const { data, isFetched } = query;
+  const { data, isFetched } = query
 
   const referrals =
     data && isFetched
@@ -22,15 +26,13 @@ const useGetAllCompanyReferrals = ({ companyId }: { companyId: number }) => {
           lastUpdate: new Date(referral.updatedAt).toLocaleDateString(),
           assignedTo: referral.assignedToWorkerId
             ? `${referral.assignedToWorker.personalInformation.firstName} ${referral.assignedToWorker.personalInformation.lastName}`
-            : "",
+            : '',
           status: referral.status,
         }))
-      : [];
+      : []
 
   return {
     ...query,
     referrals,
-  };
-};
-
-export default useGetAllCompanyReferrals;
+  }
+}
