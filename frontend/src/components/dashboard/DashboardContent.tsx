@@ -7,28 +7,10 @@ import {
   getComponentMapWorker,
 } from '@/lib/dashboardComponentMap'
 import { roleConstants } from '@/lib/constants'
-import { DevToolButton } from '@/components/devTools'
-import { postChangeUserRole } from '@/lib/api/devTools/postChangeUserRole'
 
-type UserRoles = 'CLIENT' | 'WORKER'
 
 interface DashBoardContentProps {
   userId: string
-}
-
-// Testing
-const onClickSwitchUserRole = async (userId: string, role: UserRoles) => {
-  try {
-    const response = await postChangeUserRole({ userId, role })
-    if (response) {
-      console.log('User role switched successfully:', response)
-      window.location.reload()
-    } else {
-      console.error('Failed to switch user role')
-    }
-  } catch (error) {
-    console.error('Error switching user role:', error)
-  }
 }
 
 export const DashboardContent = ({ userId }: DashBoardContentProps) => {
@@ -63,19 +45,9 @@ export const DashboardContent = ({ userId }: DashBoardContentProps) => {
               />
             ) : (
               <>
-                <div className="grid grid-cols-1 items-start gap-2 lg:grid-cols-3">
+                <div className="grid grid-cols-1 items-start gap-2">
                   <ProfileHoverCards
                     componentMap={getComponentMapUser(userData, userId)}
-                  />
-                  <DevToolButton
-                    text="Test - Switch to worker"
-                    onClick={() => {
-                      onClickSwitchUserRole(
-                        userId,
-                        roleConstants.worker as UserRoles,
-                      )
-                    }}
-                    buttonText="Switch Role"
                   />
                 </div>
               </>
@@ -84,23 +56,13 @@ export const DashboardContent = ({ userId }: DashBoardContentProps) => {
         ) : (
           <>
             {userData.companyId && (
-              <div className="grid grid-cols-1 items-start gap-2 lg:grid-cols-3">
+              <div className="grid grid-cols-1 items-start gap-2">
                 <ProfileHoverCards
                   componentMap={getComponentMapWorker(
                     userData,
                     userId,
                     userData.companyId,
                   )}
-                />
-                <DevToolButton
-                  text="Test - Switch to client"
-                  onClick={() => {
-                    onClickSwitchUserRole(
-                      userId,
-                      roleConstants.client as UserRoles,
-                    )
-                  }}
-                  buttonText="Switch Role"
                 />
               </div>
             )}
