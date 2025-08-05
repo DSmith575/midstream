@@ -22,7 +22,7 @@ export const ProfileHoverCards = ({ componentMap }: HoverDevCardsProps) => {
               subtitle={`View ${formatPascalCase(key)}`}
               Icon={getIconForKey(key)}
               onClick={() =>
-                setSelectedCard((prev) => (prev === key ? null : key))
+                setSelectedCard(key)
               }
             />
           ))}
@@ -30,7 +30,7 @@ export const ProfileHoverCards = ({ componentMap }: HoverDevCardsProps) => {
       </div>
 
       {SelectedComponent && (
-        <div className="mt-2 col-start-1">{<SelectedComponent />}</div>
+        <div className="mt-2 col-start-1" style={{ margin: '0 20% 20%' }} >{<SelectedComponent/>}</div>
       )}
     </>
   )
