@@ -276,7 +276,6 @@ const getCaseWorkerReferrals = async (
 			return res.status(400).json({ message: "User does not exist" });
 		}
 
-		console.log(userExists);
 
 		const userId = userExists.id;
 		const referrals = await prisma.referralForm.findMany({

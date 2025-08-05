@@ -1,9 +1,9 @@
 import { motion } from 'framer-motion'
 import { useState } from 'react'
-import {SpringModal} from '@/components/modal/SpringModal'
 import type { CompanyProps } from '@/lib/interfaces'
+import { SpringModal } from '@/components/modal/SpringModal'
 
-const CompanyCard = ({
+export const CompanyCard = ({
   company,
   userId,
 }: {
@@ -66,5 +66,3 @@ const Card = ({
     </motion.button>
   )
 }
-
-export { CompanyCard }

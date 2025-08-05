@@ -1,11 +1,14 @@
 interface StepNavigationProps {
-  steps: { id: string; name: string }[]
+  steps: Array<{ id: string; name: string }>
   currentStep: number
 }
 
-const FormStepNavigation = ({ steps, currentStep }: StepNavigationProps) => {
+export const FormStepNavigation = ({
+  steps,
+  currentStep,
+}: StepNavigationProps) => {
   return (
-    <nav aria-label="Progress">
+    <nav aria-label="Progress" className="mb-8 mt-4 mx-4">
       <ol role="list" className="space-y-4 md:flex md:space-x-8 md:space-y-0">
         {steps.map((step, index) => (
           <li key={step.name} className="md:flex-1">
@@ -40,5 +43,3 @@ const FormStepNavigation = ({ steps, currentStep }: StepNavigationProps) => {
     </nav>
   )
 }
-
-export { FormStepNavigation }

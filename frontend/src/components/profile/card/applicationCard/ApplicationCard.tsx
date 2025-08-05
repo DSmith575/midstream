@@ -1,14 +1,14 @@
-import { Button } from '@/components/ui/button'
 import { Link } from '@tanstack/react-router'
-import {UserReferralFormView} from '@/components/referralForms/UserReferralFormView'
-import useGetReferralForms from '@/hooks/userProfile/useGetReferralForms'
-import {Spinner} from '@/components/spinner/Spinner'
+import { Button } from '@/components/ui/button'
+import { UserReferralFormView } from '@/components/referralForms/UserReferralFormView'
+import { useGetReferralForms } from '@/hooks/userProfile/useGetReferralForms'
+import { Spinner } from '@/components/spinner/Spinner'
 
 interface ApplicationCardProps {
   userId: string
 }
 
-const ApplicationCard = ({ userId }: ApplicationCardProps) => {
+export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
   const { error, isLoading, referralForms } = useGetReferralForms(userId)
 
   return (
@@ -54,5 +54,3 @@ const ApplicationCard = ({ userId }: ApplicationCardProps) => {
     </div>
   )
 }
-
-export { ApplicationCard }

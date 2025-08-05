@@ -1,11 +1,8 @@
+import type { z } from 'zod'
 import type { UseFormReturn } from 'react-hook-form'
-import { z } from 'zod'
-import { referralFormSchema } from '@/lib/schemas/referralFormSchema'
-import {MotionContainer} from '@/components/animation/MotionContainer'
-import {
-  FormSelect,
-  FormTextArea,
-} from '@/components/forms/formComponents/index'
+import type { referralFormSchema } from '@/lib/schemas/referralFormSchema'
+import { MotionContainer } from '@/components/animation/MotionContainer'
+import { FormSelect, FormTextArea } from '@/components/forms/formComponents/'
 import { SelectItem } from '@/components/ui/select'
 import {
   referralFormFirstLanguageOptions,
@@ -14,7 +11,7 @@ import {
 
 type Inputs = z.infer<typeof referralFormSchema>
 
-const StepLanguageInfo = ({
+export const StepLanguageInfo = ({
   form,
   delta,
   communicationNeedsValue,
@@ -88,5 +85,3 @@ const StepLanguageInfo = ({
     </MotionContainer>
   )
 }
-
-export { StepLanguageInfo }

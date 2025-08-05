@@ -1,9 +1,9 @@
-import express from 'express';
-import { createMembershipInvite } from '@/api/v1/controllers/clerk/clerkMembership.controller';
+// import express from 'express';
+// import { createMembershipInvite } from '@/api/v1/controllers/clerk/clerkMembership.controller';
 
-const router = express.Router();
+// const router = express.Router();
 
-router.post('/createMembershipInvite', createMembershipInvite);
+// router.post('/createMembershipInvite', createMembershipInvite);
 
-export default router;
+// export default router;
 
