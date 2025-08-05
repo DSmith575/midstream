@@ -3,10 +3,10 @@ import { useGetCompanyList } from '@/hooks/company/useGetCompanyList'
 
 export const CompanyList = ({
   userId,
-  userCity,
+  // userCity,
 }: {
   userId: string
-  userCity: string
+  // userCity: string
 }) => {
   const { companyList: companies, error, isError } = useGetCompanyList(userId)
 
@@ -24,7 +24,7 @@ export const CompanyList = ({
         <div className="grid grid-cols-1 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {/* Companies filtered by users city */}
           {companies
-            .filter((company) => company.city === userCity)
+            // .filter((company) => company.city === userCity)
             .map((company) => (
               <div key={company.id} className={'mt-2 mx-auto'}>
                 <CompanyCard company={company} userId={userId} />

@@ -82,6 +82,7 @@ export const preLoadedData = (
     interpreter: '',
     culturalSupport: '',
     communicationNeeds: '',
+    communicationNeedsDetails: '',
     doctorName: '',
     doctorPhone: '',
     doctorAddress: '',
@@ -135,6 +136,7 @@ export const buildReferralDetails = (
     interpreter,
     culturalSupport,
     communicationNeeds,
+    communicationNeedsDetails,
     doctorName,
     doctorPhone,
     doctorAddress,
@@ -190,6 +192,7 @@ export const buildReferralDetails = (
       interpreter,
       culturalSupport,
       communicationNeeds,
+      communicationNeedsDetails,
     },
     doctorInfo: {
       doctorName,

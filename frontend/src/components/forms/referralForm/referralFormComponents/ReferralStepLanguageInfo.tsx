@@ -2,10 +2,7 @@ import type { z } from 'zod'
 import type { UseFormReturn } from 'react-hook-form'
 import type { referralFormSchema } from '@/lib/schemas/referralFormSchema'
 import { MotionContainer } from '@/components/animation/MotionContainer'
-import {
-  FormSelect,
-  FormTextArea,
-} from '@/components/forms/formComponents/index'
+import { FormSelect, FormTextArea } from '@/components/forms/formComponents/'
 import { SelectItem } from '@/components/ui/select'
 import {
   referralFormFirstLanguageOptions,

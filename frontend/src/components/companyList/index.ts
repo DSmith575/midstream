@@ -1,2 +1,2 @@
-export { CompanyCard } from '@/components/companyList/CompanyCard'
-export { CompanyList } from '@/components/companyList/CompanyList'
+export { CompanyCard } from './CompanyCard'
+export { CompanyList } from './CompanyList'

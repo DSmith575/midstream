@@ -4,7 +4,7 @@ import {
   UserProfileAddressCard,
   UserProfileContactCard,
   UserProfilePersonalInformationCard,
-} from '@/components/profile/card/userCard/index'
+} from '@/components/profile/card/userCard/'
 
 import { CaseStatSection } from '@/components/card/caseStat/CaseStat'
 import { Button } from '@/components/ui/button'

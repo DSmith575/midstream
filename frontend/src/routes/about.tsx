@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Block, Reveal } from '@/components/animation/index'
+import { Block, Reveal } from '@/components/animation/'
 import { AboutUsHero } from '@/components/hero/AboutUsHero'
 
 const RouteComponent = () => {

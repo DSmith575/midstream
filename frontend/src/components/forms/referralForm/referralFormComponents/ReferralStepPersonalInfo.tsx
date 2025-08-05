@@ -2,7 +2,7 @@ import type { z } from 'zod'
 import type { UseFormReturn } from 'react-hook-form'
 import type { referralFormSchema } from '@/lib/schemas/referralFormSchema'
 import { MotionContainer } from '@/components/animation/MotionContainer'
-import { FormInput } from '@/components/forms/formComponents/index'
+import { FormInput } from '@/components/forms/formComponents/'
 
 type Inputs = z.infer<typeof referralFormSchema>
 

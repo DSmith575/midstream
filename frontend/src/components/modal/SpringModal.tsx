@@ -4,17 +4,19 @@ import { useNavigate } from '@tanstack/react-router'
 import type { CompanyProps } from '@/lib/interfaces'
 import { useJoinCompany } from '@/hooks/company/useJoinCompany'
 
+interface SpringModalProps {
+  isOpen: boolean
+  setIsOpen: (open: boolean) => void
+  company: CompanyProps
+  userId: string
+}
+
 export const SpringModal = ({
   isOpen,
   setIsOpen,
   company,
   userId,
-}: {
-  isOpen: boolean
-  setIsOpen: (open: boolean) => void
-  company: CompanyProps
-  userId: string
-}) => {
+}: SpringModalProps) => {
   const navigate = useNavigate()
   const { mutate } = useJoinCompany(userId, () => {
     navigate({ to: `/dashboard` })

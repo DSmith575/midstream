@@ -1,1 +1,1 @@
-export { DevToolButton } from './DevToolButton';
+export { DevToolButton } from './DevToolButton'

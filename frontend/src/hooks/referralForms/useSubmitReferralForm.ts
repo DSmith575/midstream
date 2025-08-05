@@ -18,6 +18,7 @@ export const useSubmitReferralForm = (userId: string | null, userData: any) => {
       userData?.company?.id,
       values,
     )
+
     try {
       mutate(referralDetails)
     } catch (error) {

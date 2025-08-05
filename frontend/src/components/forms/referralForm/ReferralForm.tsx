@@ -39,7 +39,7 @@ const stepComponents = [
 export const ReferralForm = () => {
   const { userId, userData } = usePreloadedUserReferralData()
   const form = useReferralForm()
-  const { stepIndex, next, prev, fields, meta } = useReferralFormSteps()
+  const { stepIndex, next, prev, stepReset, fields, meta } = useReferralFormSteps()
   const CurrentStep = stepComponents[stepIndex]
   const isFormComplete = useIsReferralFormComplete(form)
   const { submit, isPending } = useSubmitReferralForm(
@@ -55,7 +55,18 @@ export const ReferralForm = () => {
   return (
     <FormProvider {...form}>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(submit)} className="space-y-6 mx-2">
+        {/* submit form and reset */}
+        <form
+          className="space-y-6 mx-2"
+          onSubmit={
+            form.handleSubmit((values) => {
+              submit(values)
+              // form.reset()
+              stepReset()
+            })
+          }
+        >
+          {/* <form onSubmit={form.handleSubmit(submit)} className="space-y-6 mx-2"> */}
           <FormStepNavigation
             steps={referralFormSteps}
             currentStep={stepIndex}
