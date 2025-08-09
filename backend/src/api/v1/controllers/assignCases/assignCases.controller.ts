@@ -19,12 +19,11 @@ const updateReferralForm = async (
 		// TODO
 		// Check that user belongs to company that the referral belongs to
 
-
-
 			
-		if (userRole !== roleConstants.worker) {
-			return res.status(403).json({ message: "Forbidden" });
-		}
+        // TODO: Check user session for role permissions
+		// if (userRole !== roleConstants.worker) {
+		// 	return res.status(403).json({ message: "Forbidden" });
+		// }
 
 		const caseWorkerExists = await prisma.user.findUnique({
 			where: {

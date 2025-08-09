@@ -8,15 +8,8 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-// import { Label } from "@/components/ui/label";
-// import { Badge } from "@/components/ui/badge";
-// import {
-// 	Accordion,
-// 	AccordionItem,
-// 	AccordionTrigger,
-// 	AccordionContent,
-// } from "@/components/ui/accordion";
-// import ReferralFormFields from "@/components/referralForms/ReferralFormFields";
+import { PDFViewer } from '@react-pdf/renderer';
+import { ReferralFormPDF } from './ReferralFormPDF';
 
 export const UserReferralFormView = ({ referralForm }: any) => {
   return (
@@ -32,22 +25,11 @@ export const UserReferralFormView = ({ referralForm }: any) => {
             {referralForm.user.personalInformation.firstName}{' '}
             {referralForm.user.personalInformation.lastName}
           </DialogTitle>
-          <DialogDescription>
-            {/* <Accordion type="single" collapsible className="w-full">
-							{formSections.map((section, index) => (
-								<AccordionItem key={index} value={`item-${index}`}>
-									<AccordionTrigger>{section.title}</AccordionTrigger>
-									<AccordionContent>
-										<ReferralFormFields
-											refField={section.field}
-											header={section.header}
-										/>
-									</AccordionContent>
-								</AccordionItem>
-							))}
-						</Accordion> */}
-          </DialogDescription>
+          <DialogDescription />
         </DialogHeader>
+        <PDFViewer style={{ width: '30rem', height: '40rem' }}>
+          <ReferralFormPDF referralForm={referralForm} />
+        </PDFViewer>
         <DialogFooter>
           <Button
             variant="outline"

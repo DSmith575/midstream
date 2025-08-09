@@ -1,5 +1,6 @@
 import { Menu } from 'lucide-react'
 import { SignedIn, UserButton, useAuth } from '@clerk/clerk-react'
+import { useUserProfile } from '@/hooks/userProfile/useUserProfile'
 import { NavBarLogo } from '@/components/links/NavBarLogoLink'
 import { LinkComponent } from '@/components/links/LinkComponent'
 import {
@@ -9,12 +10,32 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
+import { DevToolButton } from '@/components/devTools'
 
 import { DialogTitle } from '@/components/ui/dialog'
-import { routeConstants } from '@/lib/constants'
+import { roleConstants, routeConstants } from '@/lib/constants'
+import { postChangeUserRole } from '@/lib/api/devTools/postChangeUserRole'
+
+type UserRoles = 'CLIENT' | 'WORKER'
+// Testing
+const onClickSwitchUserRole = async (userId: string, role: UserRoles) => {
+  try {
+    const response = await postChangeUserRole({ userId, role })
+    if (response) {
+      console.log('User role switched successfully:', response)
+      window.location.reload()
+    } else {
+      console.error('Failed to switch user role')
+    }
+  } catch (error) {
+    console.error('Error switching user role:', error)
+  }
+}
+
 
 export const Header = () => {
   const { userId } = useAuth()
+  const { userData } = useUserProfile(userId || '');
   return (
     <header className="bg-white flex h-20 w-full shrink-0 items-center px-4 shadow-md md:px-6">
       <Sheet>
@@ -47,6 +68,18 @@ export const Header = () => {
               linkName={'Features'}
             />
             <LinkComponent linkRef={routeConstants.about} linkName={'About'} />
+
+            { userData ?
+                <DevToolButton
+                  text={`TESTING - Switch role to ${userData.role == roleConstants.client ? 'Worker' : 'Client' }`}
+                  onClick={() => {
+                    onClickSwitchUserRole(
+                      userId,
+                      (userData.role == roleConstants.client ? roleConstants.worker : roleConstants.client) as UserRoles,
+                    )
+                  }}
+                  buttonText="Switch Role"
+                /> : <div/>}
           </section>
         </SheetContent>
 
