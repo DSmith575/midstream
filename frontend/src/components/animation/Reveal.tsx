@@ -1,12 +1,13 @@
-import { useEffect, useRef, type JSX } from 'react'
-import { motion, useInView, useAnimation } from 'framer-motion'
+import { useEffect, useRef } from 'react'
+import { motion, useAnimation, useInView } from 'framer-motion'
+import type { JSX } from 'react'
 
 interface Props {
   children: JSX.Element
   width?: 'fit-content' | '100%'
 }
 
-const Reveal = ({ children, width = 'fit-content' }: Props) => {
+export const Reveal = ({ children, width = 'fit-content' }: Props) => {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true })
 
@@ -62,5 +63,3 @@ const Reveal = ({ children, width = 'fit-content' }: Props) => {
     </div>
   )
 }
-
-export default Reveal

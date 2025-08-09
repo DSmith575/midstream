@@ -1,6 +1,6 @@
-import aboutUsImg from '@/assets/images/hero-sky.jpg';
+import aboutUsImg from '@/assets/images/hero-sky.jpg'
 
-const AboutUsHero = () => {
+export const AboutUsHero = () => {
   return (
     <div className="relative w-full md:h-[500px]">
       <img
@@ -12,7 +12,5 @@ const AboutUsHero = () => {
         About Us
       </h1>
     </div>
-  );
-};
-
-export default AboutUsHero;
+  )
+}

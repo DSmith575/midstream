@@ -1,14 +1,14 @@
-import { Button } from '@/components/ui/button'
 import { Link } from '@tanstack/react-router'
-import ReferralFormApplication from '@/components/referralForms/ReferralFormApplication'
-import useGetReferralForms from '@/hooks/userProfile/useGetReferralForms'
-import Spinner from '@/components/spinner/Spinner'
+import { Button } from '@/components/ui/button'
+import { UserReferralFormView } from '@/components/referralForms/UserReferralFormView'
+import { useGetReferralForms } from '@/hooks/userProfile/useGetReferralForms'
+import { Spinner } from '@/components/spinner/Spinner'
 
 interface ApplicationCardProps {
   userId: string
 }
 
-const ApplicationCard = ({ userId }: ApplicationCardProps) => {
+export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
   const { error, isLoading, referralForms } = useGetReferralForms(userId)
 
   return (
@@ -21,6 +21,7 @@ const ApplicationCard = ({ userId }: ApplicationCardProps) => {
           </Link>
         </Button>
       </div>
+      <hr className="border-gray-200" style={{ marginTop: '1rem' }} />
       <div className="mt-4 max-h-[300px] space-y-2 overflow-y-auto">
         {isLoading ? (
           <div className="flex justify-center py-10">
@@ -39,7 +40,14 @@ const ApplicationCard = ({ userId }: ApplicationCardProps) => {
               key={idx}
               className="flex items-center justify-between text-sm"
             >
-              <ReferralFormApplication referralForm={form} />
+              <UserReferralFormView referralForm={form} />
+              <div>
+                {
+                  `Referred by ${form.referrer.firstName} ${form.referrer.lastName}
+                   for ${form.disability.disabilityType} -
+                   ${form.disability.disabilityReasonForReferral}`
+                }
+              </div>
               <p
                 className={`rounded-full px-3 py-1 ${
                   form.status === 'SUBMITTED' ? 'bg-[#84e984]' : 'bg-red-100'
@@ -54,5 +62,3 @@ const ApplicationCard = ({ userId }: ApplicationCardProps) => {
     </div>
   )
 }
-
-export default ApplicationCard

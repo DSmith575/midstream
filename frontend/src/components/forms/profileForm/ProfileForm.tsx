@@ -1,37 +1,41 @@
 import { useState } from 'react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useForm } from 'react-hook-form'
+import { useUser } from '@clerk/clerk-react'
+import { useNavigate } from '@tanstack/react-router'
+import type { z } from 'zod'
+import type { CreateUserProps } from '@/lib/interfaces'
 import { Input } from '@/components/ui/input'
 import { SelectItem } from '@/components/ui/select'
 import { Form, FormControl, FormItem, FormLabel } from '@/components/ui/form'
 import { profileFormSchema } from '@/lib/schemas/profileFormSchema'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { useUser } from '@clerk/clerk-react'
 
-import MotionContainer from '@/components/animation/MotionContainer'
-import StepNavigation from '@/components/forms/formComponents/StepNavigation'
-import FormInput from '@/components/forms/formComponents/FormInput'
-import FormSelect from '@/components/forms/formComponents/FormSelect'
+import { MotionContainer } from '@/components/animation/MotionContainer'
 import {
-  titleSelectOptions,
   genderSelectOptions,
   profileFormSteps,
+  titleSelectOptions,
 } from '@/lib/formOptions/profileFormOptions'
-import FormStepButtons from '@/components/forms/formComponents/FormStepButtons'
-import useCreateUserProfile from '@/hooks/userProfile/useCreateUserProfile'
-import type { CreateUserProps } from '@/lib/profileInterfaces'
-import { useNavigate } from '@tanstack/react-router'
+import {
+  FormInput,
+  FormSelect,
+  FormStepButtons,
+  FormStepNavigation,
+} from '@/components/forms/formComponents'
+import { useCreateUserProfile } from '@/hooks/userProfile/useCreateUserProfile'
 
 type Inputs = z.infer<typeof profileFormSchema>
 type FieldName = keyof Inputs
 
-const ProfileForm = () => {
+export const ProfileForm = () => {
   const user = useUser()
-  const navigate = useNavigate();
-  const { mutate, isPending, isSuccess } = useCreateUserProfile(user.user?.id as string,() => {
-    navigate({ to: `/dashboard` });
-  });
-  
+  const navigate = useNavigate()
+  const { mutate, isPending, isSuccess } = useCreateUserProfile(
+    user.user?.id as string,
+    () => {
+      navigate({ to: `/dashboard` })
+    },
+  )
 
   const form = useForm<Inputs>({
     resolver: zodResolver(profileFormSchema),
@@ -47,7 +51,7 @@ const ProfileForm = () => {
       address: '',
       suburb: '',
       city: '',
-      postCode: 0,
+      postCode: '0',
       country: '',
     },
   })
@@ -57,7 +61,7 @@ const ProfileForm = () => {
   const [currentStep, setCurrentStep] = useState(0)
   const delta = currentStep - previousStep
 
-  const onSubmit = async (values: z.infer<typeof profileFormSchema>) => {
+  const onSubmit = (values: z.infer<typeof profileFormSchema>) => {
     const googleUserId = user.user?.id
     if (!googleUserId) {
       return
@@ -85,7 +89,6 @@ const ProfileForm = () => {
       if (isSuccess) {
         navigate({ to: '/dashboard' })
       }
-
     } catch (error) {
       console.error(error)
     }
@@ -94,7 +97,9 @@ const ProfileForm = () => {
   const next = async () => {
     const fields = profileFormSteps[currentStep]?.fields
 
-    const output = await trigger(fields as FieldName[], { shouldFocus: true })
+    const output = await trigger(fields as Array<FieldName>, {
+      shouldFocus: true,
+    })
     if (!output) return
 
     if (currentStep < profileFormSteps.length - 1) {
@@ -112,7 +117,7 @@ const ProfileForm = () => {
 
   return (
     <section className="flex flex-col justify-between px-10 py-10">
-      <StepNavigation steps={profileFormSteps} currentStep={currentStep} />
+      <FormStepNavigation steps={profileFormSteps} currentStep={currentStep} />
 
       {/* Form */}
       <Form {...form}>
@@ -236,7 +241,7 @@ const ProfileForm = () => {
                 fieldName={'postCode'}
                 formLabel={'Post Code'}
                 placeholder={'1234'}
-                type={'number'}
+                type={'string'}
               />
 
               <FormInput
@@ -266,7 +271,7 @@ const ProfileForm = () => {
                     </FormLabel>
                     <FormControl>
                       <Input
-                        value={value as string}
+                        value={value}
                         readOnly
                         className="block w-full cursor-not-allowed rounded-md border-0 bg-gray-200 py-1.5 text-gray-900 shadow-sm sm:text-sm sm:leading-6"
                       />
@@ -295,5 +300,3 @@ const ProfileForm = () => {
     </section>
   )
 }
-
-export default ProfileForm

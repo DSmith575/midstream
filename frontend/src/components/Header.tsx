@@ -1,19 +1,41 @@
-import NavBarLogo from '@/components/links/NavBarLogoLink'
-import LinkComponent from '@/components/links/LinkComponent'
 import { Menu } from 'lucide-react'
-import { SignedIn, useAuth, UserButton } from '@clerk/clerk-react'
+import { SignedIn, UserButton, useAuth } from '@clerk/clerk-react'
+import { useUserProfile } from '@/hooks/userProfile/useUserProfile'
+import { NavBarLogo } from '@/components/links/NavBarLogoLink'
+import { LinkComponent } from '@/components/links/LinkComponent'
 import {
   Sheet,
-  SheetTrigger,
   SheetContent,
   SheetDescription,
+  SheetTrigger,
 } from '@/components/ui/sheet'
 import { Button } from '@/components/ui/button'
+import { DevToolButton } from '@/components/devTools'
 
 import { DialogTitle } from '@/components/ui/dialog'
+import { roleConstants, routeConstants } from '@/lib/constants'
+import { postChangeUserRole } from '@/lib/api/devTools/postChangeUserRole'
 
-const Header = () => {
+type UserRoles = 'CLIENT' | 'WORKER'
+// Testing
+const onClickSwitchUserRole = async (userId: string, role: UserRoles) => {
+  try {
+    const response = await postChangeUserRole({ userId, role })
+    if (response) {
+      console.log('User role switched successfully:', response)
+      window.location.reload()
+    } else {
+      console.error('Failed to switch user role')
+    }
+  } catch (error) {
+    console.error('Error switching user role:', error)
+  }
+}
+
+
+export const Header = () => {
   const { userId } = useAuth()
+  const { userData } = useUserProfile(userId || '');
   return (
     <header className="bg-white flex h-20 w-full shrink-0 items-center px-4 shadow-md md:px-6">
       <Sheet>
@@ -27,16 +49,37 @@ const Header = () => {
             <div className={'my-8 flex items-center justify-center'}>
               {!userId ? (
                 <div className={'w-full flex justify-center shadow-sm'}>
-                  <LinkComponent linkRef={'/login'} linkName={'Login'} />
+                  <LinkComponent
+                    linkRef={routeConstants.login}
+                    linkName={'Login'}
+                  />
                 </div>
               ) : (
-                <LinkComponent linkRef="/dashboard" linkName="Dashboard" />
+                <LinkComponent
+                  linkRef={routeConstants.dashboard}
+                  linkName="Dashboard"
+                />
               )}
             </div>
 
-            <LinkComponent linkRef={'/'} linkName={'Home'} />
-            <LinkComponent linkRef={'/features'} linkName={'Features'} />
-            <LinkComponent linkRef={'/about'} linkName={'About'} />
+            <LinkComponent linkRef={routeConstants.home} linkName={'Home'} />
+            <LinkComponent
+              linkRef={routeConstants.features}
+              linkName={'Features'}
+            />
+            <LinkComponent linkRef={routeConstants.about} linkName={'About'} />
+
+            { userData ?
+                <DevToolButton
+                  text={`TESTING - Switch role to ${userData.role == roleConstants.client ? 'Worker' : 'Client' }`}
+                  onClick={() => {
+                    onClickSwitchUserRole(
+                      userId,
+                      (userData.role == roleConstants.client ? roleConstants.worker : roleConstants.client) as UserRoles,
+                    )
+                  }}
+                  buttonText="Switch Role"
+                /> : <div/>}
           </section>
         </SheetContent>
 
@@ -63,5 +106,3 @@ const Header = () => {
     </header>
   )
 }
-
-export default Header

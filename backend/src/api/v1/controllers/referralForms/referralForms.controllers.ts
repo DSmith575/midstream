@@ -42,7 +42,7 @@ const createReferralForm = async (
 
 		const checkCompany = await prisma.company.findUnique({
 			where: {
-				id: Number(companyId),
+				id: String(companyId),
 			},
 		});
 
@@ -178,7 +178,7 @@ const getUserReferrals = async (req: Request, res: Response): Promise<any> => {
 
 		const userId = userExists.id;
 		const referrals = await prisma.referralForm.findMany({
-			where: { userId: Number(userId) },
+			where: { userId: String(userId) },
 			include: {
 				user: {
 					include: {
@@ -221,7 +221,7 @@ const getAllReferrals = async (req: Request, res: Response): Promise<any> => {
 		const referrals = await prisma.referralForm.findMany({
 			where: {
 				assignedToWorkerId: null,
-				companyId: Number(companyId),
+				companyId: String(companyId),
 			},
 			include: {
 				user: {
@@ -276,11 +276,10 @@ const getCaseWorkerReferrals = async (
 			return res.status(400).json({ message: "User does not exist" });
 		}
 
-		console.log(userExists);
 
 		const userId = userExists.id;
 		const referrals = await prisma.referralForm.findMany({
-			where: { assignedToWorkerId: Number(userId) },
+			where: { assignedToWorkerId: String(userId) },
 			include: {
 				user: {
 					include: {
