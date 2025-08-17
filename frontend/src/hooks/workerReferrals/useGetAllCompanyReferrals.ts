@@ -1,14 +1,20 @@
 import { useQuery } from '@tanstack/react-query'
 import { fetchCompanyReferrals } from '@/lib/api/fetchCompanyReferrals'
 
+export type ReferralFilter = {
+  // TODO: Allow array filters?
+  assignedWorkerId?: string
+  companyId: number
+}
+
+
 export const useGetAllCompanyReferrals = ({
   companyId,
-}: {
-  companyId: number
-}) => {
+  assignedWorkerId,
+}: ReferralFilter) => {
   const query = useQuery({
-    queryKey: ['companyReferrals', companyId], // <- include companyId to avoid stale caching
-    queryFn: () => fetchCompanyReferrals(companyId),
+    queryKey: ['companyReferrals', companyId, assignedWorkerId], // <- include companyId to avoid stale caching
+    queryFn: () => fetchCompanyReferrals(companyId, { assignedWorkerId }),
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: 2,
     refetchInterval: 10 * 60 * 1000, // 10 minutes
