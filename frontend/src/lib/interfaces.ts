@@ -137,3 +137,7 @@ export interface JoinCompanyProps {
   companyId: number
   userId: string
 }
+
+export interface CreateServicePlanProps {
+  serviceCaseId: string
+}
