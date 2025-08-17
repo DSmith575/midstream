@@ -1,143 +1,156 @@
-// import {
-// 	Table,
-// 	TableBody,
-// 	TableCaption,
-// 	TableCell,
-// 	TableFooter,
-// 	TableHead,
-// 	TableHeader,
-// 	TableRow,
-// } from "@/components/ui/table";
-// import type { SortingState, ColumnDef } from "@tanstack/react-table";
-// import {
-// 	flexRender,
-// 	getCoreRowModel,
-// 	getPaginationRowModel,
-// 	getSortedRowModel,
-// 	useReactTable,
-// } from "@tanstack/react-table";
+import { useMemo, useState } from 'react'
+import {
+  flexRender,
+  getCoreRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from '@tanstack/react-table'
+import type { ColumnDef, SortingState } from '@tanstack/react-table'
+import { Button } from '@/components/ui/button'
+import { Spinner } from '@/components/spinner/Spinner'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
 
-// import useGetAllCompanyReferrals from "@/hooks/workerReferrals/useGetAllCompanyReferrals";
-// import { Button } from "@/components/ui/button";
-// import { useState } from "react";
-// import ReferralFormCaseWorkerButton from "@/components/referralForms/ReferralFormCaseWorkerButton";
-// import Spinner from "../spinner/Spinner";
+import { useGetCaseWorkerServiceCases } from '@/hooks/serviceCase/useGetCaseWorkerServiceCases'
 
-// interface DataTableProps<TData, TValue> {
-// 	orgRole: string;
-// 	caseWorkerId: string;
-// 	showReferrals?: boolean;
-// 	columns: ColumnDef<TData, TValue>[];
-// 	data: TData[];
-// }
+import { CaseModal } from './CaseModal'
 
-// const CaseWorkerTable = <TData, TValue>({
-// 	caseWorkerId,
-// 	orgRole,
-// 	showReferrals,
-// 	columns,
-// 	data,
-// }: DataTableProps<TData, TValue>) => {
-// 	const { isLoading, data: referrals } = useGetAllCompanyReferrals({
-// 		enabled: !!showReferrals, // Enable the query only if showReferrals is true
-// 	});
-// 	const [sorting, setSorting] = useState<SortingState>([]);
-// 	const [open, setOpen] = useState(false);
-// 	const [referralForm, setReferralForm] = useState<any>(null);
+interface DataTableProps<TData, TValue> {
+  caseWorkerId: string
+  columns: Array<ColumnDef<TData, TValue>>
+  data?: Array<TData>
+}
 
-// 	const table = useReactTable({
-// 		data: showReferrals && referrals ? referrals : data || [], // ← guarantees it's an array
-// 		columns,
-// 		getCoreRowModel: getCoreRowModel(),
-// 		getPaginationRowModel: getPaginationRowModel(),
-// 		onSortingChange: setSorting,
-// 		getSortedRowModel: getSortedRowModel(),
-// 		state: {
-// 			sorting,
-// 		},
-// 	});
+export const CaseWorkerTable = <TData, TValue>({
+  caseWorkerId,
+  columns,
+}: DataTableProps<TData, TValue>) => {
+  const { isLoading, data: { data: serviceCases } = { data: [] } } = useGetCaseWorkerServiceCases({
+    caseWorkerId
+  })
 
-// 	if (isLoading) {
-// 		return <Spinner />;
-// 	}
+  const [sorting, setSorting] = useState<SortingState>([])
+  const [open, setOpen] = useState(false)
+  const [serviceCase, setServiceCase] = useState<any>(null)
 
-// 	return (
-// 		<>
-// 			<div className="rounded-md border">
-// 				<Table>
-// 					<TableHeader className="bg-gray-100">
-// 						{table.getHeaderGroups().map((headerGroup) => (
-// 							<TableRow key={headerGroup.id}>
-// 								{headerGroup.headers.map((header) => (
-// 									<TableHead
-// 										key={header.id}
-// 										className={"text-center text-black"}>
-// 										{header.isPlaceholder
-// 											? null
-// 											: flexRender(
-// 													header.column.columnDef.header,
-// 													header.getContext(),
-// 												)}
-// 									</TableHead>
-// 								))}
-// 							</TableRow>
-// 						))}
-// 					</TableHeader>
+  if (!caseWorkerId) {
+    return (
+      <div className="text-red-500">
+        You must be assigned a case worker to view referrals.
+      </div>
+    )
+  }
 
-// 					<TableBody>
-// 						{table.getRowModel().rows?.length ? (
-// 							table.getRowModel().rows.map((row) => (
-// 								<TableRow
-// 									onClick={() => {
-// 										setReferralForm(row.original), setOpen(true);
-// 									}}
-// 									className={"text-center"}
-// 									key={row.id}
-// 									data-state={row.getIsSelected() && "selected"}>
-// 									{row.getVisibleCells().map((cell) => (
-// 										<TableCell key={cell.id}>
-// 											{flexRender(
-// 												cell.column.columnDef.cell,
-// 												cell.getContext(),
-// 											)}
-// 										</TableCell>
-// 									))}
-// 								</TableRow>
-// 							))
-// 						) : (
-// 							<TableRow>
-// 								<TableCell
-// 									colSpan={columns.length}
-// 									className="h-24 text-center">
-// 									No results.
-// 								</TableCell>
-// 							</TableRow>
-// 						)}
-// 					</TableBody>
-// 				</Table>
-// 			</div>
-// 			<div className="flex items-center justify-end space-x-2 py-4">
-// 				<Button
-// 					variant="outline"
-// 					size="sm"
-// 					onClick={() => table.previousPage()}
-// 					disabled={!table.getCanPreviousPage()}>
-// 					Previous
-// 				</Button>
-// 				<Button
-// 					variant="outline"
-// 					size="sm"
-// 					onClick={() => table.nextPage()}
-// 					disabled={!table.getCanNextPage()}>
-// 					Next
-// 				</Button>
-// 			</div>
+  const memoizedColumns = useMemo(() => columns, [columns])
+  const memoizedServiceCases = useMemo(() => serviceCases, [isLoading])
 
-// 			{open && referralForm && (
-// 				<ReferralFormCaseWorkerButton caseWorkerId={caseWorkerId} referralForm={referralForm} setOpen={setOpen} orgRole={orgRole} open={open} />
-// 			)}
-// 		</>
-// 	);
-// };
+  const table = useReactTable({
+    data: memoizedServiceCases,
+    columns: memoizedColumns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    onSortingChange: setSorting,
+    getSortedRowModel: getSortedRowModel(),
+    state: {
+      sorting,
+    },
+  })
 
-// export default CaseWorkerTable;
+  if (isLoading) {
+    return <Spinner />
+  }
+
+  return (
+    <>
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader className="bg-gray-100">
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => (
+                  <TableHead
+                    key={header.id}
+                    className={'text-center text-black'}
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
+                  </TableHead>
+                ))}
+              </TableRow>
+            ))}
+          </TableHeader>
+
+          <TableBody>
+            {table.getRowModel().rows.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  onClick={() => {
+                    setServiceCase(row.original), setOpen(true)
+                  }}
+                  className={'text-center cursor-pointer hover:bg-gray-100'}
+                  key={row.id}
+                  data-state={row.getIsSelected() && 'selected'}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext(),
+                      )}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+      <div className="flex items-center justify-end space-x-2 py-4">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.previousPage()}
+          disabled={!table.getCanPreviousPage()}
+        >
+          Previous
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage()}
+        >
+          Next
+        </Button>
+      </div>
+
+      {open && serviceCase && (
+				<CaseModal
+					caseData={serviceCase}
+					setOpen={setOpen}
+					open={open}
+				/>
+      )}
+    </>
+  )
+}
