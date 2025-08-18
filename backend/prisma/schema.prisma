@@ -31,6 +31,10 @@ enum UserRole {
   MIDSTREAM
 }
 
+enum  DocumentType {
+  PDF
+}
+
 model User {
   id                  String               @id @default(uuid())
   googleId            String               @unique
@@ -100,6 +104,7 @@ model ReferralForm {
   emergencyContactId      String                 @unique
   consentId               String                 @unique
   additionalInformationId String                 @unique
+  // audioDocumentId         String?
   user                    User                   @relation("CreatedReferrals", fields: [userId], references: [id])
   assignedToWorker        User?                  @relation("AssignedReferrals", fields: [assignedToWorkerId], references: [id])
   referrer                Referrer               @relation(fields: [referrerId], references: [id])
@@ -110,6 +115,8 @@ model ReferralForm {
   consent                 ReferralConsent        @relation(fields: [consentId], references: [id])
   additionalInformation   AdditionalInformation? @relation(fields: [additionalInformationId], references: [id])
   company                 Company?               @relation(fields: [companyId], references: [id])
+  // documents               Document?              @relation(fields: [audioDocumentId], references: [id])
+  documents               Document[]             @relation("ReferralDocuments")
 }
 
 model ReferralCommunication {
@@ -195,4 +202,16 @@ model Company {
   updatedAt DateTime       @default(now()) @updatedAt
   users     User[]
   referrals ReferralForm[]
+}
+
+model Document {
+  id           String       @id @default(uuid())
+  referralId   String
+  name         String
+  pdfFile      Bytes
+  type         DocumentType @default(PDF)
+  // url           String
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @default(now()) @updatedAt
+  referralForm ReferralForm @relation("ReferralDocuments", fields: [referralId], references: [id])
 }

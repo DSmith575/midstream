@@ -9,6 +9,7 @@ import dotenv from 'dotenv';
 import assignCasesRouter from '@/api/v1/routes/assignCases/assignCases.routes';
 import companyRouter from '@/api/v1/routes/company/company.routes';
 import devRouter from '@/api/v1/routes/devTools/userRoles.routes';
+import documentRouter from '@/api/v1/routes/audioDocuments/audioDocuments.routes';
 
 dotenv.config();
 const app = express();
@@ -30,6 +31,7 @@ app.use(`${API_BASE_URL}/referralForms`, referralFormRouter);
 app.use(`${API_BASE_URL}/assignCases`, assignCasesRouter);
 app.use(`${API_BASE_URL}/company`, companyRouter);
 app.use(`${API_BASE_URL}/devTools`, devRouter);
+app.use(`${API_BASE_URL}/referral-documents`, documentRouter);
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
