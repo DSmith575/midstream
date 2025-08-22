@@ -180,6 +180,7 @@ const getUserReferrals = async (req: Request, res: Response): Promise<any> => {
 		const referrals = await prisma.referralForm.findMany({
 			where: { userId: String(userId) },
 			include: {
+				documents: true,
 				user: {
 					include: {
 						contactInformation: true,
@@ -207,8 +208,18 @@ const getUserReferrals = async (req: Request, res: Response): Promise<any> => {
 		if (referrals.length === 0) {
 			return res.status(404).json({ message: "No referrals found" });
 		}
+		
+const referralsWithBase64Docs = referrals.map((referral) => ({
+  ...referral,
+  documents: referral.documents
+  .filter((doc) => doc.pdfFile)
+  .map((doc) => ({
+    ...doc,
+    pdfFile: Buffer.from(doc.pdfFile).toString("base64"),
+  })),
+}))
 
-		return res.status(200).json({ data: referrals });
+		return res.status(200).json({ data: referralsWithBase64Docs });
 	} catch (error) {
 		res.status(500).json({ error: "Failed to get referrals" });
 	}
@@ -275,7 +286,6 @@ const getCaseWorkerReferrals = async (
 		if (!userExists) {
 			return res.status(400).json({ message: "User does not exist" });
 		}
-
 
 		const userId = userExists.id;
 		const referrals = await prisma.referralForm.findMany({

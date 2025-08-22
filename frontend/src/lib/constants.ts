@@ -13,3 +13,5 @@ export const routeConstants = {
   login: '/login',
   signup: '/signup',
 }
+
+export const pdfBase64Prefix = 'data:application/pdf;base64,'

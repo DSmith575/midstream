@@ -53,6 +53,8 @@ async def upload_audio(file: UploadFile = File(default=None), referralId: str = 
             response = await client.post(NODE_API_URL, files=files, data=data)
             response.raise_for_status()
 
+            print("File uploaded successfully")
+
         return {"message": "Audio file processed and uploaded successfully", transcription: transcription}
 
         # return StreamingResponse(

@@ -1,1 +1,1 @@
-export { ReferralFormPDF } from './ReferralFormPDF';
+export { ReferralFormPDF } from './ReferralFormPDF'
