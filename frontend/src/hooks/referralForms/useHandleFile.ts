@@ -1,7 +1,7 @@
 import { useCreateUserReferralAudio } from '../userProfile'
 
 export const useHandleFile = (refId: string, successCallBack?: () => void) => {
-  const { mutate, isPending, isSuccess, isError } = useCreateUserReferralAudio(refId, () => {
+  const { mutate, isPending, isSuccess, error, isError } = useCreateUserReferralAudio(refId, () => {
     successCallBack?.()
   })
 
@@ -9,14 +9,15 @@ export const useHandleFile = (refId: string, successCallBack?: () => void) => {
     event: React.ChangeEvent<HTMLInputElement>,
     referralId: string,
   ) => {
-    event.preventDefault()
     const file = event.target.files?.[0]
+
     if (!file) {
       alert('Please select a file to upload')
       return
     }
+
     mutate({ file, referralId })
   }
 
-  return { handleFileChange, isPending, isSuccess, isError }
+  return { handleFileChange, isPending, isSuccess, isError, error }
 }

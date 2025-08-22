@@ -7,11 +7,16 @@ from app.lib.constants.constants import ALLOWED_EXTENSIONS_AUDIO
 from app.lib.aiCompletions.gpt_completions import process_client_audio
 from app.lib.processing.audio.audio_processing import convert_to_wav
 from app.lib.processing.pdfProcessing.pdf_processing import generate_pdf_with_audio_transcript
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
+BASE_API_URL = os.getenv('NODE_API_URL')
+NODE_API_URL = f"{BASE_API_URL}referral-documents/upload-audio"
 
 router = APIRouter()
 
-NODE_API_URL = 'http://localhost:3001/api/v1/referral-documents/upload-audio'
+# url + referral-documents/upload-audio
 
 @router.post(APIRoutes.UPLOAD_AUDIO.value)
 async def upload_audio(file: UploadFile = File(default=None), referralId: str = Form(...)):
@@ -23,7 +28,10 @@ async def upload_audio(file: UploadFile = File(default=None), referralId: str = 
         raise HTTPException(status_code=400, detail="No file provided")
     
     if not allowed_file(filename=file.filename, allowed_extensions=ALLOWED_EXTENSIONS_AUDIO):
-        return {"message": "Invalid file type, allowed types are: " + ", ".join(ALLOWED_EXTENSIONS_AUDIO)}
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid file type, allowed types are: {', '.join(ALLOWED_EXTENSIONS_AUDIO)}"
+    )
     
     try:
         print("File received:", file.filename)
@@ -55,14 +63,7 @@ async def upload_audio(file: UploadFile = File(default=None), referralId: str = 
 
             print("File uploaded successfully")
 
-        return {"message": "Audio file processed and uploaded successfully", transcription: transcription}
-
-        # return StreamingResponse(
-        #     pdf_buffer,
-        #     media_type="application/pdf",
-        #     headers={"Content-Disposition": f"attachment; filename={pdf_buffer.name}"}
-        # )
-    
+        return {"detail": "Audio file processed and uploaded successfully"}
 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error processing audio: {str(e)}")

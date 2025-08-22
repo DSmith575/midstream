@@ -19,7 +19,7 @@ export const UserReferralFormView = ({ referralForm }: any) => {
 
   return (
     <Dialog modal>
-      <DialogTrigger>
+      <DialogTrigger asChild>
         <Button variant="outline" size="lg">
           {new Date(referralForm.createdAt).toLocaleDateString()}
         </Button>

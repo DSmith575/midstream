@@ -5,14 +5,22 @@ export const createUserReferralAudio = async (file: File, referralId: string) =>
   formData.append('file', file)
   formData.append('referralId', referralId)
 
+  try {
+
   const response = await fetch(`${pythonApiKey}upload-audio`, {
     method: 'POST',
     body: formData,
   })
 
-  if (!response.ok) {
-    throw new Error('Failed to upload audio')
-  }
+
+if (!response.ok) {
+  const errorData = await response.json().catch(() => null)
+  console.error("Upload failed:", errorData || response.statusText)
+  throw new Error(errorData?.detail || 'Failed to upload audio')
+}
 
   return response.json()
+  } catch (error) {
+    throw error instanceof Error ? error : new Error('An unexpected error occurred')
+  }
 }
