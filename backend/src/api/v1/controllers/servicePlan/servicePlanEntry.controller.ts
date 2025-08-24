@@ -27,6 +27,18 @@ export const createServicePlanEntry = async (
       return res.status(400).json({ message: "Service plan does not exist" })
     }
 
+    const user = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { id: String(userId) },
+          { googleId: String(userId) }
+        ]
+      }
+    })
+    if (!user) {
+      return res.status(400).json({ message: "Failed to find user" })
+    }
+
     const result = await prisma.$transaction(async (prisma) => {
       try {
         const servicePlanEntry = await prisma.servicePlanEntry.create({
@@ -41,7 +53,7 @@ export const createServicePlanEntry = async (
             data: {
               servicePlanEntryId: servicePlanEntry.id,
               comment: comment,
-              authorId: userId
+              authorId: user.id
             }
           })
         }
