@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { ReferralStatusBadge } from '@/components/referralForms/ReferralStatusBadge'
 import { useEditServicePlan } from '@/hooks/servicePlan/useEditServicePlan'
+import { ServicePlanSummary } from '../servicePlan/ServicePlanSummary'
 
 interface CaseModalProps {
   caseData: any
@@ -54,7 +55,7 @@ export const CaseModal = ({
               <AccordionItem key={1} value={"item-1"}>
                 <AccordionTrigger>Service Plan Summary</AccordionTrigger>
                 <AccordionContent>
-                  // TODO: Add service plan summary
+                  <ServicePlanSummary serviceList={caseData?.servicePlan?.services} />
                 </AccordionContent>
               </AccordionItem>
           </Accordion>
