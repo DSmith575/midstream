@@ -141,3 +141,11 @@ export interface JoinCompanyProps {
 export interface CreateServicePlanProps {
   serviceCaseId: string
 }
+
+export interface CreateServicePlanEntryProps {
+  servicePlanId: string,
+  serviceCategoryId: string,
+  allocatedMinutes: number,
+  comment?: string,
+  userId?: string,
+}

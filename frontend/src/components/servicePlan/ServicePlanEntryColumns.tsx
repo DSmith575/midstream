@@ -1,5 +1,4 @@
 import type { ColumnDef } from '@tanstack/react-table'
-import { TextSpan } from '../text/TextSpan'
 
 export const ServicePlanEntryColumns: Array<ColumnDef<any>> = [
   {
@@ -7,7 +6,7 @@ export const ServicePlanEntryColumns: Array<ColumnDef<any>> = [
     header: 'Service Category',
   },
   {
-    accessorFn: (row) => row.allocatedMinutes / 60,
+    accessorFn: (row) => (row.allocatedMinutes / 60).toFixed(1),
     header: 'Hours'
   },
   {
@@ -15,7 +14,7 @@ export const ServicePlanEntryColumns: Array<ColumnDef<any>> = [
     header: 'Fixed/Flexible'
   },
   {
-    accessorFn: (row) => row.comments.map(({ comment }: { comment: string }) => (<TextSpan text={comment} />)),
-    header: 'Comment'
+    accessorFn: (row) => row.comments.length,
+    header: 'Comments'
   },
 ]
