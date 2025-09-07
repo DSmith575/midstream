@@ -15,9 +15,9 @@ interface ServicePlanSummaryProps {
 }
 
 export const ServicePlanSummary = ({
-  serviceList
+  serviceList = []
 }: ServicePlanSummaryProps) => {
-  const allocatedMinutes = serviceList?.reduce((minutes: { total: number, fixed: number, flexible: number }, currentValue: any) => {
+  const allocatedMinutes = serviceList.reduce((minutes: { total: number, fixed: number, flexible: number }, currentValue: any) => {
     minutes.total += currentValue.allocatedMinutes;
     if(currentValue.serviceCategory.flexibleHours) {
       minutes.flexible += currentValue.allocatedMinutes;
