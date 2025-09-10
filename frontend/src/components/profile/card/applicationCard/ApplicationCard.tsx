@@ -17,7 +17,6 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
   const { error, isLoading, referralForms } = useGetReferralForms(userId)
   const {
     handleFileChange,
-    isSuccess: fileSuccess,
     isPending: filePending,
     error: fileError,
   } = useHandleFile(userId)
@@ -69,7 +68,7 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
                   accept="audio/*"
                   ref={fileInputRef}
                   onChange={(e) => {
-                    handleFileChange(e, form.id);
+                    handleFileChange(e, form.id)
                   }}
                   className="hidden"
                 />

@@ -10,13 +10,10 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogClose
+  DialogClose,
 } from '@/components/ui/dialog'
 
-
 export const UserReferralFormView = ({ referralForm }: any) => {
-
-
   return (
     <Dialog modal>
       <DialogTrigger asChild>

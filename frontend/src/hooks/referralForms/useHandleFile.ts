@@ -1,9 +1,10 @@
 import { useCreateUserReferralAudio } from '../userProfile'
 
 export const useHandleFile = (refId: string, successCallBack?: () => void) => {
-  const { mutate, isPending, isSuccess, error, isError } = useCreateUserReferralAudio(refId, () => {
-    successCallBack?.()
-  })
+  const { mutate, isPending, isSuccess, error, isError } =
+    useCreateUserReferralAudio(refId, () => {
+      successCallBack?.()
+    })
 
   const handleFileChange = (
     event: React.ChangeEvent<HTMLInputElement>,

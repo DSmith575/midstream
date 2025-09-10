@@ -6,6 +6,7 @@ import {
 } from '@/components/ui/accordion'
 import { convertStringToPdf } from '@/lib/functions/pdfs/pdfFunctions'
 
+
 export const PdfAccordion = ({ documents }: { documents: Array<any> }) => {
   return (
     <Accordion type="single" collapsible className="w-full">
@@ -21,7 +22,7 @@ export const PdfAccordion = ({ documents }: { documents: Array<any> }) => {
           <AccordionContent className="px-4 pb-4">
             <div className="border rounded-xl shadow-sm overflow-hidden">
               <iframe
-                src={convertStringToPdf(doc.pdfFile)}
+                src={convertStringToPdf(doc.rawBytes)}
                 width="100%"
                 height="500px"
                 className="rounded-xl"
