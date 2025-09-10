@@ -208,7 +208,7 @@ model Document {
   id           String       @id @default(uuid())
   referralId   String
   name         String
-  pdfFile      Bytes
+  rawBytes     Bytes
   type         DocumentType @default(PDF)
   // url           String
   createdAt    DateTime     @default(now())

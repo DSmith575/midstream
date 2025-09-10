@@ -24,7 +24,7 @@ const createAudioDocumentReferralHandler = (req: Request, res: Response) => {
           name: file.originalname,
           referralId,
           type: 'PDF',
-          pdfFile: file.buffer,
+          rawBytes: file.buffer,
         },
       });
 
