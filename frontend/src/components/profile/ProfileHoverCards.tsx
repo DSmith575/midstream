@@ -21,16 +21,16 @@ export const ProfileHoverCards = ({ componentMap }: HoverDevCardsProps) => {
               title={formatPascalCase(key)}
               subtitle={`View ${formatPascalCase(key)}`}
               Icon={getIconForKey(key)}
-              onClick={() =>
-                setSelectedCard(key)
-              }
+              onClick={() => setSelectedCard(key)}
             />
           ))}
         </div>
       </div>
 
       {SelectedComponent && (
-        <div className="mt-2 col-start-1" style={{ margin: '0 20% 20%' }} >{<SelectedComponent/>}</div>
+        <div className="mt-2 col-start-1" style={{ margin: '0 20% 20%' }}>
+          {<SelectedComponent />}
+        </div>
       )}
     </>
   )

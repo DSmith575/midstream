@@ -14,8 +14,7 @@ export const useReferralFormSteps = () => {
     stepStore.setState((s) => ({ ...s, stepIndex: s.stepIndex + 1 }))
   const prev = () =>
     stepStore.setState((s) => ({ ...s, stepIndex: s.stepIndex - 1 }))
-    const stepReset = () =>
-    stepStore.setState((s) => ({ ...s, stepIndex: 0 }))
+  const stepReset = () => stepStore.setState((s) => ({ ...s, stepIndex: 0 }))
 
   return {
     stepIndex,

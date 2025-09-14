@@ -3,7 +3,7 @@ import { BulletList } from './BulletList';
 import { styles } from './style';
 import { splitAndCapitalize } from '@/lib/functions/functions'
 
-import type { BulletListItem } from './BulletList';
+import type { BulletListItem } from './BulletList'
 
 const mapValue = (value: any) => {
     switch(typeof value) {
@@ -17,29 +17,30 @@ const mapValue = (value: any) => {
       default:
         return (value as string)
     }
+
 }
 
 interface SectionProps {
-  formSection: any,
+  formSection: any
   index: number
 }
 
 export const Section = ({ formSection, index }: SectionProps) => {
   return (
     <View>
-      <Text style={styles.header}>{'\n'}Section {index + 1}: {formSection.title}</Text>
-      <BulletList 
+      <Text style={styles.header}>
+        {'\n'}Section {index + 1}: {formSection.title}
+      </Text>
+      <BulletList
         nestingLevel={0}
-        listItems={
-          Object.entries(formSection.field)
+        listItems={Object.entries(formSection.field)
           .filter(
             ([key]) =>
               key !== 'id' &&
               key !== 'userId' &&
               key !== 'createdAt' &&
               key !== 'updatedAt',
-          )
-          .map(([key, value]) => (
+          ).map(([key, value]) => (
             {
               value: (
               <Text>

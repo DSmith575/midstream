@@ -32,10 +32,9 @@ const onClickSwitchUserRole = async (userId: string, role: UserRoles) => {
   }
 }
 
-
 export const Header = () => {
   const { userId } = useAuth()
-  const { userData } = useUserProfile(userId || '');
+  const { userData } = useUserProfile(userId || '')
   return (
     <header className="bg-white flex h-20 w-full shrink-0 items-center px-4 shadow-md md:px-6">
       <Sheet>

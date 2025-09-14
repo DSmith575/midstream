@@ -20,6 +20,7 @@ export const useGetReferralForms = (userId: string) => {
 
   if (data && isFetched) {
     const referralForms = data.data
+
     return { isFetched, referralForms }
   }
 

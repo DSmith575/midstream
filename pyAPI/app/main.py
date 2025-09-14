@@ -19,8 +19,8 @@ app.add_middleware(
 async def main():
     return {"Hello": "World"}
 
-@app.get("/items")
-def read_root():
-    return JSONResponse(content={"status_code": status.HTTP_200_OK,"message": "Hello World"}, status_code=status.HTTP_200_OK)
+# @app.get("/items")
+# def read_root():
+#     return JSONResponse(content={"status_code": status.HTTP_200_OK,"message": "Hello World"}, status_code=status.HTTP_200_OK)
 
 app.include_router(upload_audio.router)
