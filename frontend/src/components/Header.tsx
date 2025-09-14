@@ -69,7 +69,7 @@ export const Header = () => {
             />
             <LinkComponent linkRef={routeConstants.about} linkName={'About'} />
 
-            { userData ?
+            { userData && userId ?
                 <DevToolButton
                   text={`TESTING - Switch role to ${userData.role == roleConstants.client ? 'Worker' : 'Client' }`}
                   onClick={() => {

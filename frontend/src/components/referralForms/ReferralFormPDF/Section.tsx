@@ -8,11 +8,11 @@ const mapValue = (value: any) => {
     switch(typeof value) {
       case 'boolean':
         return value ? 'Yes' : 'No'
+      // @ts-ignore: Intentional fallthrough
       case 'string':
         if (!isNaN(Date.parse(value))) {
           return new Date(value).toLocaleDateString()
         }
-        // eslint-disable-next-line no-fallthrough
       default:
         return (value as string)
     }
