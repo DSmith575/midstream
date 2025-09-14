@@ -50,6 +50,9 @@ model User {
   casesCompleted      Int?                 @default(0)
   casesAssigned       Int?                 @default(0)
   role                UserRole             @default(CLIENT)
+  serviceCase         ServiceCase[]        @relation("userServiceCase")
+  workerServiceCases  ServiceCase[]        @relation("caseWorkerServiceCase")
+  servicePlanComments ServicePlanEntryComment[]
 }
 
 model ContactInformation {
@@ -117,6 +120,7 @@ model ReferralForm {
   company                 Company?               @relation(fields: [companyId], references: [id])
   // documents               Document?              @relation(fields: [audioDocumentId], references: [id])
   documents               Document[]             @relation("ReferralDocuments")
+  serviceCase             ServiceCase?
 }
 
 model ReferralCommunication {
@@ -214,4 +218,54 @@ model Document {
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @default(now()) @updatedAt
   referralForm ReferralForm @relation("ReferralDocuments", fields: [referralId], references: [id])
+}
+model ServicePlan {
+  id            String              @id @default(uuid())
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @default(now()) @updatedAt
+  serviceCaseId String              @unique
+  services      ServicePlanEntry[]
+  serviceCase   ServiceCase         @relation(fields: [serviceCaseId], references: [id])
+}
+
+model ServiceCategory {
+  id                  String            @id @default(uuid())
+  serviceName         String            @unique
+  flexibleHours       Boolean
+  // Might be useful down the line
+  // parentCategoryId    String?
+  // parentCategory      ServiceCategory   @relation(fields: [parentCategoryId], references: [id])
+  servicePlanEntries  ServicePlanEntry[]
+}
+
+model ServicePlanEntry {
+  id                String          @id @default(uuid())
+  servicePlanId     String
+  serviceCategoryId String
+  allocatedMinutes  Int             // Store as int minutes, convert to fractional hours in code
+  servicePlan       ServicePlan     @relation(fields: [servicePlanId], references: [id])
+  serviceCategory   ServiceCategory @relation(fields: [serviceCategoryId], references: [id])
+  comments          ServicePlanEntryComment[]
+}
+
+model ServicePlanEntryComment {
+  id                  String            @id @default(uuid())
+  servicePlanEntryId  String
+  comment             String
+  authorId            String
+  servicePlanEntry    ServicePlanEntry  @relation(fields: [servicePlanEntryId], references: [id])
+  author              User              @relation(fields: [authorId], references: [id])
+}
+
+model ServiceCase {
+  id                  String            @id @default(uuid())
+  userId              String
+  workerId            String
+  referralFormId      String?           @unique
+  // assessmentId     String
+  user                User              @relation("userServiceCase", fields: [userId], references: [id])
+  caseWorker          User              @relation("caseWorkerServiceCase", fields: [workerId], references: [id])
+  referralForm        ReferralForm?     @relation(fields: [referralFormId], references: [id])
+  // assessment       Assessment        @relation(fields: [assessmentId], references: [id])
+  servicePlan         ServicePlan?
 }

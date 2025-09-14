@@ -1,10 +1,9 @@
 const apiKey = import.meta.env.VITE_API_BACKEND_URL
 
-export const fetchCompanyReferrals = async (companyId: number, queryParams: { assignedWorkerId?: string }) => {
+export const fetchServiceCategories = async () => {
   try {
-    const query = new URLSearchParams(queryParams?.assignedWorkerId ? queryParams : {});
     const response = await fetch(
-      `${apiKey}referralForms/getAllReferralForms/${companyId}?${query}`,
+      `${apiKey}servicePlan/getServiceCategories`,
       {
         method: 'GET',
         headers: {
@@ -14,7 +13,7 @@ export const fetchCompanyReferrals = async (companyId: number, queryParams: { as
     )
 
     if (!response.ok) {
-      throw new Error('Failed to fetch referral form')
+      throw new Error('Failed to fetch service categories')
     }
 
     const data = await response.json()

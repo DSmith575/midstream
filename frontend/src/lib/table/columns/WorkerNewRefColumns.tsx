@@ -1,11 +1,13 @@
 import { ArrowUpDown } from 'lucide-react'
 import type { ColumnDef } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
+import { ReferralStatusBadge } from '@/components/referralForms';
 
 export interface DataProps {
   name: string
   city: string
   formSubmitted: string
+  status: string
 }
 
 export const workerNewRefColumns: Array<ColumnDef<DataProps>> = [
@@ -48,4 +50,21 @@ export const workerNewRefColumns: Array<ColumnDef<DataProps>> = [
     },
     sortingFn: 'datetime',
   },
+  {
+    accessorKey: 'status',
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+        >
+          Status
+          <ArrowUpDown className={'h-4 w-4'} />
+        </Button>
+      )
+    },
+    cell: ({ row }) => {
+      return <ReferralStatusBadge status={row.original.status} />
+    }
+  }
 ]

@@ -1,21 +1,23 @@
-import { Text, View } from '@react-pdf/renderer'
-import { BulletList } from './BulletList'
-import { styles } from './style'
+import { Text, View } from '@react-pdf/renderer';
+import { BulletList } from './BulletList';
+import { styles } from './style';
+import { splitAndCapitalize } from '@/lib/functions/functions'
 
 import type { BulletListItem } from './BulletList'
 
 const mapValue = (value: any) => {
-  switch (typeof value) {
-    case 'boolean':
-      return value ? 'Yes' : 'No'
-    case 'string':
-      if (!isNaN(Date.parse(value))) {
-        return new Date(value).toLocaleDateString()
-      }
-    // eslint-disable-next-line no-fallthrough
-    default:
-      return value as string
-  }
+    switch(typeof value) {
+      case 'boolean':
+        return value ? 'Yes' : 'No'
+      // @ts-ignore: Intentional fallthrough
+      case 'string':
+        if (!isNaN(Date.parse(value))) {
+          return new Date(value).toLocaleDateString()
+        }
+      default:
+        return (value as string)
+    }
+
 }
 
 interface SectionProps {
@@ -38,20 +40,18 @@ export const Section = ({ formSection, index }: SectionProps) => {
               key !== 'userId' &&
               key !== 'createdAt' &&
               key !== 'updatedAt',
-          )
-          .map(
-            ([key, value]) =>
-              ({
-                value: (
-                  <Text>
-                    <Text style={styles.boldText}>{key}: </Text>
-                    <Text>{mapValue(value)}</Text>
-                  </Text>
-                ),
-                nestedList: [],
-              }) as BulletListItem,
-          )}
-      />
+          ).map(([key, value]) => (
+            {
+              value: (
+              <Text>
+                <Text style={styles.boldText}>{splitAndCapitalize(key)}: </Text>
+                <Text>{mapValue(value)}</Text>
+              </Text>
+              ),
+              nestedList: [],
+            } as BulletListItem
+          )) as Array<BulletListItem>
+      }/>
     </View>
   )
 }

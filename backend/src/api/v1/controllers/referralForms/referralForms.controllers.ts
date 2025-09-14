@@ -228,12 +228,26 @@ const referralsWithBase64Docs = referrals.map((referral) => ({
 const getAllReferrals = async (req: Request, res: Response): Promise<any> => {
 	try {
 		const { companyId } = req.params;
+        const workerId = req.query?.assignedWorkerId as string | undefined;
+
+        let whereClause: any = {
+		    companyId: String(companyId),
+        };
+
+        if (workerId) {
+            whereClause = { ...whereClause,
+                assignedToWorker: {
+                    googleId: String(workerId),
+                }
+            }
+        } else {
+            whereClause = { ...whereClause,
+                assignedToWorkerId: null,
+            }
+        }
 
 		const referrals = await prisma.referralForm.findMany({
-			where: {
-				assignedToWorkerId: null,
-				companyId: String(companyId),
-			},
+			where: whereClause,
 			include: {
 				user: {
 					include: {

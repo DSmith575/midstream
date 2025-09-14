@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import {
   flexRender,
   getCoreRowModel,
@@ -6,9 +6,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import type { ColumnDef, SortingState } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
-import { Spinner } from '@/components/spinner/Spinner'
 import {
   Table,
   TableBody,
@@ -17,43 +15,27 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-
-import { useGetCaseWorkerServiceCases } from '@/hooks/serviceCase/useGetCaseWorkerServiceCases'
-
-import { CaseModal } from './CaseModal'
+import type { ColumnDef, SortingState } from '@tanstack/react-table'
+import { NewEntryModal } from './NewEntryModal'
 
 interface DataTableProps<TData, TValue> {
-  caseWorkerId: string
+  servicePlanId: string,
+  entries: Array<any>
   columns: Array<ColumnDef<TData, TValue>>
   data?: Array<TData>
 }
 
-export const CaseWorkerTable = <TData, TValue>({
-  caseWorkerId,
-  columns,
+export const ServicePlanEntryTable = <TData, TValue>({
+  servicePlanId,
+  entries,
+  columns
 }: DataTableProps<TData, TValue>) => {
-  const { isLoading, data: { data: serviceCases } = { data: [] } } = useGetCaseWorkerServiceCases({
-    caseWorkerId
-  })
-
   const [sorting, setSorting] = useState<SortingState>([])
   const [open, setOpen] = useState(false)
-  const [serviceCase, setServiceCase] = useState<any>(null)
-
-  if (!caseWorkerId) {
-    return (
-      <div className="text-red-500">
-        You must be assigned a case worker to view referrals.
-      </div>
-    )
-  }
-
-  const memoizedColumns = useMemo(() => columns, [columns])
-  const memoizedServiceCases = useMemo(() => serviceCases, [isLoading])
 
   const table = useReactTable({
-    data: memoizedServiceCases,
-    columns: memoizedColumns,
+    data: entries,
+    columns: columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     onSortingChange: setSorting,
@@ -63,12 +45,8 @@ export const CaseWorkerTable = <TData, TValue>({
     },
   })
 
-  if (isLoading) {
-    return <Spinner />
-  }
-
   return (
-    <>
+     <>
       <div className="rounded-md border">
         <Table>
           <TableHeader className="bg-gray-100">
@@ -96,7 +74,7 @@ export const CaseWorkerTable = <TData, TValue>({
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   onClick={() => {
-                    setServiceCase(row.original), setOpen(true)
+                    // setServiceCase(row.original), setOpen(true)
                   }}
                   className={'text-center cursor-pointer hover:bg-gray-100'}
                   key={row.id}
@@ -129,28 +107,17 @@ export const CaseWorkerTable = <TData, TValue>({
         <Button
           variant="outline"
           size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
+          onClick={() => setOpen(true)}
         >
-          Previous
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Next
+          Add Item
         </Button>
       </div>
-
-      {open && serviceCase && (
-				<CaseModal
-					caseData={serviceCase}
-					setOpen={setOpen}
-					open={open}
-				/>
+      {open && (
+        <NewEntryModal
+          servicePlanId={servicePlanId}
+          setOpen={setOpen}
+          open={open}
+        />
       )}
-    </>
-  )
+    </> )
 }

@@ -68,22 +68,17 @@ export const Header = () => {
             />
             <LinkComponent linkRef={routeConstants.about} linkName={'About'} />
 
-            {userData ? (
-              <DevToolButton
-                text={`TESTING - Switch role to ${userData.role == roleConstants.client ? 'Worker' : 'Client'}`}
-                onClick={() => {
-                  onClickSwitchUserRole(
-                    userId,
-                    (userData.role == roleConstants.client
-                      ? roleConstants.worker
-                      : roleConstants.client) as UserRoles,
-                  )
-                }}
-                buttonText="Switch Role"
-              />
-            ) : (
-              <div />
-            )}
+            { userData && userId ?
+                <DevToolButton
+                  text={`TESTING - Switch role to ${userData.role == roleConstants.client ? 'Worker' : 'Client' }`}
+                  onClick={() => {
+                    onClickSwitchUserRole(
+                      userId,
+                      (userData.role == roleConstants.client ? roleConstants.worker : roleConstants.client) as UserRoles,
+                    )
+                  }}
+                  buttonText="Switch Role"
+                /> : <div/>}
           </section>
         </SheetContent>
 
