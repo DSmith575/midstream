@@ -22,7 +22,7 @@ import { useGetAllCompanyReferrals } from '@/hooks/workerReferrals/useGetAllComp
 import { WorkerAssignCase } from '@/components/dashboard/WorkerAssignCase'
 
 interface DataTableProps<TData, TValue> {
-  caseWorkerId?: string
+  caseWorkerId: string
   companyId: number
   columns: Array<ColumnDef<TData, TValue>>
   data?: Array<TData>
@@ -49,7 +49,7 @@ export const WorkerReferralTable = <TData, TValue>({
   }
 
   const memoizedColumns = useMemo(() => columns, [columns])
-  const memoizedReferrals = useMemo(() => referrals, [])
+  const memoizedReferrals = useMemo(() => referrals, [isLoading])
 
   const table = useReactTable({
     data: memoizedReferrals,

@@ -1,0 +1,68 @@
+{
+  "data": [
+    {
+      "serviceName": "Getting Started for the Day",
+      "flexibleHours": false
+    },
+    {
+      "serviceName": "Toileting",
+      "flexibleHours": false
+    },
+    {
+      "serviceName": "Nutrition and Hydration",
+      "flexibleHours": false
+    },
+    {
+      "serviceName": "Behaviour Emotional Support",
+      "flexibleHours": false
+    },
+    {
+      "serviceName": "Communication",
+      "flexibleHours": false
+    },
+    {
+      "serviceName": "Physical/Mobility",
+      "flexibleHours": false
+    },
+    {
+      "serviceName": "Other Support",
+      "flexibleHours": false
+    },
+    {
+      "serviceName": "Overnight Support",
+      "flexibleHours": false
+    },
+    {
+      "serviceName": "Preparing for Bed",
+      "flexibleHours": false
+    },
+    {
+      "serviceName": "Household Activities",
+      "flexibleHours": false
+    },
+    {
+      "serviceName": "Absence from School",
+      "flexibleHours": true
+    },
+    {
+      "serviceName": "Absence vocational (default)",
+      "flexibleHours": true
+    },
+    {
+      "serviceName": "Social recreational activites",
+      "flexibleHours": true
+    },
+    {
+      "serviceName": "Known intermittent needs",
+      "flexibleHours": true
+    },
+    {
+      "serviceName": "Budgeting/Income Management",
+      "flexibleHours": true
+    },
+    {
+      "serviceName": "Personal Shopping",
+      "flexibleHours": true
+    }
+  ]
+}

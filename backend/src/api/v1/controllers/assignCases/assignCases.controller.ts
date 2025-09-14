@@ -19,7 +19,6 @@ const updateReferralForm = async (
 		// TODO
 		// Check that user belongs to company that the referral belongs to
 
-			
         // TODO: Check user session for role permissions
 		// if (userRole !== roleConstants.worker) {
 		// 	return res.status(403).json({ message: "Forbidden" });
@@ -55,6 +54,20 @@ const updateReferralForm = async (
 				assignedToWorkerId: caseWorker,
 				status: ReferralStatus.ASSIGNED,
 			},
+		});
+
+		await prisma.serviceCase.upsert({
+			where: {
+				referralFormId: referralId
+			},
+			update: {
+				workerId: caseWorker
+			},
+			create: {
+				referralFormId: referralId,
+				workerId: caseWorker,
+				userId: referral.userId
+			}
 		});
 
 		// update counter for the case worker assigned

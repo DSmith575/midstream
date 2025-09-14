@@ -15,7 +15,7 @@ import {
 
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
+import { ReferralStatusBadge } from '@/components/referralForms/ReferralStatusBadge'
 import { WorkerReferralFormClientView } from '@/components/referralForms/WorkerReferralFormClientView'
 import { generateFormSections } from '@/lib/functions/formFunctions'
 
@@ -105,28 +105,9 @@ export const WorkerAssignCase = ({
               <Label htmlFor="submitStatus" className={'text-right'}>
                 Status:
               </Label>
-              <Badge
-                id="submitStatus"
-                className={`block cursor-default text-black ${
-                  referralForm.status === 'SUBMITTED'
-                    ? 'bg-green-100'
-                    : referralForm.status === 'PENDING'
-                      ? 'bg-yellow-100'
-                      : referralForm.status === 'REJECTED'
-                        ? 'bg-red-100'
-                        : referralForm.status === 'APPROVED'
-                          ? 'bg-blue-100'
-                          : referralForm.status === 'COMPLETED'
-                            ? 'bg-purple-100'
-                            : referralForm.status === 'CANCELLED'
-                              ? 'bg-gray-100'
-                              : referralForm.status === 'ASSIGNED'
-                                ? 'bg-orange-100'
-                                : ''
-                }`}
-              >
-                {referralForm.status}
-              </Badge>
+              <ReferralStatusBadge
+                status={referralForm.status}
+              />
             </div>
           </div>
           <div>

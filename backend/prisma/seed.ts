@@ -3,6 +3,7 @@ import seedUsers from '../prisma/seeds/seedUser.json'
 import seedPersonalInformation from '../prisma/seeds/seedPersonalInformation.json'
 import seedAddressInformation from '../prisma/seeds/seedAddressInformation.json'
 import seedCompanyInformation from '../prisma/seeds/seedCompanyInformation.json'
+import seedServiceCategories from '../prisma/seeds/seedServiceCategories.json'
 
 const prisma = new PrismaClient();
 
@@ -37,6 +38,14 @@ const main = async () => {
         where: { id: companyInfo.id },
         update: {},
         create: companyInfo,
+      });
+    };
+
+    for (const serviceCategory of seedServiceCategories.data) {
+      await prisma.serviceCategory.upsert({
+        where: { serviceName: serviceCategory.serviceName },
+        update: {},
+        create: serviceCategory,
       });
     };
 

@@ -6,6 +6,8 @@ import { UserProfileCard } from '@/components/profile/card/userCard/UserProfileC
 import { BillsCard } from '@/components/profile/card/bills/BillsCard'
 import { ApplicationCard } from '@/components/profile/card/applicationCard/ApplicationCard'
 import { WorkerReferralTable } from '@/components/dashboard/WorkerNewReferralTable'
+import { CaseWorkerTable } from '@/components/workerCaseTable'
+import { caseWorkerColumns } from '@/lib/table/columns/caseWorkerColumns'
 
 export const getComponentMapUser = (
   userData: UserProfileProps,
@@ -25,7 +27,12 @@ export const getComponentMapWorker = (
   companyId: number,
 ): Record<CardKeyWorker, () => JSX.Element> => ({
   Account: () => <UserProfileCard userProfile={userData} />,
-  Referrals: () => <p>Test</p>,
+  AssignedCases: () => (
+    <CaseWorkerTable
+      caseWorkerId={userId}
+      columns={caseWorkerColumns}
+    />
+  ),
   NewReferrals: () => (
     <WorkerReferralTable
       caseWorkerId={userId}

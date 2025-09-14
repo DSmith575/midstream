@@ -16,6 +16,7 @@ import { Route as LoginImport } from './routes/login'
 import { Route as DashboardImport } from './routes/dashboard'
 import { Route as AboutImport } from './routes/about'
 import { Route as IndexImport } from './routes/index'
+import { Route as DashboardServicePlanServicePlanIdImport } from './routes/dashboard_.servicePlan.$servicePlanId'
 import { Route as DashboardReferralUserIdImport } from './routes/dashboard_.referral.$userId'
 
 // Create/Update Routes
@@ -49,6 +50,13 @@ const IndexRoute = IndexImport.update({
   path: '/',
   getParentRoute: () => rootRoute,
 } as any)
+
+const DashboardServicePlanServicePlanIdRoute =
+  DashboardServicePlanServicePlanIdImport.update({
+    id: '/dashboard_/servicePlan/$servicePlanId',
+    path: '/dashboard/servicePlan/$servicePlanId',
+    getParentRoute: () => rootRoute,
+  } as any)
 
 const DashboardReferralUserIdRoute = DashboardReferralUserIdImport.update({
   id: '/dashboard_/referral/$userId',
@@ -102,6 +110,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardReferralUserIdImport
       parentRoute: typeof rootRoute
     }
+    '/dashboard_/servicePlan/$servicePlanId': {
+      id: '/dashboard_/servicePlan/$servicePlanId'
+      path: '/dashboard/servicePlan/$servicePlanId'
+      fullPath: '/dashboard/servicePlan/$servicePlanId'
+      preLoaderRoute: typeof DashboardServicePlanServicePlanIdImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -114,6 +129,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/dashboard/referral/$userId': typeof DashboardReferralUserIdRoute
+  '/dashboard/servicePlan/$servicePlanId': typeof DashboardServicePlanServicePlanIdRoute
 }
 
 export interface FileRoutesByTo {
@@ -123,6 +139,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/dashboard/referral/$userId': typeof DashboardReferralUserIdRoute
+  '/dashboard/servicePlan/$servicePlanId': typeof DashboardServicePlanServicePlanIdRoute
 }
 
 export interface FileRoutesById {
@@ -133,6 +150,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/dashboard_/referral/$userId': typeof DashboardReferralUserIdRoute
+  '/dashboard_/servicePlan/$servicePlanId': typeof DashboardServicePlanServicePlanIdRoute
 }
 
 export interface FileRouteTypes {
@@ -144,6 +162,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/dashboard/referral/$userId'
+    | '/dashboard/servicePlan/$servicePlanId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -152,6 +171,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/dashboard/referral/$userId'
+    | '/dashboard/servicePlan/$servicePlanId'
   id:
     | '__root__'
     | '/'
@@ -160,6 +180,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/dashboard_/referral/$userId'
+    | '/dashboard_/servicePlan/$servicePlanId'
   fileRoutesById: FileRoutesById
 }
 
@@ -170,6 +191,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   SignupRoute: typeof SignupRoute
   DashboardReferralUserIdRoute: typeof DashboardReferralUserIdRoute
+  DashboardServicePlanServicePlanIdRoute: typeof DashboardServicePlanServicePlanIdRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
@@ -179,6 +201,8 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   SignupRoute: SignupRoute,
   DashboardReferralUserIdRoute: DashboardReferralUserIdRoute,
+  DashboardServicePlanServicePlanIdRoute:
+    DashboardServicePlanServicePlanIdRoute,
 }
 
 export const routeTree = rootRoute
@@ -196,7 +220,8 @@ export const routeTree = rootRoute
         "/dashboard",
         "/login",
         "/signup",
-        "/dashboard_/referral/$userId"
+        "/dashboard_/referral/$userId",
+        "/dashboard_/servicePlan/$servicePlanId"
       ]
     },
     "/": {
@@ -216,6 +241,9 @@ export const routeTree = rootRoute
     },
     "/dashboard_/referral/$userId": {
       "filePath": "dashboard_.referral.$userId.tsx"
+    },
+    "/dashboard_/servicePlan/$servicePlanId": {
+      "filePath": "dashboard_.servicePlan.$servicePlanId.tsx"
     }
   }
 }

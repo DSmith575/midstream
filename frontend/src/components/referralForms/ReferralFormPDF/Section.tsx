@@ -1,6 +1,7 @@
 import { Text, View } from '@react-pdf/renderer';
 import { BulletList } from './BulletList';
 import { styles } from './style';
+import { splitAndCapitalize } from '@/lib/functions/functions'
 
 import type { BulletListItem } from './BulletList';
 
@@ -42,7 +43,7 @@ export const Section = ({ formSection, index }: SectionProps) => {
             {
               value: (
               <Text>
-                <Text style={styles.boldText}>{key}: </Text>
+                <Text style={styles.boldText}>{splitAndCapitalize(key)}: </Text>
                 <Text>{mapValue(value)}</Text>
               </Text>
               ),
