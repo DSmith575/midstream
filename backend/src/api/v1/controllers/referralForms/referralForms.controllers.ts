@@ -212,10 +212,10 @@ const getUserReferrals = async (req: Request, res: Response): Promise<any> => {
 const referralsWithBase64Docs = referrals.map((referral) => ({
   ...referral,
   documents: referral.documents
-  .filter((doc) => doc.pdfFile)
+  .filter((doc) => doc.rawBytes)
   .map((doc) => ({
     ...doc,
-    pdfFile: Buffer.from(doc.pdfFile).toString("base64"),
+    rawBytes: Buffer.from(doc.rawBytes).toString("base64"),
   })),
 }))
 
