@@ -24,7 +24,7 @@ export const PdfAccordion = ({ documents }: { documents: Array<any> }) => {
               <iframe
                 src={convertStringToPdf(doc.rawBytes)}
                 width="100%"
-                height="500px"
+                height="600px"
                 className="rounded-xl"
               />
             </div>

@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from app.lib.constants.routes import APIRoutes, CORS_CONFIG
 from app.routes import upload_audio
+from app.routes import upload_referral_form
 
 
 app = FastAPI()
@@ -24,3 +25,4 @@ async def main():
 #     return JSONResponse(content={"status_code": status.HTTP_200_OK,"message": "Hello World"}, status_code=status.HTTP_200_OK)
 
 app.include_router(upload_audio.router)
+app.include_router(upload_referral_form.router)
