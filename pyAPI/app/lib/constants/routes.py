@@ -3,7 +3,7 @@ from enum import Enum
 class APIRoutes(Enum):
     HOME = "/"
     UPLOAD_AUDIO = "/upload-audio"
-    UPLOAD_REFERRAL_FORM = "/generate"
+    GENERATE_REFERRAL = "/generate-referral"
 
 
 CORS_CONFIG = {

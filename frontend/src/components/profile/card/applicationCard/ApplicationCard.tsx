@@ -9,9 +9,40 @@ import { useRef } from 'react'
 import { useHandleFile } from '@/hooks/referralForms'
 import { UploadSpinner } from '@/components/spinner'
 
+const apiKey = import.meta.env.VITE_API_BACKEND_URL
+
 interface ApplicationCardProps {
   userId: string
 }
+
+const sendReferralToPythonService = async (formId: string) => {
+  // send to node backend which sends to python backend
+  try {
+    const response = await fetch(`${apiKey}referralForms/generateFullReferralForm`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ referralFormId: formId }),
+    });
+
+if (!response.ok) throw new Error(`Error: ${response.statusText}`);
+
+    const blob = await response.blob(); // convert response to blob
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${formId}-referral.pdf`; // filename
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.URL.revokeObjectURL(url); // clean up
+  } catch (error) {
+    console.error("Error sending referral to Python service:", error);
+    throw error;
+  }
+};
 
 export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
   const { error, isLoading, referralForms } = useGetReferralForms(userId)
@@ -73,6 +104,7 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
                   className="hidden"
                 />
 
+
                 <Button
                   disabled={filePending}
                   type={'button'}
@@ -82,6 +114,12 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
                   onClick={() => fileInputRef.current?.click()}
                 >
                   <FileAudio2 className="w-4 h-4" />
+                </Button>
+
+                <Button
+                  onClick={() => sendReferralToPythonService(form.id)}
+                >
+                  Generate File
                 </Button>
               </section>
               <div>

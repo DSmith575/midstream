@@ -1,116 +1,198 @@
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
-from reportlab.pdfgen import canvas
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, ListFlowable, ListItem
 import os
 import pymupdf
 from datetime import datetime
-
+from fastapi.responses import StreamingResponse
 from io import BytesIO
 
-
 def generate_pdf_with_audio_transcript(text: str, filename: str) -> BytesIO:
-    """Generate a PDF containing the provided text using ReportLab."""
-    try:
-        pdf_buffer = BytesIO()
-        c = canvas.Canvas(pdf_buffer, pagesize=A4)  # Set page size to A4
-        c.setTitle("Audio Transcription")
-        c.setAuthor("Test")
-        
-        # Title, subtitle, and date
-        title = f"{filename} Audio Transcription"
-        subtitle = "Village Wise"
-        date = datetime.now().strftime("%B %d, %Y")  # Current date
-        
-        # Positioning values
-        page_width, page_height = A4
-        x_position = 50  # Start from the far left
-        title_y_position = page_height - 50  # Start from the top of the page
-        subtitle_y_position = title_y_position - 20  # Subtitle below the title
-        date_y_position = subtitle_y_position - 20  # Date below the subtitle
-        gap_y_position = date_y_position - 30  # Gap before the transcription starts
-
-        # Add title on the far left
-        c.setFont("Times-Roman", 16)
-        c.drawString(x_position, title_y_position, title)
-
-        # # Add subtitle below the title
-        # c.setFont("Helvetica", 10)
-        # c.drawString(x_position, subtitle_y_position, subtitle)
-
-        # # Add date below the subtitle
-        # c.setFont("Helvetica", 10)
-        # c.drawString(x_position, date_y_position, f"Date: {date}")
-
-        # Gap before transcription text
-        c.setFont("Helvetica", 14)
-        y_position = gap_y_position
-
-        # Add transcription text below the gap
-        text_lines = text.split("\n")
-        for line in text_lines:
-            if y_position < 50:  # Prevent text from going off the page
-                c.showPage()
-                y_position = page_height - 50  # Reset position after page break
-            c.drawString(50, y_position, line)
-            y_position -= 20
-
-        c.save()
-        pdf_buffer.seek(0)
-        pdf_buffer.name = f"{filename}.pdf"
-        return pdf_buffer
+    pdf_buffer = BytesIO()
+    doc = SimpleDocTemplate(pdf_buffer, pagesize=A4,
+                            rightMargin=50, leftMargin=50,
+                            topMargin=50, bottomMargin=50)
     
-    except Exception as e:
-        raise RuntimeError(f"An error occurred while generating the PDF: {str(e)}")
+    styles = getSampleStyleSheet()
+    story = []
 
+    # Title
+    story.append(Paragraph(f"<b>{filename} Audio Transcription</b>", styles["Title"]))
+    story.append(Spacer(1, 12))
 
-def save_form_data_to_pdf(form_data, filename, uploads_dir):
-    output_filepath = os.path.join(uploads_dir, filename)
-
-    try:
-        doc = SimpleDocTemplate(output_filepath, pagesize=A4)
-        story = []
-
-        styles = getSampleStyleSheet()
-        heading_style = ParagraphStyle(
-            'ColoredHeading',
-            parent=styles['Heading2'],
-            textColor=colors.blue
-        )
-
-        subheading_style = ParagraphStyle(
-            'ColoredSubheading',
-            parent=styles['Heading3'],
-            textColor=colors.black
-        )
-
-        paragraph_style = styles['BodyText']
-
-        story.append(Paragraph('Processed AI Transcription', styles['Title']))
+    # Transcription text
+    for line in text.split("\n"):
+        story.append(Paragraph(line, styles["Normal"]))
         story.append(Spacer(1, 12))
 
-        for section, items in form_data.items():
+    doc.build(story)
+    pdf_buffer.seek(0)
+    pdf_buffer.name = f"{filename}.pdf"
+    return pdf_buffer
 
-            story.append(Paragraph(section, heading_style))
+def generate_full_referral_form(metadata: dict, extracted_ai_text: dict):
+    pdf_buffer = BytesIO()
+    doc = SimpleDocTemplate(pdf_buffer, pagesize=A4,
+                            rightMargin=50, leftMargin=50,
+                            topMargin=50, bottomMargin=50)
+    
+    styles = getSampleStyleSheet()
+    heading_style = ParagraphStyle('ColoredHeading', parent=styles['Heading2'], textColor=colors.black)
+    paragraph_style = styles['BodyText']
+
+    story = []
+
+    # Add title
+    story.append(Paragraph(f"{metadata.get('firstName', '')} {metadata.get('lastName', '')} Full Referral Form", styles['Title']))
+    story.append(Spacer(1, 12))
+
+    # --- Metadata Section with bullets ---
+    story.append(Paragraph("Referral Metadata", heading_style))
+    story.append(Spacer(1, 6))
+
+    def create_bullet_items(data):
+        items = []
+        for section, content in data.items():
+            if not isinstance(content, dict):
+                continue
+
+            # Top-level bullet (section title)
+            section_title = section.replace('_', ' ').title()
+            section_items = []
+
+            for key, value in content.items():
+                if key == 'id' or value is None:
+                    continue
+                label = key.replace('_', ' ').title()
+                section_items.append(ListItem(Paragraph(f"<b>{label}:</b> {value}", paragraph_style)))
+
+            if section_items:
+                # Add main bullet for the section
+                items.append(ListItem(Paragraph(f"<b>{section_title}:</b>", paragraph_style)))
+                # Add nested bullets
+                items.extend(section_items)
+        return items
+
+    story.append(ListFlowable(create_bullet_items(metadata), bulletType='bullet', leftIndent=12))
+    story.append(Spacer(1, 12))
+
+    # --- AI Extracted Text Section ---
+    story.append(Paragraph("AI Extracted Information", heading_style))
+    story.append(Spacer(1, 6))
+
+    for section, items in extracted_ai_text.items():
+        story.append(Paragraph(section, heading_style))
+        story.append(Spacer(1, 6))
+
+        for item, response in items.items():
+            # Add item as the subheading
+            story.append(Paragraph(item, styles['Heading3']))
+
+            # Add the response as a paragraph
+            story.append(Paragraph(
+                str(response) if response else "No relevant information found.", paragraph_style))
             story.append(Spacer(1, 6))
 
-            for item, response in items.items():
-                # Add item as the subheading
-                story.append(Paragraph(item, subheading_style))
+    doc.build(story)
+    pdf_buffer.seek(0)
+    pdf_buffer.name = f"{metadata.get('firstName', '')}-{metadata.get('lastName', '')}-full-referral-form.pdf"
 
-                # Add the response as a paragraph
-                story.append(Paragraph(
-                    str(response) if response else "No relevant information found.", paragraph_style))
+    return pdf_buffer
 
-                story.append(Spacer(1, 6))
 
-        doc.build(story)
-        return output_filepath
+#     output_filepath = os.path.join(uploads_dir, filename)
 
-    except Exception as e:
-        print(f"Failed to write processed data: {e}")
-        return None
+#     try:
+#         doc = SimpleDocTemplate(output_filepath, pagesize=A4)
+#         story = []
+
+#         styles = getSampleStyleSheet()
+#         heading_style = ParagraphStyle(
+#             'ColoredHeading',
+#             parent=styles['Heading2'],
+#             textColor=colors.blue
+#         )
+
+#         subheading_style = ParagraphStyle(
+#             'ColoredSubheading',
+#             parent=styles['Heading3'],
+#             textColor=colors.black
+#         )
+
+#         paragraph_style = styles['BodyText']
+
+#         story.append(Paragraph('Processed AI Transcription', styles['Title']))
+#         story.append(Spacer(1, 12))
+
+#         for section, items in form_data.items():
+
+#             story.append(Paragraph(section, heading_style))
+#             story.append(Spacer(1, 6))
+
+#             for item, response in items.items():
+#                 # Add item as the subheading
+#                 story.append(Paragraph(item, subheading_style))
+
+#                 # Add the response as a paragraph
+#                 story.append(Paragraph(
+#                     str(response) if response else "No relevant information found.", paragraph_style))
+
+#                 story.append(Spacer(1, 6))
+
+#         doc.build(story)
+#         return output_filepath
+
+#     except Exception as e:
+#         print(f"Failed to write processed data: {e}")
+#         return None
+
+# def save_form_data_to_pdf(form_data, filename, uploads_dir):
+#     output_filepath = os.path.join(uploads_dir, filename)
+
+#     try:
+#         doc = SimpleDocTemplate(output_filepath, pagesize=A4)
+#         story = []
+
+#         styles = getSampleStyleSheet()
+#         heading_style = ParagraphStyle(
+#             'ColoredHeading',
+#             parent=styles['Heading2'],
+#             textColor=colors.blue
+#         )
+
+#         subheading_style = ParagraphStyle(
+#             'ColoredSubheading',
+#             parent=styles['Heading3'],
+#             textColor=colors.black
+#         )
+
+#         paragraph_style = styles['BodyText']
+
+#         story.append(Paragraph('Processed AI Transcription', styles['Title']))
+#         story.append(Spacer(1, 12))
+
+#         for section, items in form_data.items():
+
+#             story.append(Paragraph(section, heading_style))
+#             story.append(Spacer(1, 6))
+
+#             for item, response in items.items():
+#                 # Add item as the subheading
+#                 story.append(Paragraph(item, subheading_style))
+
+#                 # Add the response as a paragraph
+#                 story.append(Paragraph(
+#                     str(response) if response else "No relevant information found.", paragraph_style))
+
+#                 story.append(Spacer(1, 6))
+
+#         doc.build(story)
+#         return output_filepath
+
+#     except Exception as e:
+#         print(f"Failed to write processed data: {e}")
+#         return None
 
 
 def extract_text_from_pdf(filepath):
@@ -188,8 +270,8 @@ def save_referral_form_to_pdf(form_data, first_name, last_name, processed_dir):
         paragraph_style = styles['BodyText']
 
         # Add title
-        story.append(Paragraph(f'{first_name} {
-                     last_name} Referral Form', styles['Title']))
+        story.append(
+            Paragraph(f'{first_name} {last_name} Referral Form', styles['Title']))
         story.append(Spacer(1, 12))
 
         # Iterate through each section in the data object
@@ -286,3 +368,31 @@ def build_assessment_form(audio_data, referral_data, process_path, filename):
     except Exception as e:
         print(f"Failed to write assessment form to PDF: {e}")
         raise
+
+
+def create_pdf(text: str, title: str = "Referral Form") -> StreamingResponse:
+    """
+    Generate a PDF from text and return as a StreamingResponse.
+
+    :param text: The narrative content for the PDF.
+    :param title: The title of the document.
+    :return: FastAPI StreamingResponse containing the PDF.
+    """
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer)
+    styles = getSampleStyleSheet()
+
+    story = [
+        Paragraph(title, styles["Title"]),
+        Spacer(1, 12),
+        Paragraph(text.replace("\n", "<br/>"), styles["Normal"]),
+    ]
+
+    doc.build(story)
+    buffer.seek(0)
+
+    return StreamingResponse(
+        buffer,
+        media_type="application/pdf",
+        headers={"Content-Disposition": f"attachment; filename={title.replace(' ', '_').lower()}.pdf"}
+    )
