@@ -13,6 +13,7 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as SignupImport } from './routes/signup'
 import { Route as LoginImport } from './routes/login'
+import { Route as FeaturesImport } from './routes/features'
 import { Route as DashboardImport } from './routes/dashboard'
 import { Route as AboutImport } from './routes/about'
 import { Route as IndexImport } from './routes/index'
@@ -30,6 +31,12 @@ const SignupRoute = SignupImport.update({
 const LoginRoute = LoginImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const FeaturesRoute = FeaturesImport.update({
+  id: '/features',
+  path: '/features',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -89,6 +96,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardImport
       parentRoute: typeof rootRoute
     }
+    '/features': {
+      id: '/features'
+      path: '/features'
+      fullPath: '/features'
+      preLoaderRoute: typeof FeaturesImport
+      parentRoute: typeof rootRoute
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -126,6 +140,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/dashboard': typeof DashboardRoute
+  '/features': typeof FeaturesRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/dashboard/referral/$userId': typeof DashboardReferralUserIdRoute
@@ -136,6 +151,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/dashboard': typeof DashboardRoute
+  '/features': typeof FeaturesRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/dashboard/referral/$userId': typeof DashboardReferralUserIdRoute
@@ -147,6 +163,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/dashboard': typeof DashboardRoute
+  '/features': typeof FeaturesRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/dashboard_/referral/$userId': typeof DashboardReferralUserIdRoute
@@ -159,6 +176,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/dashboard'
+    | '/features'
     | '/login'
     | '/signup'
     | '/dashboard/referral/$userId'
@@ -168,6 +186,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/dashboard'
+    | '/features'
     | '/login'
     | '/signup'
     | '/dashboard/referral/$userId'
@@ -177,6 +196,7 @@ export interface FileRouteTypes {
     | '/'
     | '/about'
     | '/dashboard'
+    | '/features'
     | '/login'
     | '/signup'
     | '/dashboard_/referral/$userId'
@@ -188,6 +208,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   DashboardRoute: typeof DashboardRoute
+  FeaturesRoute: typeof FeaturesRoute
   LoginRoute: typeof LoginRoute
   SignupRoute: typeof SignupRoute
   DashboardReferralUserIdRoute: typeof DashboardReferralUserIdRoute
@@ -198,6 +219,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   DashboardRoute: DashboardRoute,
+  FeaturesRoute: FeaturesRoute,
   LoginRoute: LoginRoute,
   SignupRoute: SignupRoute,
   DashboardReferralUserIdRoute: DashboardReferralUserIdRoute,
@@ -218,6 +240,7 @@ export const routeTree = rootRoute
         "/",
         "/about",
         "/dashboard",
+        "/features",
         "/login",
         "/signup",
         "/dashboard_/referral/$userId",
@@ -232,6 +255,9 @@ export const routeTree = rootRoute
     },
     "/dashboard": {
       "filePath": "dashboard.tsx"
+    },
+    "/features": {
+      "filePath": "features.tsx"
     },
     "/login": {
       "filePath": "login.tsx"

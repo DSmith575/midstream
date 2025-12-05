@@ -11,7 +11,7 @@ export const NavBarLogo = () => {
         className={'flex items-center justify-center'}
       >
         <img src={logo} alt="logo" className={cn('h-16 w-16')} />
-        <p className={cn('font-bold text-inherit')}>
+        <p className={cn('font-bold text-inherit ')}>
           MID<span className={cn('text-[#3659B1]')}>STREAM</span>
         </p>
       </Link>
