@@ -9,10 +9,11 @@ import {
   NavigationMenuList,
 } from '@/components/ui/navigation-menu'
 
-// import { postChangeUserRole } from '@/lib/api/devTools/postChangeUserRole'
+import {  routeConstants } from '@/lib/constants'
+import { postChangeUserRole } from '@/lib/api/devTools/postChangeUserRole'
 
 // type UserRoles = 'CLIENT' | 'WORKER'
-// Testing
+// // Testing
 // const onClickSwitchUserRole = async (userId: string, role: UserRoles) => {
 //   try {
 //     const response = await postChangeUserRole({ userId, role })
