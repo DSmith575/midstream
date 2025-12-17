@@ -18,7 +18,7 @@ export const UserReferralFormView = ({ referralForm }: any) => {
   return (
     <Dialog modal>
       <DialogTrigger asChild>
-        <Button className="border border-primary/20 bg-gradient-to-b from-primary/5 to-primary/10 hover:text-white text-primary font-medium shadow-sm hover:shadow-md hover:from-primary/10 hover:to-primary/15 transition-all duration-200" size="sm">
+        <Button className="border border-primary/20 bg-linear-to-b from-primary/5 to-primary/10 hover:text-white text-primary font-medium shadow-sm hover:shadow-md hover:from-primary/10 hover:to-primary/15 transition-all duration-200" size="sm">
           <Eye className="h-4 w-4" />
           <p>View Form:</p>
           <span>{new Date(referralForm.createdAt).toLocaleDateString()}</span>

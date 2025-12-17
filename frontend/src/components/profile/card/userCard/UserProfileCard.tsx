@@ -87,7 +87,7 @@ export const UserProfileCard = ({ userProfile }: CardProps) => {
     <article className="relative col-span-1 w-full overflow-hidden rounded-2xl border border-border/70 bg-card shadow-xl shadow-primary/10">
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-secondary/20"
+        className="pointer-events-none absolute inset-0 bg-linear-to-br from-primary/10 via-background to-secondary/20"
       />
 
       <div className="relative flex flex-col gap-6 p-6 sm:p-7">

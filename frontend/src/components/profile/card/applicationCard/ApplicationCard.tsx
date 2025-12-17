@@ -67,7 +67,11 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
   const toggleChecklist = (formId: string, key: ChecklistItem) => {
     setChecklist((prev) => {
       const current =
-        prev[formId] ?? ({ audio: false, notes: false, review: false, submit: false } as Record<ChecklistItem, boolean>)
+        prev[formId] ??
+        ({ audio: false, notes: false, review: false, submit: false } as Record<
+          ChecklistItem,
+          boolean
+        >)
 
       return {
         ...prev,
@@ -99,7 +103,9 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
             Referral workflow
           </p>
-          <h2 className="text-xl font-semibold text-foreground">Forms and follow-ups</h2>
+          <h2 className="text-xl font-semibold text-foreground">
+            Forms and follow-ups
+          </h2>
           <p className="text-sm text-muted-foreground">
             Create, upload audio, and finish your checklist for each referral.
           </p>
@@ -120,10 +126,14 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
         </div>
       )}
       {fileError && (
-        <p className="px-6 pt-2 text-sm text-destructive">{(fileError as Error).message}</p>
+        <p className="px-6 pt-2 text-sm text-destructive">
+          {(fileError as Error).message}
+        </p>
       )}
       {generateError && (
-        <p className="px-6 pt-2 text-sm text-destructive">{(generateError as Error).message}</p>
+        <p className="px-6 pt-2 text-sm text-destructive">
+          {(generateError as Error).message}
+        </p>
       )}
 
       <div className="space-y-3 px-6 py-5">
@@ -133,11 +143,18 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
           </div>
         ) : error ? (
           <div className="flex flex-col items-center justify-center rounded-xl border border-border/70 bg-card/80 p-8 text-center">
-            <p className="text-destructive font-semibold">An error has occurred.</p>
-            <p className="text-sm text-muted-foreground">Please try again later.</p>
+            <p className="text-destructive font-semibold">
+              An error has occurred.
+            </p>
+            <p className="text-sm text-muted-foreground">
+              Please try again later.
+            </p>
           </div>
         ) : referralForms?.length ? (
-          <Accordion type="multiple" className="divide-y divide-border/70 rounded-xl border border-border/70 bg-card/80 shadow-sm">
+          <Accordion
+            type="multiple"
+            className="divide-y divide-border/70 rounded-xl border border-border/70 bg-card/80 shadow-sm"
+          >
             {referralForms.map((form: any, idx: number) => {
               const formId = String(form?.id ?? idx)
               const statusClass =
@@ -146,7 +163,11 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
                   : statusTone.pending
 
               return (
-                <AccordionItem key={formId} value={formId} className="border-border/70">
+                <AccordionItem
+                  key={formId}
+                  value={formId}
+                  className="border-border/70"
+                >
                   <AccordionTrigger className="px-4">
                     <div className="flex flex-1 flex-col gap-2 text-left">
                       <div className="flex flex-wrap items-center gap-2">
@@ -163,7 +184,8 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
                         {`Referred by ${form?.referrer?.firstName ?? '—'} ${form?.referrer?.lastName ?? ''} for ${form?.disability?.disabilityType ?? '—'}`}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {form?.disability?.disabilityReasonForReferral ?? 'Add reason'}
+                        {form?.disability?.disabilityReasonForReferral ??
+                          'Add reason'}
                       </p>
                     </div>
                   </AccordionTrigger>
@@ -191,16 +213,19 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
                             disabled={filePending}
                             asChild
                             size="sm"
-                            className="border border-primary/20 hover:text-white bg-gradient-to-b from-primary/5 to-primary/10 text-primary font-medium shadow-sm hover:shadow-md hover:from-primary/10 hover:to-primary/15 transition-all duration-200"
+                            className="border border-primary/20 hover:text-white bg-linear-to-b from-primary/5 to-primary/10 text-primary font-medium shadow-sm hover:shadow-md hover:from-primary/10 hover:to-primary/15 transition-all duration-200"
                           >
-                            <label htmlFor={`audio-${formId}`} className="flex cursor-pointer items-center gap-2">
+                            <label
+                              htmlFor={`audio-${formId}`}
+                              className="flex cursor-pointer items-center gap-2"
+                            >
                               <FileAudio2 className="h-4 w-4" />
                               Upload audio
                             </label>
                           </Button>
                           <Button
                             size="sm"
-                            className="border border-primary/15 hover:text-white bg-gradient-to-b from-primary/10 to-primary/5 text-primary font-medium shadow-sm hover:shadow-md hover:from-primary/15 hover:to-primary/10 transition-all duration-200"
+                            className="border border-primary/15 hover:text-white bg-linear-to-b from-primary/10 to-primary/5 text-primary font-medium shadow-sm hover:shadow-md hover:from-primary/15 hover:to-primary/10 transition-all duration-200"
                             disabled={generatePending}
                             onClick={() => generateReferralPdf(formId)}
                           >
@@ -218,14 +243,18 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
                           <label className="flex items-start gap-3 rounded-lg border border-border/50 bg-card/80 p-3">
                             <Checkbox
                               checked={checklist[formId]?.audio || false}
-                              onCheckedChange={() => toggleChecklist(formId, 'audio')}
+                              onCheckedChange={() =>
+                                toggleChecklist(formId, 'audio')
+                              }
                             />
                             <div className="space-y-1 text-sm">
                               <div className="flex items-center gap-2 font-semibold text-foreground">
-                                <FileAudio2 className="h-4 w-4 text-primary" /> Add audio notes
+                                <FileAudio2 className="h-4 w-4 text-primary" />{' '}
+                                Add audio notes
                               </div>
                               <p className="text-muted-foreground text-xs">
-                                Upload call recordings or voice notes tied to this form.
+                                Upload call recordings or voice notes tied to
+                                this form.
                               </p>
                             </div>
                           </label>
@@ -233,14 +262,18 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
                           <label className="flex items-start gap-3 rounded-lg border border-border/50 bg-card/80 p-3">
                             <Checkbox
                               checked={checklist[formId]?.notes || false}
-                              onCheckedChange={() => toggleChecklist(formId, 'notes')}
+                              onCheckedChange={() =>
+                                toggleChecklist(formId, 'notes')
+                              }
                             />
                             <div className="space-y-1 text-sm">
                               <div className="flex items-center gap-2 font-semibold text-foreground">
-                                <FileText className="h-4 w-4 text-primary" /> Add additional text
+                                <FileText className="h-4 w-4 text-primary" />{' '}
+                                Add additional text
                               </div>
                               <p className="text-muted-foreground text-xs">
-                                Capture extra context before you submit the referral.
+                                Capture extra context before you submit the
+                                referral.
                               </p>
                             </div>
                           </label>
@@ -248,11 +281,14 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
                           <label className="flex items-start gap-3 rounded-lg border border-border/50 bg-card/80 p-3">
                             <Checkbox
                               checked={checklist[formId]?.review || false}
-                              onCheckedChange={() => toggleChecklist(formId, 'review')}
+                              onCheckedChange={() =>
+                                toggleChecklist(formId, 'review')
+                              }
                             />
                             <div className="space-y-1 text-sm">
                               <div className="flex items-center gap-2 font-semibold text-foreground">
-                                <Wand2 className="h-4 w-4 text-primary" /> Review generated file
+                                <Wand2 className="h-4 w-4 text-primary" />{' '}
+                                Review generated file
                               </div>
                               <p className="text-muted-foreground text-xs">
                                 Open the PDF to verify details are accurate.
@@ -263,14 +299,18 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
                           <label className="flex items-start gap-3 rounded-lg border border-border/50 bg-card/80 p-3">
                             <Checkbox
                               checked={checklist[formId]?.submit || false}
-                              onCheckedChange={() => toggleChecklist(formId, 'submit')}
+                              onCheckedChange={() =>
+                                toggleChecklist(formId, 'submit')
+                              }
                             />
                             <div className="space-y-1 text-sm">
                               <div className="flex items-center gap-2 font-semibold text-foreground">
-                                <FileUp className="h-4 w-4 text-primary" /> Submit or resend
+                                <FileUp className="h-4 w-4 text-primary" />{' '}
+                                Submit or resend
                               </div>
                               <p className="text-muted-foreground text-xs">
-                                Confirm the referral is submitted or resend to your worker.
+                                Confirm the referral is submitted or resend to
+                                your worker.
                               </p>
                             </div>
                           </label>
