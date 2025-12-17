@@ -52,7 +52,7 @@ export const SpringModal = ({
             animate={{ scale: 1, rotate: '0deg' }}
             exit={{ scale: 0, rotate: '0deg' }}
             onClick={(e) => e.stopPropagation()}
-            className="bg-gradient-to-r from-[#8b5cf6] to-[#59b5e1] text-white p-6 rounded-lg w-full max-w-lg shadow-xl cursor-default relative overflow-hidden"
+            className="bg-linear-to-r from-[#8b5cf6] to-[#59b5e1] text-white p-6 rounded-lg w-full max-w-lg shadow-xl cursor-default relative overflow-hidden"
           >
             <CircleAlert className="text-white/10 rotate-12 text-[250px] absolute z-0 -top-24 -left-24" />
             <div className="relative z-10">

@@ -3,7 +3,7 @@ import type { UserProfileProps } from '@/lib/interfaces'
 import { fetchUserProfile } from '@/lib/api/fetchUser'
 
 export const useUserProfile = (userId: string) => {
-  const { isError, data, error, isFetched } = useSuspenseQuery({
+  const { isError, data, error, isFetched, isLoading } = useSuspenseQuery({
     queryKey: ['userProfile', userId],
     queryFn: () => fetchUserProfile(userId),
     staleTime: 5 * 60 * 1000,
@@ -28,7 +28,7 @@ export const useUserProfile = (userId: string) => {
       companyId: data.companyId,
     }
 
-    return { isFetched, userData }
+    return { isFetched, userData, isLoading }
   }
 
   return {}

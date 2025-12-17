@@ -1,3 +1,5 @@
 export { DashboardContent } from './DashboardContent'
 export { WorkerAssignCase } from './WorkerAssignCase'
 export { WorkerReferralTable } from './WorkerNewReferralTable'
+export { ApplicationView } from './UserApplicationViewDashboard'
+export { UserView } from './UserViewDashboard'
