@@ -213,7 +213,7 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
                             disabled={filePending}
                             asChild
                             size="sm"
-                            className="border border-primary/20 hover:text-white bg-linear-to-b from-primary/5 to-primary/10 text-primary font-medium shadow-sm hover:shadow-md hover:from-primary/10 hover:to-primary/15 transition-all duration-200"
+                            className="border border-primary/20 hover:text-white bg-gradient-to-b from-primary/5 to-primary/10 text-primary font-medium shadow-sm hover:shadow-md hover:from-primary/10 hover:to-primary/15 transition-all duration-200"
                           >
                             <label
                               htmlFor={`audio-${formId}`}
@@ -225,7 +225,7 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
                           </Button>
                           <Button
                             size="sm"
-                            className="border border-primary/15 hover:text-white bg-linear-to-b from-primary/10 to-primary/5 text-primary font-medium shadow-sm hover:shadow-md hover:from-primary/15 hover:to-primary/10 transition-all duration-200"
+                            className="border border-primary/15 hover:text-white bg-gradient-to-b from-primary/10 to-primary/5 text-primary font-medium shadow-sm hover:shadow-md hover:from-primary/15 hover:to-primary/10 transition-all duration-200"
                             disabled={generatePending}
                             onClick={() => generateReferralPdf(formId)}
                           >
