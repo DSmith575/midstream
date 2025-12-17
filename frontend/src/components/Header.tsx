@@ -1,7 +1,6 @@
 import { Menu, X } from 'lucide-react'
 import { useState } from 'react'
 import { SignedIn, UserButton, useAuth } from '@clerk/clerk-react'
-import { useUserProfile } from '@/hooks/userProfile/useUserProfile'
 import { NavBarLogo } from '@/components/links/NavBarLogoLink'
 import { LinkComponent } from '@/components/links/LinkComponent'
 import {
@@ -9,27 +8,24 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
 } from '@/components/ui/navigation-menu'
-import { DevToolButton } from '@/components/devTools'
 
-import { DialogTitle } from '@/components/ui/dialog'
-import { roleConstants, routeConstants } from '@/lib/constants'
-import { postChangeUserRole } from '@/lib/api/devTools/postChangeUserRole'
+// import { postChangeUserRole } from '@/lib/api/devTools/postChangeUserRole'
 
-type UserRoles = 'CLIENT' | 'WORKER'
+// type UserRoles = 'CLIENT' | 'WORKER'
 // Testing
-const onClickSwitchUserRole = async (userId: string, role: UserRoles) => {
-  try {
-    const response = await postChangeUserRole({ userId, role })
-    if (response) {
-      console.log('User role switched successfully:', response)
-      window.location.reload()
-    } else {
-      console.error('Failed to switch user role')
-    }
-  } catch (error) {
-    console.error('Error switching user role:', error)
-  }
-}
+// const onClickSwitchUserRole = async (userId: string, role: UserRoles) => {
+//   try {
+//     const response = await postChangeUserRole({ userId, role })
+//     if (response) {
+//       console.log('User role switched successfully:', response)
+//       window.location.reload()
+//     } else {
+//       console.error('Failed to switch user role')
+//     }
+//   } catch (error) {
+//     console.error('Error switching user role:', error)
+//   }
+// }
 
 export const Header = () => {
   const { userId } = useAuth()
