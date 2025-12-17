@@ -33,18 +33,18 @@ export const Header = () => {
   const [open, setOpen] = useState(false)
 
   return (
-    <header className=" bg-white flex h-20 shrink-0 items-center px-4 shadow-md md:px-6">
-      <nav className="flex w-full items-center justify-between">
+    <header className="sticky top-0 z-40 border-b border-border/50 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
+      <nav className="flex h-16 w-full items-center justify-between px-4 md:px-6">
         <NavBarLogo />
 
-        <div className={'flex items-center gap-4'}>
+        <div className="flex items-center gap-4">
           {userId && (
             <div className="flex items-center gap-3 md:order-2 md:hidden">
               <SignedIn>
                 <UserButton
                   appearance={{
                     elements: {
-                      userButtonAvatarBox: '!w-10 !h-10',
+                      userButtonAvatarBox: '!w-9 !h-9',
                     },
                   }}
                 />
@@ -52,14 +52,19 @@ export const Header = () => {
             </div>
           )}
 
-          <button className="md:hidden p-2" onClick={() => setOpen(!open)}>
+          <button
+            className="rounded-md p-2 text-foreground transition-colors hover:bg-accent md:hidden"
+            onClick={() => setOpen(!open)}
+            aria-label="Toggle menu"
+            aria-expanded={open}
+          >
             {open ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
 
         {/* Desktop Nav */}
         <NavigationMenu className="hidden md:flex">
-          <NavigationMenuList className="flex gap-4 items-center">
+          <NavigationMenuList className="flex items-center gap-1">
             <NavigationMenuLink>
               {!userId ? (
                 <LinkComponent
@@ -72,7 +77,7 @@ export const Header = () => {
                     <UserButton
                       appearance={{
                         elements: {
-                          userButtonAvatarBox: '!w-10 !h-10',
+                          userButtonAvatarBox: '!w-9 !h-9',
                         },
                       }}
                     />
@@ -98,33 +103,35 @@ export const Header = () => {
 
       {/* Mobile Menu Drawer */}
       {open && (
-        <div className="z-20 fixed top-20 left-0 w-full bg-white shadow-md flex flex-col p-6 gap-6 md:hidden">
-          {!userId ? (
-            <LinkComponent linkRef={routeConstants.login} linkName="Login" />
-          ) : (
-            <>
-              <LinkComponent
-                linkRef={routeConstants.dashboard}
-                linkName="Dashboard"
-                onClick={() => setOpen(false)}
-              />
-            </>
-          )}
-          <LinkComponent
-            linkRef={routeConstants.home}
-            linkName="Home"
-            onClick={() => setOpen(false)}
-          />
-          <LinkComponent
-            linkRef={routeConstants.features}
-            linkName="Features"
-            onClick={() => setOpen(false)}
-          />
-          <LinkComponent
-            linkRef={routeConstants.about}
-            linkName="About"
-            onClick={() => setOpen(false)}
-          />
+        <div className="border-t border-border/50 bg-card/95 p-4 backdrop-blur supports-[backdrop-filter]:bg-card/60 md:hidden">
+          <div className="flex flex-col gap-4">
+            {!userId ? (
+              <LinkComponent linkRef={routeConstants.login} linkName="Login" />
+            ) : (
+              <>
+                <LinkComponent
+                  linkRef={routeConstants.dashboard}
+                  linkName="Dashboard"
+                  onClick={() => setOpen(false)}
+                />
+              </>
+            )}
+            <LinkComponent
+              linkRef={routeConstants.home}
+              linkName="Home"
+              onClick={() => setOpen(false)}
+            />
+            <LinkComponent
+              linkRef={routeConstants.features}
+              linkName="Features"
+              onClick={() => setOpen(false)}
+            />
+            <LinkComponent
+              linkRef={routeConstants.about}
+              linkName="About"
+              onClick={() => setOpen(false)}
+            />
+          </div>
         </div>
       )}
     </header>

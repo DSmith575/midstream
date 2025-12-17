@@ -97,7 +97,7 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
   }
 
   return (
-    <article className="col-span-1 flex flex-col rounded-2xl border border-border/70 bg-card shadow-xl shadow-primary/10 md:col-span-2">
+    <article className=" col-span-1 flex flex-col rounded-2xl border border-border/70 bg-card shadow-xl shadow-primary/10 md:col-span-2">
       <div className="flex flex-wrap items-start justify-between gap-4 border-b border-border/70 px-6 py-5">
         <div className="space-y-1">
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">

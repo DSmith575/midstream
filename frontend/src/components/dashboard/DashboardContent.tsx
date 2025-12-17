@@ -58,7 +58,6 @@ export const DashboardContent = ({ userId }: DashBoardContentProps) => {
             />
           ) : (
             <>
-              <div>
                 {/* <ProfileHoverCards
                     componentMap={getComponentMapUser(userData, userId)}
                   /> */}
@@ -85,7 +84,6 @@ export const DashboardContent = ({ userId }: DashBoardContentProps) => {
                     </div>
                   </SidebarInset>
                 </SidebarProvider>
-              </div>
             </>
           )}
         </>
