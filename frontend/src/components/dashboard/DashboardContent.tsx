@@ -3,12 +3,12 @@ import { ProfileForm } from '@/components/forms/profileForm/ProfileForm'
 import { CompanyList } from '@/components/companyList/CompanyList'
 import { ProfileHoverCards } from '@/components/profile/ProfileHoverCards'
 import {
-  getComponentMapUser,
+  // getComponentMapUser,
   getComponentMapWorker,
 } from '@/lib/dashboardComponentMap'
 import { roleConstants } from '@/lib/constants'
 import { AppSidebar } from '@/components/sidebar/Sidebar'
-import { SectionCards } from '@/components/section-cards'
+// import { SectionCards } from '@/components/section-cards'
 import { SiteHeader } from '@/components/site-header'
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
 import { SIDEBAR_VIEWS, type SidebarViewKey } from '../sidebar/SidebarViews'
