@@ -4,6 +4,14 @@
 import os
 import sys
 
+# source .venv/Scripts/activate
+# python -m pip install -r requirements.txt
+# python -m pip list
+
+# py -3.12 -m venv .venv
+# .venv\Scripts\activate
+# pip install -r requirements.txt
+
 def create_virtualenv():
     os.system("python -m venv .venv")
     print("Virtual environment created.")

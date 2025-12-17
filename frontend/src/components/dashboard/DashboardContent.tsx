@@ -1,4 +1,4 @@
-import { useUserProfile } from '@/hooks/userProfile/useUserProfile'
+
 import { ProfileForm } from '@/components/forms/profileForm/ProfileForm'
 import { CompanyList } from '@/components/companyList/CompanyList'
 import { ProfileHoverCards } from '@/components/profile/ProfileHoverCards'
@@ -7,13 +7,24 @@ import {
   getComponentMapWorker,
 } from '@/lib/dashboardComponentMap'
 import { roleConstants } from '@/lib/constants'
+import { AppSidebar } from '@/components/sidebar/Sidebar'
+import { SectionCards } from '@/components/section-cards'
+import { SiteHeader } from '@/components/site-header'
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
+import { SIDEBAR_VIEWS, type SidebarViewKey } from '../sidebar/SidebarViews'
+import { useState } from 'react'
+import { Spinner } from '../spinner'
+
+import { useUserProfile } from '@/hooks/userProfile/useUserProfile'
 
 interface DashBoardContentProps {
   userId: string
 }
 
 export const DashboardContent = ({ userId }: DashBoardContentProps) => {
-  const { userData, error } = useUserProfile(userId)
+  const { userData, error, isLoading } = useUserProfile(userId)
+  const [view, setView] = useState<SidebarViewKey>('user')
+  const ViewComponent = SIDEBAR_VIEWS[view].component
 
   if (!!error && !userData) {
     return (
@@ -22,6 +33,10 @@ export const DashboardContent = ({ userId }: DashBoardContentProps) => {
         <p className="text-sm text-muted-foreground">Please try again later</p>
       </div>
     )
+  }
+
+  if (isLoading) {
+    return <Spinner />
   }
 
   if (!userData) {
@@ -33,41 +48,62 @@ export const DashboardContent = ({ userId }: DashBoardContentProps) => {
   }
 
   return (
-    <main className="min-h-[90vh] bg-[#eff0f0] px-2.5">
-      <>
-        {userData.role === roleConstants.client ? (
-          <>
-            {!userData.company && userData.addressInformation ? (
-              <CompanyList
-                userId={userId}
-                // userCity={userData.addressInformation.city}
-              />
-            ) : (
-              <>
-                <div className="grid grid-cols-1 items-start gap-2">
-                  <ProfileHoverCards
+    <>
+      {userData.role === roleConstants.client ? (
+        <>
+          {!userData.company && userData.addressInformation ? (
+            <CompanyList
+              userId={userId}
+              // userCity={userData.addressInformation.city}
+            />
+          ) : (
+            <>
+              <div>
+                {/* <ProfileHoverCards
                     componentMap={getComponentMapUser(userData, userId)}
+                  /> */}
+                <SidebarProvider
+                  style={
+                    {
+                      '--sidebar-width': 'calc(var(--spacing) * 72)',
+                      '--header-height': 'calc(var(--spacing) * 12)',
+                    } as React.CSSProperties
+                  }
+                >
+                  <AppSidebar
+                    variant="sidebar"
+                    userName={`${userData.personalInformation?.firstName} ${userData.personalInformation?.lastName}`}
+                    current={view}
+                    onViewChange={setView}
                   />
-                </div>
-              </>
-            )}
-          </>
-        ) : (
-          <>
-            {userData.companyId && (
-              <div className="grid grid-cols-1 items-start gap-2">
-                <ProfileHoverCards
-                  componentMap={getComponentMapWorker(
-                    userData,
-                    userId,
-                    userData.companyId,
-                  )}
-                />
+
+                  <SidebarInset>
+                    <SiteHeader selectedView={SIDEBAR_VIEWS[view].label} />
+
+                    <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 @container/main">
+                      <ViewComponent userId={userId} />
+                    </div>
+                  </SidebarInset>
+                </SidebarProvider>
               </div>
-            )}
-          </>
-        )}
-      </>
-    </main>
+            </>
+          )}
+        </>
+      ) : (
+        <>
+          {userData.companyId && (
+            <div className="grid grid-cols-1 items-start gap-2">
+              <ProfileHoverCards
+                componentMap={getComponentMapWorker(
+                  userData,
+                  userId,
+                  userData.companyId,
+                )}
+              />
+            </div>
+          )}
+        </>
+      )}
+    </>
   )
 }

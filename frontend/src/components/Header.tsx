@@ -36,7 +36,7 @@ export const Header = () => {
   const [open, setOpen] = useState(false)
 
   return (
-    <header className="bg-white flex h-20 shrink-0 items-center px-4 shadow-md md:px-6">
+    <header className=" bg-white flex h-20 shrink-0 items-center px-4 shadow-md md:px-6">
       <nav className="flex w-full items-center justify-between">
         <NavBarLogo />
 
@@ -67,7 +67,7 @@ export const Header = () => {
               {!userId ? (
                 <LinkComponent
                   linkRef={routeConstants.login}
-                  linkName="Login"
+                  linkName="Login/Sign Up"
                 />
               ) : (
                 <div className="flex items-center gap-4">
@@ -91,12 +91,7 @@ export const Header = () => {
             <NavigationMenuLink>
               <LinkComponent linkRef={routeConstants.home} linkName="Home" />
             </NavigationMenuLink>
-            <NavigationMenuLink>
-              <LinkComponent
-                linkRef={routeConstants.features}
-                linkName="Features"
-              />
-            </NavigationMenuLink>
+
             <NavigationMenuLink>
               <LinkComponent linkRef={routeConstants.about} linkName="About" />
             </NavigationMenuLink>
@@ -106,7 +101,7 @@ export const Header = () => {
 
       {/* Mobile Menu Drawer */}
       {open && (
-        <div className="z-20 absolute top-20 left-0 w-full bg-white shadow-md flex flex-col p-6 gap-6 md:hidden animate-in fade-in slide-in-from-top-2">
+        <div className="z-20 fixed top-20 left-0 w-full bg-white shadow-md flex flex-col p-6 gap-6 md:hidden">
           {!userId ? (
             <LinkComponent linkRef={routeConstants.login} linkName="Login" />
           ) : (
