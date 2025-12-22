@@ -9,6 +9,7 @@ export const useAudioRecorder = ({ onStop }: UseAudioRecorderOptions) => {
   const [recordingFormId, setRecordingFormId] = useState<string | null>(null)
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const chunksRef = useRef<Array<Blob>>([])
+  // @ts-expect-error: Ignore for timer
   const [startedAt, setStartedAt] = useState<number | null>(null)
   const [elapsedMs, setElapsedMs] = useState<number>(0)
   const intervalRef = useRef<number | null>(null)
