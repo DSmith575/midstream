@@ -1,29 +1,30 @@
-import type { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
+import { useUser } from '@clerk/clerk-react'
+import type { z } from 'zod'
 import { SelectItem } from '@/components/ui/select'
 import { Form } from '@/components/ui/form'
-import {
-  FormInput,
-  FormSelect,
-} from '@/components/forms/formComponents'
+import { FormInput, FormSelect } from '@/components/forms/formComponents'
 import { servicePlanEntryFormSchema } from '@/lib/schemas/servicePlanEntryFormSchema'
-import { useCreateServicePlanEntry, useGetServiceCategories } from '@/hooks/servicePlan'
+import {
+  useCreateServicePlanEntry,
+  useGetServiceCategories,
+} from '@/hooks/servicePlan'
 import { Button } from '@/components/ui/button'
-import { useUser } from '@clerk/clerk-react'
 
 type Inputs = z.infer<typeof servicePlanEntryFormSchema>
 interface ServicePlanEntryFormProps {
-  servicePlanId: string,
+  servicePlanId: string
   onSuccess: (data: any) => void
 }
 
 export const ServicePlanEntryForm = ({
   servicePlanId,
-  onSuccess
+  onSuccess,
 }: ServicePlanEntryFormProps) => {
-  const { mutate } = useCreateServicePlanEntry(servicePlanId, onSuccess);
-  const { isLoading, data: { data: serviceCategories } = { data: {} }} = useGetServiceCategories();
+  const { mutate } = useCreateServicePlanEntry(servicePlanId, onSuccess)
+  const { isLoading, data: { data: serviceCategories } = { data: {} } } =
+    useGetServiceCategories()
   const user = useUser()
 
   const form = useForm<Inputs>({
@@ -32,7 +33,7 @@ export const ServicePlanEntryForm = ({
       serviceCategoryId: '',
       hours: 0,
       minutes: 0,
-      comment: ''
+      comment: '',
     },
   })
 
@@ -41,7 +42,7 @@ export const ServicePlanEntryForm = ({
       mutate({
         servicePlanId,
         userId: user.user?.id,
-        allocatedMinutes: (values.hours * 60) + values.minutes,
+        allocatedMinutes: values.hours * 60 + values.minutes,
         ...values,
       })
     } catch (error) {
@@ -61,11 +62,22 @@ export const ServicePlanEntryForm = ({
             fieldName="serviceCategoryId"
             formLabel="Category"
             selectPlaceholder="Category"
-            children={isLoading ? <div/> : serviceCategories.map((category: { id: string, serviceName: string }, index: number) => (
-              <SelectItem key={index} value={category.id}>
-                {category.serviceName}
-              </SelectItem>
-            ))}
+            children={
+              isLoading ? (
+                <div />
+              ) : (
+                serviceCategories.map(
+                  (
+                    category: { id: string; serviceName: string },
+                    index: number,
+                  ) => (
+                    <SelectItem key={index} value={category.id}>
+                      {category.serviceName}
+                    </SelectItem>
+                  ),
+                )
+              )
+            }
           />
           <FormInput
             control={form.control}

@@ -6,7 +6,6 @@ import {
 } from '@/components/ui/accordion'
 import { convertStringToPdf } from '@/lib/functions/pdfs/pdfFunctions'
 
-
 export const PdfAccordion = ({ documents }: { documents: Array<any> }) => {
   return (
     <Accordion type="single" collapsible className="w-full">

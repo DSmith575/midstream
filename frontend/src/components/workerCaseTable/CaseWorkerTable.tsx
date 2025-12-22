@@ -6,6 +6,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
+import { CaseModal } from './CaseModal'
 import type { ColumnDef, SortingState } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
 import { Spinner } from '@/components/spinner/Spinner'
@@ -20,7 +21,6 @@ import {
 
 import { useGetCaseWorkerServiceCases } from '@/hooks/serviceCase/useGetCaseWorkerServiceCases'
 
-import { CaseModal } from './CaseModal'
 
 interface DataTableProps<TData, TValue> {
   caseWorkerId: string
@@ -32,9 +32,10 @@ export const CaseWorkerTable = <TData, TValue>({
   caseWorkerId,
   columns,
 }: DataTableProps<TData, TValue>) => {
-  const { isLoading, data: { data: serviceCases } = { data: [] } } = useGetCaseWorkerServiceCases({
-    caseWorkerId
-  })
+  const { isLoading, data: { data: serviceCases } = { data: [] } } =
+    useGetCaseWorkerServiceCases({
+      caseWorkerId,
+    })
 
   const [sorting, setSorting] = useState<SortingState>([])
   const [open, setOpen] = useState(false)
@@ -145,11 +146,7 @@ export const CaseWorkerTable = <TData, TValue>({
       </div>
 
       {open && serviceCase && (
-				<CaseModal
-					caseData={serviceCase}
-					setOpen={setOpen}
-					open={open}
-				/>
+        <CaseModal caseData={serviceCase} setOpen={setOpen} open={open} />
       )}
     </>
   )

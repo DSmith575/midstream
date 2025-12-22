@@ -76,10 +76,16 @@ export const SpringModal = ({
               <div className="mx-auto mb-3 grid h-16 w-16 place-items-center rounded-xl bg-primary/10 text-primary">
                 <Building2 className="h-8 w-8" />
               </div>
-              <h3 id="join-company-title" className="mb-1 text-center text-2xl font-semibold text-foreground">
+              <h3
+                id="join-company-title"
+                className="mb-1 text-center text-2xl font-semibold text-foreground"
+              >
                 Join {company.name}
               </h3>
-              <p id="join-company-desc" className="mb-6 text-center text-sm text-muted-foreground">
+              <p
+                id="join-company-desc"
+                className="mb-6 text-center text-sm text-muted-foreground"
+              >
                 Based in {company.city}, {company.country}.
               </p>
 
@@ -106,6 +112,6 @@ export const SpringModal = ({
         </motion.div>
       )}
     </AnimatePresence>,
-    document.body
+    document.body,
   )
 }

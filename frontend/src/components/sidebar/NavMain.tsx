@@ -1,4 +1,8 @@
-import { SIDEBAR_VIEWS, type SidebarViewKey } from "@/components/sidebar/SidebarViews"
+import type {SidebarViewKey} from '@/components/sidebar/SidebarViews';
+import {
+  SIDEBAR_VIEWS
+  
+} from '@/components/sidebar/SidebarViews'
 
 import {
   SidebarGroup,
@@ -6,7 +10,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
+} from '@/components/ui/sidebar'
 
 type NavMainProps = {
   current: SidebarViewKey
@@ -27,7 +31,7 @@ export const NavMain = ({ current, onViewChange }: NavMainProps) => {
                 <SidebarMenuButton
                   tooltip={item.label}
                   className={`
-                    ${isActive ? "bg-(--color-primary) text-(--color-accent)" : ""}
+                    ${isActive ? 'bg-(--color-primary) text-(--color-accent)' : ''}
                   `}
                   onClick={() => onViewChange(key as SidebarViewKey)}
                 >

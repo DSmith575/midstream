@@ -105,9 +105,7 @@ export const WorkerAssignCase = ({
               <Label htmlFor="submitStatus" className={'text-right'}>
                 Status:
               </Label>
-              <ReferralStatusBadge
-                status={referralForm.status}
-              />
+              <ReferralStatusBadge status={referralForm.status} />
             </div>
           </div>
           <div>

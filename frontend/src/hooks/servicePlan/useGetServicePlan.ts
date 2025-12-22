@@ -5,10 +5,7 @@ export type ServicePlanFilter = {
   servicePlanId: string
 }
 
-
-export const useGetServicePlan = ({
-  servicePlanId
-}: ServicePlanFilter) => {
+export const useGetServicePlan = ({ servicePlanId }: ServicePlanFilter) => {
   return useQuery({
     queryKey: ['servicePlan', servicePlanId],
     queryFn: () => fetchServicePlan(servicePlanId),

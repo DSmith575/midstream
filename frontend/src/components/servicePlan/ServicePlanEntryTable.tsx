@@ -6,6 +6,8 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
+import { NewEntryModal } from './NewEntryModal'
+import type { ColumnDef, SortingState } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
 import {
   Table,
@@ -15,11 +17,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import type { ColumnDef, SortingState } from '@tanstack/react-table'
-import { NewEntryModal } from './NewEntryModal'
 
 interface DataTableProps<TData, TValue> {
-  servicePlanId: string,
+  servicePlanId: string
   entries: Array<any>
   columns: Array<ColumnDef<TData, TValue>>
   data?: Array<TData>
@@ -28,7 +28,7 @@ interface DataTableProps<TData, TValue> {
 export const ServicePlanEntryTable = <TData, TValue>({
   servicePlanId,
   entries,
-  columns
+  columns,
 }: DataTableProps<TData, TValue>) => {
   const [sorting, setSorting] = useState<SortingState>([])
   const [open, setOpen] = useState(false)
@@ -46,7 +46,7 @@ export const ServicePlanEntryTable = <TData, TValue>({
   })
 
   return (
-     <>
+    <>
       <div className="rounded-md border">
         <Table>
           <TableHeader className="bg-gray-100">
@@ -104,11 +104,7 @@ export const ServicePlanEntryTable = <TData, TValue>({
         </Table>
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setOpen(true)}
-        >
+        <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
           Add Item
         </Button>
       </div>
@@ -119,5 +115,6 @@ export const ServicePlanEntryTable = <TData, TValue>({
           open={open}
         />
       )}
-    </> )
+    </>
+  )
 }

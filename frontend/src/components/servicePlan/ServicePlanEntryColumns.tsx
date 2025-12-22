@@ -7,14 +7,15 @@ export const ServicePlanEntryColumns: Array<ColumnDef<any>> = [
   },
   {
     accessorFn: (row) => (row.allocatedMinutes / 60).toFixed(1),
-    header: 'Hours'
+    header: 'Hours',
   },
   {
-    accessorFn: (row) => row.serviceCategory.flexibleHours ? 'Flexible' : 'Fixed',
-    header: 'Fixed/Flexible'
+    accessorFn: (row) =>
+      row.serviceCategory.flexibleHours ? 'Flexible' : 'Fixed',
+    header: 'Fixed/Flexible',
   },
   {
     accessorFn: (row) => row.comments.length,
-    header: 'Comments'
+    header: 'Comments',
   },
 ]

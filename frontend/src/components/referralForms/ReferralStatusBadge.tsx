@@ -17,14 +17,10 @@ interface ReferralStatusBadgeProps {
   status: string
 }
 
-export const ReferralStatusBadge = ({
-  status
-}: ReferralStatusBadgeProps) => {
+export const ReferralStatusBadge = ({ status }: ReferralStatusBadgeProps) => {
   return (
     <Badge
-      className={`block cursor-default text-black ${
-          statusColorMap[status]
-      }`}
+      className={`block cursor-default text-black ${statusColorMap[status]}`}
     >
       {status}
     </Badge>

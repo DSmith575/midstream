@@ -15,6 +15,7 @@ export const ProfileHoverCards = ({ componentMap }: HoverDevCardsProps) => {
     <>
       <div className="min-h-[150px] max-h-full flex flex-col rounded-2xl  py-4 md:col-span-full">
         <div className="grid gap-2 lg:gap-4 grid-cols-2 lg:grid-cols-4">
+          <p>HELLO</p>
           {Object.keys(componentMap).map((key) => (
             <HoverCard
               key={key}

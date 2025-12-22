@@ -1,7 +1,7 @@
+import { Building2 } from 'lucide-react'
 import { CompanyCard } from '@/components/companyList/CompanyCard'
 import { Spinner } from '@/components/spinner/Spinner'
 import { useGetCompanyList } from '@/hooks/company/useGetCompanyList'
-import { Building2 } from 'lucide-react'
 
 export const CompanyList = ({
   userId,
@@ -10,7 +10,12 @@ export const CompanyList = ({
   userId: string
   // userCity: string
 }) => {
-  const { companyList: companies, error, isError, isLoading } = useGetCompanyList(userId)
+  const {
+    companyList: companies,
+    error,
+    isError,
+    isLoading,
+  } = useGetCompanyList(userId)
 
   return (
     <section className="rounded-2xl border border-border/70 bg-card shadow-xl shadow-primary/10">
@@ -19,8 +24,12 @@ export const CompanyList = ({
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
             Nearby Companies
           </p>
-          <h2 className="text-xl font-semibold text-foreground">Find and join your provider</h2>
-          <p className="text-sm text-muted-foreground">Browse available companies and request to join.</p>
+          <h2 className="text-xl font-semibold text-foreground">
+            Find and join your provider
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            Browse available companies and request to join.
+          </p>
         </div>
         <span className="hidden md:inline-flex items-center justify-center rounded-full bg-primary/10 p-3 text-primary">
           <Building2 className="h-6 w-6" />
@@ -37,7 +46,9 @@ export const CompanyList = ({
         {isError && (
           <div className="flex flex-col items-center justify-center rounded-xl border border-border/70 bg-card/80 p-8 text-center">
             <p className="text-destructive font-semibold">{error.message}</p>
-            <p className="text-sm text-muted-foreground">Please try again later.</p>
+            <p className="text-sm text-muted-foreground">
+              Please try again later.
+            </p>
           </div>
         )}
 
@@ -52,9 +63,11 @@ export const CompanyList = ({
               ))}
           </div>
         ) : (
-          !isLoading && !isError && (
+          !isLoading &&
+          !isError && (
             <div className="rounded-xl border border-dashed border-border/70 bg-card/70 p-6 text-center text-sm text-muted-foreground">
-              No companies available yet. Try adjusting filters or check back later.
+              No companies available yet. Try adjusting filters or check back
+              later.
             </div>
           )
         )}

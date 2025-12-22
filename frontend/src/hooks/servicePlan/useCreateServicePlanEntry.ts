@@ -6,13 +6,15 @@ export const useCreateServicePlanEntry = (
   servicePlanId: string,
   onSuccessCallback: (data: any) => void,
 ) => {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
   const mutation = useMutation({
     mutationFn: (servicePlanData: CreateServicePlanEntryProps) =>
       postServicePlanEntry(servicePlanData),
     onSuccess: (data: any) => {
       console.log('data', data)
-      queryClient.invalidateQueries({ queryKey: ['servicePlan', servicePlanId] })
+      queryClient.invalidateQueries({
+        queryKey: ['servicePlan', servicePlanId],
+      })
       onSuccessCallback?.(data)
     },
   })

@@ -12,5 +12,5 @@ SILENCE_THRESHOLD = -30    # in dBFS
 MIN_SILENCE_LEN = 1000     # in milliseconds
 
 
-ALLOWED_EXTENSIONS_AUDIO = {'wav', 'mp3', 'm4a', 'mp4'}
+ALLOWED_EXTENSIONS_AUDIO = {'wav', 'mp3', 'm4a', 'mp4', 'webm', 'ogg'}
 ALLOWED_EXTENSIONS_TEXT = {'pdf'}

@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { IconInnerShadowTop } from '@tabler/icons-react'
 
+import type { SidebarViewKey } from './SidebarViews'
 import { NavMain } from '@/components/sidebar/NavMain'
 import {
   Sidebar,
@@ -11,20 +12,19 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
 
-import type { SidebarViewKey } from './SidebarViews'
 
-type AppSidebarProps = React.ComponentProps<typeof Sidebar> & {
+type SidebarAppProps = React.ComponentProps<typeof Sidebar> & {
   userName: string
   current: SidebarViewKey
   onViewChange: (v: SidebarViewKey) => void
 }
 
-export const AppSidebar = ({
+export const SidebarApp = ({
   current,
   onViewChange,
   userName,
   ...props
-}: AppSidebarProps) => {
+}: SidebarAppProps) => {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>

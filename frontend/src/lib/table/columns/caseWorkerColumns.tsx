@@ -1,7 +1,7 @@
 import { ArrowUpDown } from 'lucide-react'
 import type { ColumnDef } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
-import { ReferralStatusBadge } from '@/components/referralForms';
+import { ReferralStatusBadge } from '@/components/referralForms'
 
 // export interface DataProps {
 //   name: string
@@ -11,7 +11,8 @@ import { ReferralStatusBadge } from '@/components/referralForms';
 
 export const caseWorkerColumns: Array<ColumnDef<any>> = [
   {
-    accessorFn: (row) => `${row.user.personalInformation.firstName} ${row.user.personalInformation.lastName}`,
+    accessorFn: (row) =>
+      `${row.user.personalInformation.firstName} ${row.user.personalInformation.lastName}`,
     header: 'Name',
   },
   {
@@ -29,7 +30,8 @@ export const caseWorkerColumns: Array<ColumnDef<any>> = [
     },
   },
   {
-    accessorFn: (row) => new Date(row.referralForm.createdAt).toLocaleDateString(),
+    accessorFn: (row) =>
+      new Date(row.referralForm.createdAt).toLocaleDateString(),
     id: 'formSubmitted',
     header: ({ column }) => {
       return (
@@ -58,6 +60,6 @@ export const caseWorkerColumns: Array<ColumnDef<any>> = [
     },
     cell: ({ row }) => {
       return <ReferralStatusBadge status={row.original.referralForm.status} />
-    }
+    },
   },
 ]

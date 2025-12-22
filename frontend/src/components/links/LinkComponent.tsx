@@ -6,7 +6,11 @@ interface LinkComponentProps {
   onClick?: () => void
 }
 
-export const LinkComponent = ({ linkRef, linkName, onClick }: LinkComponentProps) => {
+export const LinkComponent = ({
+  linkRef,
+  linkName,
+  onClick,
+}: LinkComponentProps) => {
   return (
     <Link
       to={linkRef}

@@ -143,9 +143,9 @@ export interface CreateServicePlanProps {
 }
 
 export interface CreateServicePlanEntryProps {
-  servicePlanId: string,
-  serviceCategoryId: string,
-  allocatedMinutes: number,
-  comment?: string,
-  userId?: string,
+  servicePlanId: string
+  serviceCategoryId: string
+  allocatedMinutes: number
+  comment?: string
+  userId?: string
 }

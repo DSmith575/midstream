@@ -1,7 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Link } from '@tanstack/react-router'
+import { useMemo } from 'react'
 import { FileAudio2, FileText, FileUp, Wand2 } from 'lucide-react'
 
+import { ChecklistItem } from './ChecklistItem'
+import { RecordAudioButton } from './RecordAudioButton'
+import { ApplicationCardHeader } from './ApplicationCardHeader'
 import { UserReferralFormView } from '@/components/referralForms/UserReferralFormView'
 import { Spinner } from '@/components/spinner/Spinner'
 import { UploadSpinner } from '@/components/spinner'
@@ -12,18 +14,13 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion'
 import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
-import { useHandleFile } from '@/hooks/referralForms'
-import { useGenerateReferralPdf } from '@/hooks/referralForms'
+import { useGenerateReferralPdf, useHandleFile  } from '@/hooks/referralForms'
 import { useGetReferralForms } from '@/hooks/userProfile/useGetReferralForms'
 
 interface ApplicationCardProps {
   userId: string
 }
-
-type ChecklistItem = 'audio' | 'notes' | 'review' | 'submit'
-type ChecklistState = Record<string, Record<ChecklistItem, boolean>>
 
 export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
   const { error, isLoading, referralForms } = useGetReferralForms(userId)
@@ -37,48 +34,6 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
     isPending: generatePending,
     error: generateError,
   } = useGenerateReferralPdf()
-  const [checklist, setChecklist] = useState<ChecklistState>({})
-
-  useEffect(() => {
-    if (!referralForms) return
-
-    setChecklist((prev) => {
-      const next = { ...prev }
-      referralForms.forEach((form: any) => {
-        if (!next[form.id]) {
-          next[form.id] = {
-            audio: false,
-            notes: false,
-            review: false,
-            submit: false,
-          }
-        }
-      })
-
-      const ids = new Set(referralForms.map((form: any) => form.id))
-      Object.keys(next).forEach((id) => {
-        if (!ids.has(id)) delete next[id]
-      })
-
-      return next
-    })
-  }, [referralForms])
-
-  const toggleChecklist = (formId: string, key: ChecklistItem) => {
-    setChecklist((prev) => {
-      const current =
-        prev[formId] ??
-        ({ audio: false, notes: false, review: false, submit: false } as Record<
-          ChecklistItem,
-          boolean
-        >)
-
-      return {
-        ...prev,
-        [formId]: { ...current, [key]: !current[key] },
-      }
-    })
-  }
 
   const statusTone = useMemo(
     () => ({
@@ -98,41 +53,21 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
 
   return (
     <article className=" col-span-1 flex flex-col rounded-2xl border border-border/70 bg-card shadow-xl shadow-primary/10 md:col-span-2">
-      <div className="flex flex-wrap items-start justify-between gap-4 border-b border-border/70 px-6 py-5">
-        <div className="space-y-1">
-          <p className="text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
-            Referral workflow
-          </p>
-          <h2 className="text-xl font-semibold text-foreground">
-            Forms and follow-ups
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Create, upload audio, and finish your checklist for each referral.
-          </p>
-        </div>
-        <Button
-          asChild
-          className="border-primary/30 bg-primary text-primary-foreground shadow-sm hover:bg-primary/90"
-        >
-          <Link to="/dashboard/referral/$userId" params={{ userId }}>
-            New form
-          </Link>
-        </Button>
-      </div>
+      <ApplicationCardHeader userId={userId} />
 
       {filePending && (
         <div className="px-6 pt-4">
-          <UploadSpinner text="Processing audio..." />
+          <UploadSpinner text={'Processing audio...'} />
         </div>
       )}
       {fileError && (
         <p className="px-6 pt-2 text-sm text-destructive">
-          {(fileError as Error).message}
+          {(fileError).message}
         </p>
       )}
       {generateError && (
         <p className="px-6 pt-2 text-sm text-destructive">
-          {(generateError as Error).message}
+          {(generateError).message}
         </p>
       )}
 
@@ -161,6 +96,12 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
                 form?.status === 'SUBMITTED'
                   ? statusTone.submitted
                   : statusTone.pending
+              const checklistValues = {
+                audio: Boolean(form?.checklistAudioComplete),
+                notes: Boolean(form?.checklistNotesComplete),
+                review: Boolean(form?.checklistReviewComplete),
+                submit: Boolean(form?.checklistSubmitComplete),
+              }
 
               return (
                 <AccordionItem
@@ -223,6 +164,11 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
                               Upload audio
                             </label>
                           </Button>
+                          <RecordAudioButton
+                            formId={formId}
+                            userId={userId}
+                            disabled={generatePending}
+                          />
                           <Button
                             size="sm"
                             className="border border-primary/15 hover:text-white bg-gradient-to-b from-primary/10 to-primary/5 text-primary font-medium shadow-sm hover:shadow-md hover:from-primary/15 hover:to-primary/10 transition-all duration-200"
@@ -240,80 +186,32 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
                           Post-creation checklist
                         </p>
                         <div className="grid gap-3 sm:grid-cols-2">
-                          <label className="flex items-start gap-3 rounded-lg border border-border/50 bg-card/80 p-3">
-                            <Checkbox
-                              checked={checklist[formId]?.audio || false}
-                              onCheckedChange={() =>
-                                toggleChecklist(formId, 'audio')
-                              }
-                            />
-                            <div className="space-y-1 text-sm">
-                              <div className="flex items-center gap-2 font-semibold text-foreground">
-                                <FileAudio2 className="h-4 w-4 text-primary" />{' '}
-                                Add audio notes
-                              </div>
-                              <p className="text-muted-foreground text-xs">
-                                Upload call recordings or voice notes tied to
-                                this form.
-                              </p>
-                            </div>
-                          </label>
-
-                          <label className="flex items-start gap-3 rounded-lg border border-border/50 bg-card/80 p-3">
-                            <Checkbox
-                              checked={checklist[formId]?.notes || false}
-                              onCheckedChange={() =>
-                                toggleChecklist(formId, 'notes')
-                              }
-                            />
-                            <div className="space-y-1 text-sm">
-                              <div className="flex items-center gap-2 font-semibold text-foreground">
-                                <FileText className="h-4 w-4 text-primary" />{' '}
-                                Add additional text
-                              </div>
-                              <p className="text-muted-foreground text-xs">
-                                Capture extra context before you submit the
-                                referral.
-                              </p>
-                            </div>
-                          </label>
-
-                          <label className="flex items-start gap-3 rounded-lg border border-border/50 bg-card/80 p-3">
-                            <Checkbox
-                              checked={checklist[formId]?.review || false}
-                              onCheckedChange={() =>
-                                toggleChecklist(formId, 'review')
-                              }
-                            />
-                            <div className="space-y-1 text-sm">
-                              <div className="flex items-center gap-2 font-semibold text-foreground">
-                                <Wand2 className="h-4 w-4 text-primary" />{' '}
-                                Review generated file
-                              </div>
-                              <p className="text-muted-foreground text-xs">
-                                Open the PDF to verify details are accurate.
-                              </p>
-                            </div>
-                          </label>
-
-                          <label className="flex items-start gap-3 rounded-lg border border-border/50 bg-card/80 p-3">
-                            <Checkbox
-                              checked={checklist[formId]?.submit || false}
-                              onCheckedChange={() =>
-                                toggleChecklist(formId, 'submit')
-                              }
-                            />
-                            <div className="space-y-1 text-sm">
-                              <div className="flex items-center gap-2 font-semibold text-foreground">
-                                <FileUp className="h-4 w-4 text-primary" />{' '}
-                                Submit or resend
-                              </div>
-                              <p className="text-muted-foreground text-xs">
-                                Confirm the referral is submitted or resend to
-                                your worker.
-                              </p>
-                            </div>
-                          </label>
+                          <ChecklistItem
+                            checked={checklistValues.audio}
+                            title="Add audio notes"
+                            description="Upload call recordings or voice notes tied to this form."
+                            icon={
+                              <FileAudio2 className="h-4 w-4 text-primary" />
+                            }
+                          />
+                          <ChecklistItem
+                            checked={checklistValues.notes}
+                            title="Add additional text"
+                            description="Capture extra context before you submit the referral."
+                            icon={<FileText className="h-4 w-4 text-primary" />}
+                          />
+                          <ChecklistItem
+                            checked={checklistValues.review}
+                            title="Review generated file"
+                            description="Open the PDF to verify details are accurate."
+                            icon={<Wand2 className="h-4 w-4 text-primary" />}
+                          />
+                          <ChecklistItem
+                            checked={checklistValues.submit}
+                            title="Submit or resend"
+                            description="Confirm the referral is submitted or resend to your worker."
+                            icon={<FileUp className="h-4 w-4 text-primary" />}
+                          />
                         </div>
                       </div>
                     </div>

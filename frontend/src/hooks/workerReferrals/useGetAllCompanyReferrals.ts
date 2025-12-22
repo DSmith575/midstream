@@ -7,7 +7,6 @@ export type ReferralFilter = {
   companyId: number
 }
 
-
 export const useGetAllCompanyReferrals = ({
   companyId,
   assignedWorkerId,

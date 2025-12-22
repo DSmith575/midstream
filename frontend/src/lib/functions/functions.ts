@@ -11,6 +11,18 @@ export const getUserAge = (dateOfBirth: string) => {
   return userAge.toString()
 }
 
+export const getUserInitials = (firstName: string, lastName: string) => {
+  return `${firstName?.[0] ?? ''}${lastName?.[0] ?? ''}`.toUpperCase().trim()
+}
+
+export const getUserAddressLine = (
+  address: string,
+  city: string,
+  country: string,
+) => {
+  return [address, city, country].filter(Boolean).join(', ')
+}
+
 // This function formats a string to PascalCase by replacing camelCase with spaces
 export const formatPascalCase = (input: string): string => {
   return input.replace(/([a-z])([A-Z])/g, '$1 $2')

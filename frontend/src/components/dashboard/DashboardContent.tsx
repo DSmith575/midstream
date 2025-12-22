@@ -1,21 +1,19 @@
-
-import { ProfileForm } from '@/components/forms/profileForm/ProfileForm'
-import { CompanyList } from '@/components/companyList/CompanyList'
-import { ProfileHoverCards } from '@/components/profile/ProfileHoverCards'
-import {
-  // getComponentMapUser,
-  getComponentMapWorker,
-} from '@/lib/dashboardComponentMap'
-import { roleConstants } from '@/lib/constants'
-import { AppSidebar } from '@/components/sidebar/Sidebar'
-// import { SectionCards } from '@/components/section-cards'
-import { SiteHeader } from '@/components/site-header'
-import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
-import { SIDEBAR_VIEWS, type SidebarViewKey } from '../sidebar/SidebarViews'
 import { useState } from 'react'
 import { Spinner } from '../spinner'
+import type {SidebarViewKey} from '@/components/sidebar';
+import { ProfileForm } from '@/components/forms/profileForm/ProfileForm'
+import { CompanyList } from '@/components/companyList/CompanyList'
+import { roleConstants } from '@/lib/constants'
 
 import { useUserProfile } from '@/hooks/userProfile/useUserProfile'
+import {
+  SIDEBAR_VIEWS,
+  SidebarApp,
+  SidebarSiteHeader,
+  
+  SidebarWrapper
+} from '@/components/sidebar'
+import { SidebarInset } from '@/components/ui/sidebar'
 
 interface DashBoardContentProps {
   userId: string
@@ -49,56 +47,28 @@ export const DashboardContent = ({ userId }: DashBoardContentProps) => {
 
   return (
     <>
-      {userData.role === roleConstants.client ? (
+      {userData.role === roleConstants.client && (
         <>
           {!userData.company && userData.addressInformation ? (
-            <CompanyList
-              userId={userId}
-              // userCity={userData.addressInformation.city}
-            />
+            <CompanyList userId={userId} />
           ) : (
             <>
-                {/* <ProfileHoverCards
-                    componentMap={getComponentMapUser(userData, userId)}
-                  /> */}
-                <SidebarProvider
-                  style={
-                    {
-                      '--sidebar-width': 'calc(var(--spacing) * 72)',
-                      '--header-height': 'calc(var(--spacing) * 12)',
-                    } as React.CSSProperties
-                  }
-                >
-                  <AppSidebar
-                    variant="sidebar"
-                    userName={`${userData.personalInformation?.firstName} ${userData.personalInformation?.lastName}`}
-                    current={view}
-                    onViewChange={setView}
-                  />
+              <SidebarWrapper>
+                <SidebarApp
+                  variant="sidebar"
+                  userName={`${userData.personalInformation?.firstName} ${userData.personalInformation?.lastName}`}
+                  current={view}
+                  onViewChange={setView}
+                />
 
-                  <SidebarInset>
-                    <SiteHeader selectedView={SIDEBAR_VIEWS[view].label} />
-
-                    <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 @container/main">
-                      <ViewComponent userId={userId} />
-                    </div>
-                  </SidebarInset>
-                </SidebarProvider>
+                <SidebarInset>
+                  <SidebarSiteHeader selectedView={SIDEBAR_VIEWS[view].label} />
+                  <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 @container/main">
+                    <ViewComponent userId={userId} />
+                  </div>
+                </SidebarInset>
+              </SidebarWrapper>
             </>
-          )}
-        </>
-      ) : (
-        <>
-          {userData.companyId && (
-            <div className="grid grid-cols-1 items-start gap-2">
-              <ProfileHoverCards
-                componentMap={getComponentMapWorker(
-                  userData,
-                  userId,
-                  userData.companyId,
-                )}
-              />
-            </div>
           )}
         </>
       )}

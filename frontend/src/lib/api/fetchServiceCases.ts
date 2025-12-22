@@ -1,8 +1,11 @@
 const apiKey = import.meta.env.VITE_API_BACKEND_URL
 
-export const fetchServiceCases = async (queryParams: { caseWorkerId?: string, serviceCaseId?: string }) => {
+export const fetchServiceCases = async (queryParams: {
+  caseWorkerId?: string
+  serviceCaseId?: string
+}) => {
   try {
-    const query = new URLSearchParams(queryParams);
+    const query = new URLSearchParams(queryParams)
     const response = await fetch(
       `${apiKey}serviceCase/getServiceCase?${query}`,
       {

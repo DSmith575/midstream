@@ -142,6 +142,11 @@ const createReferralForm = async (
 						consentId: consentData.id,
 						additionalInformationId: referralAdditionalData.id,
 						companyId: companyId,
+						// Initialize checklist flags
+						checklistAudioComplete: false,
+						checklistNotesComplete: false,
+						checklistReviewComplete: false,
+						checklistSubmitComplete: false,
 					},
 				});
 
@@ -339,9 +344,45 @@ const getCaseWorkerReferrals = async (
 	}
 };
 
+// Update checklist completion flags for a referral form
+const updateReferralChecklist = async (
+	req: Request,
+	res: Response
+): Promise<any> => {
+	try {
+		const { referralId } = req.params;
+		const { audio, notes, review, submit } = req.body || {};
+
+		if (!referralId) {
+			return res.status(400).json({ message: "Referral ID is required" });
+		}
+
+		const data: Record<string, boolean> = {};
+		if (typeof audio === "boolean") data.checklistAudioComplete = audio;
+		if (typeof notes === "boolean") data.checklistNotesComplete = notes;
+		if (typeof review === "boolean") data.checklistReviewComplete = review;
+		if (typeof submit === "boolean") data.checklistSubmitComplete = submit;
+
+		if (Object.keys(data).length === 0) {
+			return res.status(400).json({ message: "No valid checklist fields provided" });
+		}
+
+		const updated = await prisma.referralForm.update({
+			where: { id: String(referralId) },
+			data,
+		});
+
+		return res.status(200).json({ message: "Checklist updated", data: updated });
+	} catch (error) {
+		console.error(error);
+		return res.status(500).json({ error: "Failed to update checklist" });
+	}
+};
+
 export {
 	createReferralForm,
 	getUserReferrals,
 	getAllReferrals,
 	getCaseWorkerReferrals,
+	updateReferralChecklist,
 };

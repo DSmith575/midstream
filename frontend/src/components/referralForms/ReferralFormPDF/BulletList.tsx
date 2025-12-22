@@ -1,5 +1,29 @@
-import { Text, View } from '@react-pdf/renderer'
+import { StyleSheet, Text, View } from '@react-pdf/renderer'
 import type { JSX } from 'react'
+
+const styles = StyleSheet.create({
+  list: {
+    display: 'flex',
+    gap: 4,
+  },
+  itemRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 4,
+  },
+  bullet: {
+    width: 14,
+    fontSize: 10,
+    lineHeight: 1.4,
+    color: '#2d3748',
+  },
+  content: {
+    flex: 1,
+    fontSize: 10,
+    lineHeight: 1.4,
+    color: '#1a202c',
+  },
+})
 
 const bulletUnicode = (nestingLevel: number): string => {
   switch (nestingLevel) {
@@ -19,28 +43,32 @@ export interface BulletListItem {
 
 interface BulletListProps {
   listItems: Array<BulletListItem>
-  nestingLevel: number
+  nestingLevel?: number
 }
 
 export const BulletList = ({
   listItems,
   nestingLevel = 0,
 }: BulletListProps) => {
-  console.log('listItems: ', listItems)
+  if (!listItems?.length) return null
+
+  const indent = nestingLevel * 14
+
   return (
-    <View>
+    <View style={{ ...styles.list, marginLeft: indent }}>
       {listItems.map((item, index) => (
-        <Text key={index} style={{ paddingLeft: (nestingLevel + 1) * 30 }}>
-          {'\t'.repeat(nestingLevel + 1)}
-          {bulletUnicode(nestingLevel)} {item.value}
-          {'\n'}
-          {
-            <BulletList
-              listItems={item.nestedList}
-              nestingLevel={nestingLevel + 1}
-            />
-          }
-        </Text>
+        <View key={index} style={styles.itemRow}>
+          <Text style={styles.bullet}>{bulletUnicode(nestingLevel)}</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.content}>{item.value}</Text>
+            {item.nestedList?.length ? (
+              <BulletList
+                listItems={item.nestedList}
+                nestingLevel={nestingLevel + 1}
+              />
+            ) : null}
+          </View>
+        </View>
       ))}
     </View>
   )

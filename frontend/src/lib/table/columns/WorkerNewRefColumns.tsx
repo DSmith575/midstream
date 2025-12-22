@@ -1,7 +1,7 @@
 import { ArrowUpDown } from 'lucide-react'
 import type { ColumnDef } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
-import { ReferralStatusBadge } from '@/components/referralForms';
+import { ReferralStatusBadge } from '@/components/referralForms'
 
 export interface DataProps {
   name: string
@@ -65,6 +65,6 @@ export const workerNewRefColumns: Array<ColumnDef<DataProps>> = [
     },
     cell: ({ row }) => {
       return <ReferralStatusBadge status={row.original.status} />
-    }
-  }
+    },
+  },
 ]

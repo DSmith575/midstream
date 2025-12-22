@@ -100,6 +100,10 @@ model ReferralForm {
   createdAt               DateTime               @default(now())
   updatedAt               DateTime               @default(now()) @updatedAt
   status                  ReferralStatus         @default(SUBMITTED)
+  checklistAudioComplete  Boolean                @default(false)
+  checklistNotesComplete  Boolean                @default(false)
+  checklistReviewComplete Boolean                @default(false)
+  checklistSubmitComplete Boolean                @default(false)
   communicationId         String                 @unique
   medicalId               String                 @unique
   disabilityId            String                 @unique

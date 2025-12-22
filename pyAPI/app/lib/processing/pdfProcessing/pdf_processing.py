@@ -1,31 +1,91 @@
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, ListFlowable, ListItem
+from reportlab.lib.units import inch
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, ListFlowable, ListItem, PageBreak
 import os
 import pymupdf
 from datetime import datetime
 from fastapi.responses import StreamingResponse
 from io import BytesIO
 
-def generate_pdf_with_audio_transcript(text: str, filename: str) -> BytesIO:
+def generate_pdf_with_audio_transcript(paragraphs: list[str], filename: str) -> BytesIO:
+    """
+    Generate a professional PDF from audio transcription paragraphs.
+    
+    Args:
+        paragraphs: List of paragraph strings from transcription
+        filename: Base filename for the document
+    
+    Returns:
+        BytesIO buffer containing the PDF data
+    """
     pdf_buffer = BytesIO()
-    doc = SimpleDocTemplate(pdf_buffer, pagesize=A4,
-                            rightMargin=50, leftMargin=50,
-                            topMargin=50, bottomMargin=50)
+    doc = SimpleDocTemplate(
+        pdf_buffer, 
+        pagesize=A4,
+        rightMargin=0.75*inch, 
+        leftMargin=0.75*inch,
+        topMargin=0.75*inch, 
+        bottomMargin=0.75*inch
+    )
     
     styles = getSampleStyleSheet()
+    
+    # Define custom styles for professional appearance
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Title'],
+        fontSize=24,
+        textColor=colors.HexColor('#1a202c'),
+        spaceAfter=6,
+        fontName='Helvetica-Bold'
+    )
+    
+    body_style = ParagraphStyle(
+        'CustomBody',
+        parent=styles['BodyText'],
+        fontSize=11,
+        leading=16,
+        textColor=colors.HexColor('#2d3748'),
+        spaceAfter=12,
+        alignment=4  # JUSTIFY
+    )
+    
+    metadata_style = ParagraphStyle(
+        'Metadata',
+        parent=styles['Normal'],
+        fontSize=9,
+        textColor=colors.HexColor('#718096'),
+        spaceAfter=4
+    )
+    
     story = []
-
-    # Title
-    story.append(Paragraph(f"<b>{filename} Audio Transcription</b>", styles["Title"]))
-    story.append(Spacer(1, 12))
-
-    # Transcription text
-    for line in text.split("\n"):
-        story.append(Paragraph(line, styles["Normal"]))
-        story.append(Spacer(1, 12))
-
+    
+    # Add professional header
+    story.append(Paragraph(f"Audio Transcription Report", title_style))
+    story.append(Spacer(1, 6))
+    
+    # Add metadata
+    story.append(Paragraph(
+        f"<b>Document:</b> {filename}", 
+        metadata_style
+    ))
+    story.append(Paragraph(
+        f"<b>Generated:</b> {datetime.now().strftime('%B %d, %Y at %I:%M %p')}", 
+        metadata_style
+    ))
+    story.append(Spacer(1, 18))
+    
+    # Add transcription content with better formatting
+    for i, paragraph in enumerate(paragraphs, 1):
+        # Add paragraph with professional styling
+        story.append(Paragraph(paragraph, body_style))
+        
+        # Add page break every 6 paragraphs to avoid crowded pages
+        if i % 6 == 0 and i < len(paragraphs):
+            story.append(PageBreak())
+    
     doc.build(story)
     pdf_buffer.seek(0)
     pdf_buffer.name = f"{filename}.pdf"

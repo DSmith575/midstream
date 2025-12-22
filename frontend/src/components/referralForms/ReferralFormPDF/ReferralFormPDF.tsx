@@ -12,6 +12,7 @@ export const ReferralFormPDF = ({ referralForm }: ReferralFormPDFProps) => {
   const formSections = generateFormSections(referralForm, {
     excludeKeys: ['assignedToWorker', 'documents'],
   })
+
   return (
     <Document>
       <Page size="A4" style={styles.page}>

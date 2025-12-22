@@ -2,7 +2,9 @@ import type { CreateServicePlanProps } from '@/lib/interfaces'
 
 const apiKey = import.meta.env.VITE_API_BACKEND_URL
 
-export const postServicePlan = async (servicePlanData: CreateServicePlanProps) => {
+export const postServicePlan = async (
+  servicePlanData: CreateServicePlanProps,
+) => {
   try {
     const response = await fetch(`${apiKey}servicePlan/createServicePlan`, {
       method: 'POST',

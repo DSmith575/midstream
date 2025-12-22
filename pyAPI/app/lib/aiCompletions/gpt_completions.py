@@ -4,6 +4,7 @@ from openai import OpenAI
 from io import BytesIO
 from app.lib.constants.gptCompletions import GPT_COMPLETION_SECTIONS
 from app.lib.processing.pdfProcessing.pdf_processing import create_pdf, generate_full_referral_form
+from app.lib.processing.audio.audio_processing import transcribe_audio_to_paragraphs
 from typing import List
 import fitz
 from fastapi.responses import StreamingResponse
@@ -29,15 +30,29 @@ async def process_referral_with_openai(metadata: dict, pdf_paths: List[str]):
     return StreamingResponse(built_pdf_data, media_type="application/pdf", headers={"Content-Disposition": f"attachment; filename={built_pdf_data.name}"})
     
 
-async def process_client_audio(audio_buffer: BytesIO) -> str:
-    """Main processing function: chunk audio, process, transcribe, and convert."""
+async def process_client_audio(audio_buffer: BytesIO) -> list[str]:
+    """
+    Process audio file: transcribe using Whisper and return as formatted paragraphs.
+    
+    Args:
+        audio_buffer: BytesIO buffer containing audio data
+    
+    Returns:
+        List of paragraphs from transcription
+    
+    Raises:
+        RuntimeError: If audio processing fails
+    """
     try:
-        transcript = client.audio.transcriptions.create(
-            model="whisper-1",
-            file=audio_buffer,
-            response_format="text"
-        )
-        return transcript
+        # Create a temporary UploadFile-like object for the transcription function
+        class AudioWrapper:
+            def __init__(self, buffer):
+                self.file = buffer
+                self.filename = "audio.wav"
+        
+        audio_wrapper = AudioWrapper(audio_buffer)
+        paragraphs = transcribe_audio_to_paragraphs(audio_wrapper)
+        return paragraphs
     
     except Exception as e:
         raise RuntimeError(f"Unexpected error processing audio: {e}")

@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { useState } from 'react'
-import { Building2, MapPin, ChevronRight } from 'lucide-react'
+import { Building2, ChevronRight, MapPin } from 'lucide-react'
 import type { CompanyProps } from '@/lib/interfaces'
 import { SpringModal } from '@/components/modal/SpringModal'
 

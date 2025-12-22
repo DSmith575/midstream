@@ -1,3 +1,4 @@
+import { ServicePlanEntryForm } from '../forms/servicePlanEntry/ServicePlanEntryForm'
 import {
   Dialog,
   DialogContent,
@@ -6,10 +7,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { ServicePlanEntryForm } from '../forms/servicePlanEntry/ServicePlanEntryForm'
 
 interface NewEntryModalProps {
-  servicePlanId: string,
+  servicePlanId: string
   setOpen: (open: boolean) => void
   open: boolean
 }
@@ -26,9 +26,7 @@ export const NewEntryModal = ({
         {/* Close dialog on change */}
         <DialogContent className="overflow-y-auto sm:max-w-[425px] lg:max-h-[90vh] lg:max-w-[800px]">
           <DialogHeader>
-            <DialogTitle>
-              New Service Entry
-            </DialogTitle>
+            <DialogTitle>New Service Entry</DialogTitle>
           </DialogHeader>
           <DialogDescription>Allocating hours for service</DialogDescription>
           <ServicePlanEntryForm

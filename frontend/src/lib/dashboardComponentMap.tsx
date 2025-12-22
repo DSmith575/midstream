@@ -28,10 +28,7 @@ export const getComponentMapWorker = (
 ): Record<CardKeyWorker, () => JSX.Element> => ({
   Account: () => <UserProfileCard userProfile={userData} />,
   AssignedCases: () => (
-    <CaseWorkerTable
-      caseWorkerId={userId}
-      columns={caseWorkerColumns}
-    />
+    <CaseWorkerTable caseWorkerId={userId} columns={caseWorkerColumns} />
   ),
   NewReferrals: () => (
     <WorkerReferralTable
