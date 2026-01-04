@@ -23,8 +23,7 @@ export const RecordAudioButton = ({ formId, userId, disabled }: Props) => {
     <>
       <Button
         size="sm"
-        variant="outline"
-        className="border border-primary/20 text-primary hover:text-white bg-gradient-to-b from-primary/5 to-primary/10 font-medium shadow-sm hover:shadow-md hover:from-primary/10 hover:to-primary/15"
+        className="order border-primary/15 hover:text-white bg-gradient-to-b from-primary/10 to-primary/5 text-primary font-medium shadow-sm hover:shadow-md hover:from-primary/15 hover:to-primary/10 transition-all duration-200"
         disabled={disabled || isPending}
         onClick={() => setIsModalOpen(true)}
         title="Record audio"
