@@ -15,7 +15,7 @@ export const LinkComponent = ({
     <Link
       to={linkRef}
       className={
-        'flex w-full items-center justify-center p-2 text-lg font-semibold hover:text-blue-500'
+        'flex w-full items-center justify-center p-2 text-lg font-semibold hover:text-blue-500 whitespace-nowrap'
       }
       onClick={onClick}
     >

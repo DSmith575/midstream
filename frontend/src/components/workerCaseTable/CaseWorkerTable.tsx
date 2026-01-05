@@ -21,7 +21,6 @@ import {
 
 import { useGetCaseWorkerServiceCases } from '@/hooks/serviceCase/useGetCaseWorkerServiceCases'
 
-
 interface DataTableProps<TData, TValue> {
   caseWorkerId: string
   columns: Array<ColumnDef<TData, TValue>>

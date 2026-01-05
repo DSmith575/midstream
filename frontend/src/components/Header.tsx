@@ -5,7 +5,6 @@ import { NavBarLogo } from '@/components/links/NavBarLogoLink'
 import { LinkComponent } from '@/components/links/LinkComponent'
 import {
   NavigationMenu,
-  NavigationMenuLink,
   NavigationMenuList,
 } from '@/components/ui/navigation-menu'
 
@@ -65,38 +64,32 @@ export const Header = () => {
         {/* Desktop Nav */}
         <NavigationMenu className="hidden md:flex">
           <NavigationMenuList className="flex items-center gap-1">
-            <NavigationMenuLink>
-              {!userId ? (
-                <LinkComponent
-                  linkRef={routeConstants.login}
-                  linkName="Login/Sign Up"
-                />
-              ) : (
-                <div className="flex items-center gap-4">
-                  <SignedIn>
-                    <UserButton
-                      appearance={{
-                        elements: {
-                          userButtonAvatarBox: '!w-9 !h-9',
-                        },
-                      }}
-                    />
-                  </SignedIn>
-                  <LinkComponent
-                    linkRef={routeConstants.dashboard}
-                    linkName="Dashboard"
+            {!userId ? (
+              <LinkComponent
+                linkRef={routeConstants.login}
+                linkName="Login/Sign Up"
+              />
+            ) : (
+              <div className="flex items-center gap-4">
+                <SignedIn>
+                  <UserButton
+                    appearance={{
+                      elements: {
+                        userButtonAvatarBox: '!w-9 !h-9',
+                      },
+                    }}
                   />
-                </div>
-              )}
-            </NavigationMenuLink>
+                </SignedIn>
+                <LinkComponent
+                  linkRef={routeConstants.dashboard}
+                  linkName="Dashboard"
+                />
+              </div>
+            )}
 
-            <NavigationMenuLink>
-              <LinkComponent linkRef={routeConstants.home} linkName="Home" />
-            </NavigationMenuLink>
+            <LinkComponent linkRef={routeConstants.home} linkName="Home" />
 
-            <NavigationMenuLink>
-              <LinkComponent linkRef={routeConstants.about} linkName="About" />
-            </NavigationMenuLink>
+            <LinkComponent linkRef={routeConstants.about} linkName="About" />
           </NavigationMenuList>
         </NavigationMenu>
       </nav>

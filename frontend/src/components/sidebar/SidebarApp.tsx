@@ -12,7 +12,6 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar'
 
-
 type SidebarAppProps = React.ComponentProps<typeof Sidebar> & {
   userName: string
   current: SidebarViewKey

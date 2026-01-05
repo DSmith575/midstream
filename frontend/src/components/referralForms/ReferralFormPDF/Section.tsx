@@ -4,7 +4,6 @@ import { styles } from './style'
 import type { BulletListItem } from './BulletList'
 import { splitAndCapitalize } from '@/lib/functions/functions'
 
-
 const mapValue = (value: any) => {
   switch (typeof value) {
     case 'boolean':
@@ -32,30 +31,28 @@ export const Section = ({ formSection, index }: SectionProps) => {
       </Text>
       <BulletList
         nestingLevel={0}
-        listItems={
-          Object.entries(formSection.field)
-            .filter(
-              ([key]) =>
-                key !== 'id' &&
-                key !== 'userId' &&
-                key !== 'createdAt' &&
-                key !== 'updatedAt',
-            )
-            .map(
-              ([key, value]) =>
-                ({
-                  value: (
-                    <Text>
-                      <Text style={styles.boldText}>
-                        {splitAndCapitalize(key)}:{' '}
-                      </Text>
-                      <Text>{mapValue(value)}</Text>
+        listItems={Object.entries(formSection.field)
+          .filter(
+            ([key]) =>
+              key !== 'id' &&
+              key !== 'userId' &&
+              key !== 'createdAt' &&
+              key !== 'updatedAt',
+          )
+          .map(
+            ([key, value]) =>
+              ({
+                value: (
+                  <Text>
+                    <Text style={styles.boldText}>
+                      {splitAndCapitalize(key)}:{' '}
                     </Text>
-                  ),
-                  nestedList: [],
-                }) as BulletListItem,
-            )
-        }
+                    <Text>{mapValue(value)}</Text>
+                  </Text>
+                ),
+                nestedList: [],
+              }) as BulletListItem,
+          )}
       />
     </View>
   )

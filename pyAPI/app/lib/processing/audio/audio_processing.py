@@ -48,12 +48,29 @@ def convert_to_wav(file: UploadFile, filename: str) -> BytesIO:
         Exception: If conversion fails
     """
     try:
-        input_audio = AudioSegment.from_file(file.file)
+        # Determine the input format from the file extension
+        file_extension = file.filename.rsplit('.', 1)[-1].lower() if file.filename else 'wav'
+        
+        # Special handling for webm files
+        if file_extension == 'webm':
+            # pydub can handle webm, but we need to specify the format explicitly
+            input_audio = AudioSegment.from_file(file.file, format='webm')
+        elif file_extension == 'ogg':
+            input_audio = AudioSegment.from_file(file.file, format='ogg')
+        else:
+            # For other formats, let pydub auto-detect
+            input_audio = AudioSegment.from_file(file.file)
+        
         output_buffer = BytesIO()
-        input_audio.export(output_buffer, format="wav")
+        # Export as high-quality WAV for better transcription
+        input_audio.export(
+            output_buffer,
+            format="wav",
+            parameters=["-ar", "16000", "-ac", "1"]  # 16kHz mono - optimal for Whisper
+        )
         output_buffer.seek(0)
         output_buffer.name = f"{filename}.wav"
-        logger.info(f"Successfully converted {filename} to WAV format")
+        logger.info(f"Successfully converted {filename} ({file_extension}) to WAV format")
         return output_buffer
     except Exception as e:
         logger.error(f"Error converting audio to WAV: {e}")
@@ -122,16 +139,26 @@ def transcribe_audio_to_paragraphs(audio_file: UploadFile) -> list[str]:
     try:
         logger.info(f"Starting transcription for {audio_file.filename}")
         
-        # Transcribe audio using OpenAI Whisper
+        # Ensure the file buffer is at the beginning
+        if hasattr(audio_file.file, 'seek'):
+            audio_file.file.seek(0)
+        
+        # Transcribe audio using OpenAI Whisper with improved settings
         transcript = get_openai_client().audio.transcriptions.create(
             model="whisper-1",
             file=audio_file.file,
-            language="en"
+            language="en",
+            response_format="text",
+            temperature=0.0,  # More deterministic transcription
         )
         
         # Get the transcribed text
-        text = transcript.text
+        text = transcript if isinstance(transcript, str) else transcript.text
         logger.info(f"Transcription completed: {len(text)} characters")
+        
+        if not text or len(text.strip()) < 10:
+            logger.warning(f"Transcription resulted in very short or empty text: '{text}'")
+            return ["No speech detected in the audio recording. Please try recording again and speak clearly into the microphone."]
         
         # Split into paragraphs using sentence boundaries and natural breaks
         paragraphs = split_into_paragraphs(text)
@@ -139,7 +166,7 @@ def transcribe_audio_to_paragraphs(audio_file: UploadFile) -> list[str]:
         
         return paragraphs
     except Exception as e:
-        logger.error(f"Error transcribing audio: {e}")
+        logger.error(f"Error transcribing audio: {e}", exc_info=True)
         raise
 
 

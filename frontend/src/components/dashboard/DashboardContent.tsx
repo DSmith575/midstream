@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Spinner } from '../spinner'
-import type {SidebarViewKey} from '@/components/sidebar';
+import type { SidebarViewKey } from '@/components/sidebar'
 import { ProfileForm } from '@/components/forms/profileForm/ProfileForm'
 import { CompanyList } from '@/components/companyList/CompanyList'
 import { roleConstants } from '@/lib/constants'
@@ -10,8 +10,7 @@ import {
   SIDEBAR_VIEWS,
   SidebarApp,
   SidebarSiteHeader,
-  
-  SidebarWrapper
+  SidebarWrapper,
 } from '@/components/sidebar'
 import { SidebarInset } from '@/components/ui/sidebar'
 

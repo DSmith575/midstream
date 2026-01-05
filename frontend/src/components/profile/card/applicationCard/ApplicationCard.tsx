@@ -4,6 +4,7 @@ import { FileAudio2, FileText, FileUp, Wand2 } from 'lucide-react'
 import { ChecklistItem } from './ChecklistItem'
 import { RecordAudioButton } from './RecordAudioButton'
 import { ApplicationCardHeader } from './ApplicationCardHeader'
+import { AddNotesDialog } from './AddNotesDialog'
 import { UserReferralFormView } from '@/components/referralForms/UserReferralFormView'
 import { Spinner } from '@/components/spinner/Spinner'
 import { UploadSpinner } from '@/components/spinner'
@@ -15,7 +16,11 @@ import {
 } from '@/components/ui/accordion'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { useGenerateReferralPdf, useHandleFile  } from '@/hooks/referralForms'
+import {
+  useGenerateReferralPdf,
+  useHandleFile,
+  useCreateReferralNote,
+} from '@/hooks/referralForms'
 import { useGetReferralForms } from '@/hooks/userProfile/useGetReferralForms'
 
 interface ApplicationCardProps {
@@ -34,6 +39,11 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
     isPending: generatePending,
     error: generateError,
   } = useGenerateReferralPdf()
+  const {
+    mutate: createNote,
+    isPending: notesPending,
+    error: notesError,
+  } = useCreateReferralNote(userId)
 
   const statusTone = useMemo(
     () => ({
@@ -52,7 +62,7 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
   }
 
   return (
-    <article className=" col-span-1 flex flex-col rounded-2xl border border-border/70 bg-card shadow-xl shadow-primary/10 md:col-span-2">
+    <article className="relative col-span-1 w-full overflow-hidden rounded-2xl border border-border/70 bg-card shadow-xl shadow-primary/10">
       <ApplicationCardHeader userId={userId} />
 
       {filePending && (
@@ -62,12 +72,17 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
       )}
       {fileError && (
         <p className="px-6 pt-2 text-sm text-destructive">
-          {(fileError).message}
+          {fileError.message}
         </p>
       )}
       {generateError && (
         <p className="px-6 pt-2 text-sm text-destructive">
-          {(generateError).message}
+          {generateError.message}
+        </p>
+      )}
+      {notesError && (
+        <p className="px-6 pt-2 text-sm text-destructive">
+          {notesError.message}
         </p>
       )}
 
@@ -169,6 +184,14 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
                             userId={userId}
                             disabled={generatePending}
                           />
+                          <AddNotesDialog
+                            formId={formId}
+                            disabled={notesPending || generatePending}
+                            onSave={(formId, content) =>
+                              createNote({ referralId: formId, content })
+                            }
+                            existingNotes={form?.notes || []}
+                          />
                           <Button
                             size="sm"
                             className="border border-primary/15 hover:text-white bg-gradient-to-b from-primary/10 to-primary/5 text-primary font-medium shadow-sm hover:shadow-md hover:from-primary/15 hover:to-primary/10 transition-all duration-200"
@@ -185,6 +208,11 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
                         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                           Post-creation checklist
                         </p>
+                        <span className="text-xs text-muted-foreground">
+                          Complete these steps to finalize the referral form. The more information you provide,
+                          the better the support worker can assist.
+                        </span>
+                        
                         <div className="grid gap-3 sm:grid-cols-2">
                           <ChecklistItem
                             checked={checklistValues.audio}

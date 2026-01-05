@@ -76,24 +76,20 @@ async def upload_audio(
         transcription = await process_client_audio(wav_buffer)
         logger.info(f"Successfully transcribed {filename}: {len(transcription)} paragraphs")
         
-        # Generate PDF with transcript
-        pdf_buffer = generate_pdf_with_audio_transcript(transcription, filename)
-        pdf_bytes = pdf_buffer.getvalue()
-        logger.info(f"Generated PDF for {filename}: {len(pdf_bytes)} bytes")
+        # Convert transcription list to string
+        transcribed_text = "\n\n".join(transcription)
         
-        # Prepare upload payload
-        files = {
-            "pdf": (f"{filename}.pdf", pdf_bytes, "application/pdf"),
-        }
-        data = {
+        # Prepare upload payload with transcribed content
+        payload = {
             "name": filename,
             "referralId": referralId,
             "type": "PDF",
+            "transcribedContent": transcribed_text,
         }
         
-        # Upload to Node backend
+        # Upload to Node backend (sending JSON)
         async with httpx.AsyncClient() as client:
-            response = await client.post(NODE_API_URL, files=files, data=data)
+            response = await client.post(NODE_API_URL, json=payload)
             response.raise_for_status()
 
             # Update checklist flag on Node backend
@@ -101,7 +97,7 @@ async def upload_audio(
             checklist_resp = await client.patch(checklist_url, json={"audio": True})
             checklist_resp.raise_for_status()
 
-        logger.info(f"Uploaded PDF and updated checklist for referralId {referralId}")
+        logger.info(f"Uploaded transcription and updated checklist for referralId {referralId}")
         return {"detail": "Audio file processed and uploaded successfully"}
 
     except HTTPException:

@@ -10,7 +10,7 @@ interface ReferralFormPDFProps {
 
 export const ReferralFormPDF = ({ referralForm }: ReferralFormPDFProps) => {
   const formSections = generateFormSections(referralForm, {
-    excludeKeys: ['assignedToWorker', 'documents'],
+    excludeKeys: ['assignedToWorker', 'documents', 'notes'],
   })
 
   return (

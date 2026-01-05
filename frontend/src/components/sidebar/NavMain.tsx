@@ -1,8 +1,5 @@
-import type {SidebarViewKey} from '@/components/sidebar/SidebarViews';
-import {
-  SIDEBAR_VIEWS
-  
-} from '@/components/sidebar/SidebarViews'
+import type { SidebarViewKey } from '@/components/sidebar/SidebarViews'
+import { SIDEBAR_VIEWS } from '@/components/sidebar/SidebarViews'
 
 import {
   SidebarGroup,

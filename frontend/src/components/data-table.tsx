@@ -1,14 +1,12 @@
 import * as React from 'react'
 import {
   DndContext,
-  
   KeyboardSensor,
   MouseSensor,
   TouchSensor,
-  
   closestCenter,
   useSensor,
-  useSensors
+  useSensors,
 } from '@dnd-kit/core'
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
 import {
@@ -45,7 +43,7 @@ import {
 import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts'
 import { toast } from 'sonner'
 import { z } from 'zod'
-import type {DragEndEvent, UniqueIdentifier} from '@dnd-kit/core';
+import type { DragEndEvent, UniqueIdentifier } from '@dnd-kit/core'
 import type {
   ColumnDef,
   ColumnFiltersState,

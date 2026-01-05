@@ -44,11 +44,14 @@ async def process_client_audio(audio_buffer: BytesIO) -> list[str]:
         RuntimeError: If audio processing fails
     """
     try:
-        # Create a temporary UploadFile-like object for the transcription function
+        # Create a proper UploadFile-like object for the transcription function
         class AudioWrapper:
             def __init__(self, buffer):
                 self.file = buffer
-                self.filename = "audio.wav"
+                # Ensure the buffer has a name attribute for the transcription
+                if not hasattr(buffer, 'name'):
+                    buffer.name = "audio.wav"
+                self.filename = getattr(buffer, 'name', 'audio.wav')
         
         audio_wrapper = AudioWrapper(audio_buffer)
         paragraphs = transcribe_audio_to_paragraphs(audio_wrapper)

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { Mic, Square, Play } from 'lucide-react'
+import { Mic, Play, Square } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -41,31 +41,54 @@ export const AudioRecordingModal = ({
 
   const startRecording = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      const mimeType = MediaRecorder.isTypeSupported('audio/webm')
-        ? 'audio/webm'
-        : 'audio/ogg'
-      const recorder = new MediaRecorder(stream, { mimeType })
+      // Request audio with specific constraints for better quality
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          sampleRate: 48000,
+        },
+      })
+
+      // Prefer audio/webm with opus codec for better quality
+      let mimeType = 'audio/webm;codecs=opus'
+      if (!MediaRecorder.isTypeSupported(mimeType)) {
+        mimeType = 'audio/webm'
+        if (!MediaRecorder.isTypeSupported(mimeType)) {
+          mimeType = 'audio/ogg;codecs=opus'
+          if (!MediaRecorder.isTypeSupported(mimeType)) {
+            mimeType = 'audio/ogg'
+          }
+        }
+      }
+
+      const recorder = new MediaRecorder(stream, {
+        mimeType,
+        audioBitsPerSecond: 128000, // 128 kbps for good quality
+      })
       chunksRef.current = []
 
       recorder.ondataavailable = (e) => {
-        if (e.data && e.data.size > 0) chunksRef.current.push(e.data)
+        if (e.data && e.data.size > 0) {
+          chunksRef.current.push(e.data)
+        }
       }
 
       recorder.onstop = () => {
         const blob = new Blob(chunksRef.current, { type: mimeType })
-        const file = new File(
-          [blob],
-          `${formId}-recording.${mimeType.includes('webm') ? 'webm' : 'ogg'}`,
-          { type: mimeType },
-        )
+        const extension = mimeType.includes('webm') ? 'webm' : 'ogg'
+        const file = new File([blob], `${formId}-recording.${extension}`, {
+          type: mimeType,
+        })
         recordedFileRef.current = file
         setHasRecording(true)
         setIsRecording(false)
         recorder.stream.getTracks().forEach((t) => t.stop())
       }
 
-      recorder.start()
+      // Start recording with 1000ms timeslice to ensure data is collected regularly
+      recorder.start(1000)
       mediaRecorderRef.current = recorder
       setIsRecording(true)
       setHasRecording(false)
@@ -156,7 +179,9 @@ export const AudioRecordingModal = ({
             </li>
             <li className="flex gap-2">
               <span className="text-primary">•</span>
-              <span>Is there anything urgent or time-sensitive we should know about?</span>
+              <span>
+                Is there anything urgent or time-sensitive we should know about?
+              </span>
             </li>
           </ul>
         </div>

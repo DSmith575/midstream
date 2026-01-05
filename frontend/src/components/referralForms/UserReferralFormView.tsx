@@ -1,7 +1,6 @@
-import { PDFViewer } from '@react-pdf/renderer'
 import { Eye } from 'lucide-react'
-import { PdfAccordion } from '../accordion'
-import { ReferralFormPDF } from './ReferralFormPDF'
+import { DocumentAccordion } from '../accordion/DocumentAccordion'
+import { ReferralFormView } from './ReferralFormView'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -27,21 +26,31 @@ export const UserReferralFormView = ({ referralForm }: any) => {
           <span>{new Date(referralForm.createdAt).toLocaleDateString()}</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
+      <DialogContent className="max-h-[90vh] sm:max-w-3xl flex flex-col">
         <DialogHeader>
           <DialogTitle>
-            {referralForm.user.personalInformation.firstName}{' '}
+            Referral Form - {referralForm.user.personalInformation.firstName}{' '}
             {referralForm.user.personalInformation.lastName}
           </DialogTitle>
-          <DialogDescription />
+          <DialogDescription>
+            Complete referral information and supporting documents
+          </DialogDescription>
         </DialogHeader>
-        <PDFViewer style={{ width: '30rem', height: '40rem' }}>
-          <ReferralFormPDF referralForm={referralForm} />
-        </PDFViewer>
 
-        <PdfAccordion documents={referralForm.documents} />
+        <div className="overflow-y-auto flex-1 pr-2">
+          <ReferralFormView referralForm={referralForm} />
 
-        <DialogFooter>
+          {referralForm.documents && referralForm.documents.length > 0 && (
+            <div className="mt-4">
+              <DocumentAccordion
+                documents={referralForm.documents}
+                editable={true}
+              />
+            </div>
+          )}
+        </div>
+
+        <DialogFooter className="mt-4">
           <DialogClose>
             <Button variant="outline">Close</Button>
           </DialogClose>

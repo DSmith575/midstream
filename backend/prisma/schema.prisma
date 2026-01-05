@@ -16,6 +16,7 @@ datasource db {
 // }
 
 enum ReferralStatus {
+  CREATED
   SUBMITTED
   VIEWED
   ASSIGNED
@@ -99,7 +100,7 @@ model ReferralForm {
   assignedToWorkerId      String?
   createdAt               DateTime               @default(now())
   updatedAt               DateTime               @default(now()) @updatedAt
-  status                  ReferralStatus         @default(SUBMITTED)
+  status                  ReferralStatus         @default(CREATED)
   checklistAudioComplete  Boolean                @default(false)
   checklistNotesComplete  Boolean                @default(false)
   checklistReviewComplete Boolean                @default(false)
@@ -124,6 +125,7 @@ model ReferralForm {
   company                 Company?               @relation(fields: [companyId], references: [id])
   // documents               Document?              @relation(fields: [audioDocumentId], references: [id])
   documents               Document[]             @relation("ReferralDocuments")
+  notes                   ReferralNote[]
   serviceCase             ServiceCase?
 }
 
@@ -213,16 +215,25 @@ model Company {
 }
 
 model Document {
+  id                 String       @id @default(uuid())
+  referralId         String
+  name               String
+  transcribedContent String?      @db.Text
+  type               DocumentType @default(PDF)
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @default(now()) @updatedAt
+  referralForm       ReferralForm @relation("ReferralDocuments", fields: [referralId], references: [id])
+}
+
+model ReferralNote {
   id           String       @id @default(uuid())
   referralId   String
-  name         String
-  rawBytes     Bytes
-  type         DocumentType @default(PDF)
-  // url           String
+  content      String
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @default(now()) @updatedAt
-  referralForm ReferralForm @relation("ReferralDocuments", fields: [referralId], references: [id])
+  referralForm ReferralForm @relation(fields: [referralId], references: [id])
 }
+
 model ServicePlan {
   id            String              @id @default(uuid())
   createdAt     DateTime            @default(now())

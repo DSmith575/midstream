@@ -6,6 +6,17 @@ export const splitAndCapitalize = (label: string) => {
     .replace(/^./, (match) => match.toUpperCase())
 }
 
+export const formatDate = (dateString: string) => {
+    if (!dateString) return 'N/A'
+    return new Date(dateString).toLocaleDateString('en-NZ', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  }
+
 export const getUserAge = (dateOfBirth: string) => {
   const userAge = new Date().getFullYear() - new Date(dateOfBirth).getFullYear()
   return userAge.toString()

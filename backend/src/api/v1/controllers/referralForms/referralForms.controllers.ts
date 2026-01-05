@@ -199,6 +199,12 @@ const getUserReferrals = async (req: Request, res: Response): Promise<any> => {
 				referrer: true,
 				emergencyContact: true,
 				consent: true,
+				additionalInformation: true,
+				notes: {
+					orderBy: {
+						createdAt: 'desc',
+					},
+				},
 				assignedToWorker: {
 					include: {
 						personalInformation: true,
@@ -213,18 +219,8 @@ const getUserReferrals = async (req: Request, res: Response): Promise<any> => {
 		if (referrals.length === 0) {
 			return res.status(404).json({ message: "No referrals found" });
 		}
-		
-const referralsWithBase64Docs = referrals.map((referral) => ({
-  ...referral,
-  documents: referral.documents
-  .filter((doc) => doc.rawBytes)
-  .map((doc) => ({
-    ...doc,
-    rawBytes: Buffer.from(doc.rawBytes).toString("base64"),
-  })),
-}))
 
-		return res.status(200).json({ data: referralsWithBase64Docs });
+		return res.status(200).json({ data: referrals });
 	} catch (error) {
 		res.status(500).json({ error: "Failed to get referrals" });
 	}
@@ -379,10 +375,58 @@ const updateReferralChecklist = async (
 	}
 };
 
+// Create a new note for a referral form
+const createReferralNote = async (
+	req: Request,
+	res: Response
+): Promise<any> => {
+	try {
+		const { referralId } = req.params;
+		const { content } = req.body || {};
+
+		if (!referralId) {
+			return res.status(400).json({ message: "Referral ID is required" });
+		}
+
+		if (typeof content !== "string" || content.trim().length === 0) {
+			return res.status(400).json({ message: "Note content is required" });
+		}
+
+		// Verify referral exists
+		const referral = await prisma.referralForm.findUnique({
+			where: { id: String(referralId) },
+		});
+
+		if (!referral) {
+			return res.status(404).json({ message: "Referral not found" });
+		}
+
+		// Create the new note
+		const newNote = await prisma.referralNote.create({
+			data: {
+				referralId: String(referralId),
+				content: content.trim(),
+			},
+		});
+
+		// Mark the notes checklist as complete
+		await prisma.referralForm.update({
+			where: { id: String(referralId) },
+			data: { checklistNotesComplete: true },
+		});
+
+		return res.status(201).json({ message: "Note created", data: newNote });
+	} catch (error) {
+		console.error(error);
+		return res.status(500).json({ error: "Failed to create note" });
+	}
+};
+
 export {
 	createReferralForm,
 	getUserReferrals,
 	getAllReferrals,
 	getCaseWorkerReferrals,
 	updateReferralChecklist,
+	createReferralNote,
 };
