@@ -1,24 +1,17 @@
-import type { z } from 'zod'
-import type { UseFormReturn } from 'react-hook-form'
-import type { referralFormSchema } from '@/lib/schemas/referralFormSchema'
+import type { ReferralFormStepProps } from '@/lib/interfaces'
 import { MotionContainer } from '@/components/animation/MotionContainer'
 import { FormInput, FormSelect } from '@/components/forms/formComponents/'
 import { referralFormDisabilityOptions } from '@/lib/formOptions/referralFormOptions'
 import { SelectItem } from '@/components/ui/select'
 
-type Inputs = z.infer<typeof referralFormSchema>
+const renderSelectOptions = (options: string[]) =>
+  options.map((option) => (
+    <SelectItem key={option} value={option}>
+      {option}
+    </SelectItem>
+  ))
 
-export const StepDisabilityInfo = ({
-  form,
-  delta,
-  header,
-  subtitle,
-}: {
-  form: UseFormReturn<Inputs>
-  delta: number
-  header: string
-  subtitle: string
-}) => {
+export const StepDisabilityInfo = ({ form, delta, header, subtitle }: ReferralFormStepProps) => {
   return (
     <MotionContainer delta={delta} header={header} subtitle={subtitle}>
       <FormSelect
@@ -26,11 +19,7 @@ export const StepDisabilityInfo = ({
         fieldName="disabilityType"
         formLabel="Disability Type"
         selectPlaceholder="Select Type"
-        children={referralFormDisabilityOptions.map((option, index) => (
-          <SelectItem key={index} value={option}>
-            {option}
-          </SelectItem>
-        ))}
+        children={renderSelectOptions(referralFormDisabilityOptions)}
       />
       <FormInput
         control={form.control}

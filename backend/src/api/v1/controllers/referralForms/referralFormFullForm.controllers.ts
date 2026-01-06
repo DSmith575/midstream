@@ -1,9 +1,51 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
-import { Readable } from "stream";
+import { statusCodes } from "@/constants";
 
 const prisma = new PrismaClient();
 const PYTHON_API_URL = process.env.PYTHON_API_KEY;
+
+// Include object for referral form data
+const REFERRAL_FORM_INCLUDE = {
+	communication: true,
+	disability: true,
+	additionalInformation: true,
+	documents: true,
+};
+
+// Helper functions
+const sendError = (res: Response, status: number, message: string) => {
+	return res.status(status).json({ message });
+};
+
+const createPdfBlob = (doc: any): Blob => {
+	const byteArray = Object.values(doc.rawBytes);
+	const uint8Array = new Uint8Array(byteArray as any);
+	return new Blob([uint8Array], { type: "application/pdf" });
+};
+
+const sendReferralToPythonService = async (referralForm: any) => {
+	const form = new FormData();
+	const { documents, ...metadataWithoutDocs } = referralForm;
+
+	form.append("metadata", JSON.stringify(metadataWithoutDocs));
+
+	for (const doc of documents) {
+		const blob = createPdfBlob(doc);
+		form.append("files", blob, doc.name);
+	}
+
+	const response = await fetch(`${PYTHON_API_URL}generate-referral`, {
+		method: "POST",
+		body: form,
+	});
+
+	if (!response.ok) {
+		throw new Error(`Python API error: ${response.statusText}`);
+	}
+
+	return response;
+};
 
 const generateFullReferralForm = async (
 	req: Request,
@@ -11,26 +53,20 @@ const generateFullReferralForm = async (
 ): Promise<any> => {
 	try {
 		if (!req.body || req.body.length === 0) {
-			return res.status(400).send({ message: "Content cannot be empty!" });
+			return sendError(res, statusCodes.badRequest, "Content cannot be empty!");
 		}
 
-		// Get user ReferralForm by Id
 		const { referralFormId } = req.body;
+
 		const referralFormData = await prisma.referralForm.findUnique({
 			where: { id: String(referralFormId) },
-			include: {
-				communication: true,
-				disability: true,
-				additionalInformation: true,
-				documents: true,
-			},
+			include: REFERRAL_FORM_INCLUDE,
 		});
 
 		if (!referralFormData) {
-			return res.status(404).json({ message: "Referral form not found" });
+			return sendError(res, statusCodes.notFound, "Referral form not found");
 		}
 
-		// Get user personal information
 		const userData = await prisma.user.findUnique({
 			where: { id: String(referralFormData.userId) },
 			include: {
@@ -39,10 +75,9 @@ const generateFullReferralForm = async (
 		});
 
 		if (!userData) {
-			return res.status(404).json({ message: "User not found" });
+			return sendError(res, statusCodes.notFound, "User not found");
 		}
 
-		// Combine referral form data with user personal information
 		const referralForm = {
 			firstName: userData.personalInformation?.firstName,
 			lastName: userData.personalInformation?.lastName,
@@ -54,64 +89,22 @@ const generateFullReferralForm = async (
 
 		const pythonResponse = await sendReferralToPythonService(referralForm);
 
-    if (!pythonResponse.body) {
-      return res.status(500).send("No PDF received from Python service");
-    }
-
-    const pdfBuffer = Buffer.from(await pythonResponse.arrayBuffer());
-
-    // Set headers to trigger download
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader(
-      "Content-Disposition",
-      `attachment; filename="${referralForm.firstName}-${referralForm.lastName}-referral.pdf"`
-    );
-
-    // Send the PDF buffer
-    res.send(pdfBuffer);
-
-	} catch (error) {
-		console.error("Error creating full referral form:", error);
-		return res.status(500).json({ message: "Internal server error" });
-	}
-};
-
-const sendReferralToPythonService = async (referralForm: any) => {
-	try {
-		const form = new FormData();
-
-		const { documents, ...metadataWithoutDocs } = referralForm;
-
-		form.append("metadata", JSON.stringify(metadataWithoutDocs));
-
-		// Append each document
-		for (const doc of documents) {
-			const byteArray = Object.values(doc.rawBytes);
-			const uint8Array = new Uint8Array(byteArray as any);
-
-			const blob = new Blob([uint8Array], { type: "application/pdf" });
-			form.append("files", blob, doc.name);
+		if (!pythonResponse.body) {
+			return res.status(statusCodes.internalServerError).send("No PDF received from Python service");
 		}
 
-		console.log("Form Data Prepared:", form);
+		const pdfBuffer = Buffer.from(await pythonResponse.arrayBuffer());
 
-		// Send to Python API
-		const response = await fetch(
-			`${PYTHON_API_URL}generate-referral`,
-			{
-				method: "POST",
-				body: form,
-			}
+		res.setHeader("Content-Type", "application/pdf");
+		res.setHeader(
+			"Content-Disposition",
+			`attachment; filename="${referralForm.firstName}-${referralForm.lastName}-referral.pdf"`
 		);
 
-		if (!response.ok) {
-			throw new Error(`Python API error: ${response.statusText}`);
-		}
-
-		return response;
+		res.send(pdfBuffer);
 	} catch (error) {
-		console.error("Error sending referral to Python service:", error);
-		throw error;
+		console.error("Error creating full referral form:", error);
+		return sendError(res, statusCodes.internalServerError, "Internal server error");
 	}
 };
 

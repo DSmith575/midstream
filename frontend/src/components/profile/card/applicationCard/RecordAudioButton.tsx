@@ -3,6 +3,7 @@ import { Mic } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useCreateUserReferralAudio } from '@/hooks/userProfile/useCreateUserReferralAudio'
 import { AudioRecordingModal } from '@/components/modal/AudioRecordingModal'
+import { UploadSpinner } from '@/components/spinner'
 
 interface Props {
   formId: string
@@ -17,6 +18,12 @@ export const RecordAudioButton = ({ formId, userId, disabled }: Props) => {
 
   const handleComplete = (file: File) => {
     uploadRecordedAudio({ file, referralId: formId })
+  }
+
+  if (isPending) {
+    return (
+      <UploadSpinner text="Uploading your audio recording..." />
+    )
   }
 
   return (

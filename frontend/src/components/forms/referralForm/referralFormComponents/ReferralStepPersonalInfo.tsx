@@ -1,22 +1,8 @@
-import type { z } from 'zod'
-import type { UseFormReturn } from 'react-hook-form'
-import type { referralFormSchema } from '@/lib/schemas/referralFormSchema'
+import type { ReferralFormStepProps } from '@/lib/interfaces'
 import { MotionContainer } from '@/components/animation/MotionContainer'
 import { FormInput } from '@/components/forms/formComponents/'
 
-type Inputs = z.infer<typeof referralFormSchema>
-
-export const StepPersonalInfo = ({
-  form,
-  delta,
-  header,
-  subtitle,
-}: {
-  form: UseFormReturn<Inputs>
-  delta: number
-  header: string
-  subtitle: string
-}) => {
+export const StepPersonalInfo = ({ form, delta, header, subtitle }: ReferralFormStepProps) => {
   return (
     <MotionContainer delta={delta} header={header} subtitle={subtitle}>
       <FormInput

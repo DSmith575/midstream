@@ -1,14 +1,20 @@
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
+import { useAuth } from '@clerk/clerk-react'
 import type { UserProfileProps } from '@/lib/interfaces'
 import { fetchUserProfile } from '@/lib/api/fetchUser'
 
 export const useUserProfile = (userId: string) => {
-  const { isError, data, error, isFetched, isLoading } = useSuspenseQuery({
+  const { getToken } = useAuth()
+  
+  const { isError, data, error, isFetched, isLoading } = useQuery({
     queryKey: ['userProfile', userId],
-    queryFn: () => fetchUserProfile(userId),
+    queryFn: async () => {
+      const token = await getToken()
+      if (!token) throw new Error('Not authenticated')
+      return fetchUserProfile(userId, token)
+    },
     staleTime: 5 * 60 * 1000,
-    // enabled: !!userId, // Fetch only when userId is valid
-    retry: 1,
+    retry: false,
   })
 
   if (isError) {
@@ -31,5 +37,5 @@ export const useUserProfile = (userId: string) => {
     return { isFetched, userData, isLoading }
   }
 
-  return {}
+  return { isLoading }
 }

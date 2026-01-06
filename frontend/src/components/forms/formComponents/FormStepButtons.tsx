@@ -2,54 +2,44 @@ import { Button } from '@/components/ui/button'
 
 interface FormStepButtonsProps {
   currentStep: number
-  profileFormStepsLength: number
-  prevButtonType: 'submit' | 'reset' | 'button'
-  nextButtonType: 'submit' | 'reset' | 'button'
-  submitButtonType: 'submit' | 'reset' | 'button'
+  stepsLength: number
   onClickPrev: () => void
   onClickNext: () => void
-  prevButtonText: string
-  nextButtonText: string
-  submitButtonText: string
+  prevButtonText?: string
+  nextButtonText?: string
+  submitButtonText?: string
+  isSubmitting?: boolean
 }
 
 export const FormStepButtons = ({
   currentStep,
-  profileFormStepsLength,
-  prevButtonType,
-  nextButtonType,
-  submitButtonType,
+  stepsLength,
   onClickPrev,
   onClickNext,
-  prevButtonText,
-  nextButtonText,
-  submitButtonText,
+  prevButtonText = 'Previous',
+  nextButtonText = 'Next',
+  submitButtonText = 'Submit',
+  isSubmitting = false,
 }: FormStepButtonsProps) => {
+  const isLastStep = currentStep === stepsLength - 1
+
   return (
-    <section className={'mt-8 pt-5'}>
-      <div className={'flex justify-between'}>
+    <section className="mt-8 pt-5">
+      <div className="flex justify-between">
         {currentStep > 0 && (
-          <Button
-            type={prevButtonType}
-            onClick={onClickPrev}
-            variant={'outline'}
-          >
+          <Button type="button" onClick={onClickPrev} variant="outline">
             {prevButtonText}
           </Button>
         )}
 
-        {currentStep < profileFormStepsLength - 1 && (
-          <Button
-            type={nextButtonType}
-            onClick={onClickNext}
-            variant={'outline'}
-          >
+        {!isLastStep && (
+          <Button type="button" onClick={onClickNext} variant="outline">
             {nextButtonText}
           </Button>
         )}
 
-        {currentStep === profileFormStepsLength - 1 && (
-          <Button type={submitButtonType} variant={'outline'}>
+        {isLastStep && (
+          <Button type="submit" disabled={isSubmitting} variant="outline">
             {submitButtonText}
           </Button>
         )}

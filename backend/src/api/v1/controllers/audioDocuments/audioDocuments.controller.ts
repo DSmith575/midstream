@@ -1,7 +1,6 @@
 import { statusCodes } from '@/constants';
 import { PrismaClient } from '@prisma/client';
 import { Request, Response } from 'express';
-import multer from 'multer';
 
 
 const prisma = new PrismaClient();
@@ -10,7 +9,7 @@ const createAudioDocumentReferralHandler = async (req: Request, res: Response): 
   const { referralId, transcribedContent, name, type } = req.body;
 
   if (!referralId || !name) {
-    return res.status(400).json({ message: 'referralId and name are required' });
+    return res.status(statusCodes.badRequest).json({ message: 'referralId and name are required' });
   }
 
   try {
@@ -30,7 +29,7 @@ const createAudioDocumentReferralHandler = async (req: Request, res: Response): 
     });
   } catch (error) {
     console.error('Error creating audio document:', error);
-    return res.status(500).json({ message: 'Internal server error' });
+    return res.status(statusCodes.internalServerError).json({ message: 'Internal server error' });
   }
 };
 
@@ -39,11 +38,11 @@ const updateDocumentTranscribedContent = async (req: Request, res: Response): Pr
   const { transcribedContent } = req.body;
 
   if (!documentId) {
-    return res.status(400).json({ message: 'documentId is required' });
+    return res.status(statusCodes.badRequest).json({ message: 'documentId is required' });
   }
 
   if (typeof transcribedContent !== 'string') {
-    return res.status(400).json({ message: 'transcribedContent must be a string' });
+    return res.status(statusCodes.badRequest).json({ message: 'transcribedContent must be a string' });
   }
 
   try {
@@ -52,7 +51,7 @@ const updateDocumentTranscribedContent = async (req: Request, res: Response): Pr
       data: { transcribedContent },
     });
 
-    return res.status(200).json({
+    return res.status(statusCodes.success).json({
       statusCode: res.statusCode,
       message: 'Document updated successfully',
       document,

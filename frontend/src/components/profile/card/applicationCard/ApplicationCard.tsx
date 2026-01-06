@@ -27,6 +27,19 @@ interface ApplicationCardProps {
   userId: string
 }
 
+const STATUS_STYLES = {
+  submitted: 'border-emerald-200 bg-emerald-50 text-emerald-700',
+  pending: 'border-amber-200 bg-amber-50 text-amber-800',
+} as const
+
+const BUTTON_GRADIENT_CLASS = 'border border-primary/20 hover:text-white bg-gradient-to-b from-primary/5 to-primary/10 text-primary font-medium shadow-sm hover:shadow-md hover:from-primary/10 hover:to-primary/15 transition-all duration-200'
+const GENERATE_BUTTON_CLASS = 'border border-primary/15 hover:text-white bg-gradient-to-b from-primary/10 to-primary/5 text-primary font-medium shadow-sm hover:shadow-md hover:from-primary/15 hover:to-primary/10 transition-all duration-200'
+
+const ErrorMessage = ({ message }: { message: string }) => (
+  <p className="px-6 pt-2 text-sm text-destructive">{message}</p>
+)
+
+
 export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
   const { error, isLoading, referralForms } = useGetReferralForms(userId)
   const {
@@ -45,14 +58,6 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
     error: notesError,
   } = useCreateReferralNote(userId)
 
-  const statusTone = useMemo(
-    () => ({
-      submitted: 'border-emerald-200 bg-emerald-50 text-emerald-700',
-      pending: 'border-amber-200 bg-amber-50 text-amber-800',
-    }),
-    [],
-  )
-
   if (generatePending) {
     return (
       <div className="flex justify-center py-10">
@@ -67,24 +72,12 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
 
       {filePending && (
         <div className="px-6 pt-4">
-          <UploadSpinner text={'Processing audio...'} />
+          <UploadSpinner text="Processing audio..." />
         </div>
       )}
-      {fileError && (
-        <p className="px-6 pt-2 text-sm text-destructive">
-          {fileError.message}
-        </p>
-      )}
-      {generateError && (
-        <p className="px-6 pt-2 text-sm text-destructive">
-          {generateError.message}
-        </p>
-      )}
-      {notesError && (
-        <p className="px-6 pt-2 text-sm text-destructive">
-          {notesError.message}
-        </p>
-      )}
+      {fileError && <ErrorMessage message={fileError.message} />}
+      {generateError && <ErrorMessage message={generateError.message} />}
+      {notesError && <ErrorMessage message={notesError.message} />}
 
       <div className="space-y-3 px-6 py-5">
         {isLoading ? (
@@ -93,7 +86,7 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
           </div>
         ) : error ? (
           <div className="flex flex-col items-center justify-center rounded-xl border border-border/70 bg-card/80 p-8 text-center">
-            <p className="text-destructive font-semibold">
+            <p className="font-semibold text-destructive">
               An error has occurred.
             </p>
             <p className="text-sm text-muted-foreground">
@@ -109,8 +102,8 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
               const formId = String(form?.id ?? idx)
               const statusClass =
                 form?.status === 'SUBMITTED'
-                  ? statusTone.submitted
-                  : statusTone.pending
+                  ? STATUS_STYLES.submitted
+                  : STATUS_STYLES.pending
               const checklistValues = {
                 audio: Boolean(form?.checklistAudioComplete),
                 notes: Boolean(form?.checklistNotesComplete),
@@ -169,7 +162,7 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
                             disabled={filePending}
                             asChild
                             size="sm"
-                            className="border border-primary/20 hover:text-white bg-gradient-to-b from-primary/5 to-primary/10 text-primary font-medium shadow-sm hover:shadow-md hover:from-primary/10 hover:to-primary/15 transition-all duration-200"
+                            className={BUTTON_GRADIENT_CLASS}
                           >
                             <label
                               htmlFor={`audio-${formId}`}
@@ -194,7 +187,7 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
                           />
                           <Button
                             size="sm"
-                            className="border border-primary/15 hover:text-white bg-gradient-to-b from-primary/10 to-primary/5 text-primary font-medium shadow-sm hover:shadow-md hover:from-primary/15 hover:to-primary/10 transition-all duration-200"
+                            className={GENERATE_BUTTON_CLASS}
                             disabled={generatePending}
                             onClick={() => generateReferralPdf(formId)}
                           >

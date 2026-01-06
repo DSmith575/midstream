@@ -1,8 +1,20 @@
+import type { UseFormReturn } from 'react-hook-form'
+import type { referralFormSchema } from '@/lib/schemas/referralFormSchema'
+import type { z } from 'zod'
+
 export interface Steps {
   id: string
   name: string
   subtitle: string
   fields: Array<string>
+}
+
+export interface ReferralFormStepProps {
+  form: UseFormReturn<z.infer<typeof referralFormSchema>>
+  delta: number
+  header: string
+  subtitle: string
+  communicationNeedsValue?: string
 }
 
 export interface UserInformationProps {
@@ -149,3 +161,4 @@ export interface CreateServicePlanEntryProps {
   comment?: string
   userId?: string
 }
+

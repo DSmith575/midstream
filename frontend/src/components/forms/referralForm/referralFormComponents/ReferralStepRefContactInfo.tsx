@@ -1,24 +1,17 @@
-import type { z } from 'zod'
-import type { UseFormReturn } from 'react-hook-form'
-import type { referralFormSchema } from '@/lib/schemas/referralFormSchema'
+import type { ReferralFormStepProps } from '@/lib/interfaces'
 import { referrerRelationshipOptions } from '@/lib/formOptions/referralFormOptions'
 import { MotionContainer } from '@/components/animation/MotionContainer'
 import { FormInput, FormSelect } from '@/components/forms/formComponents/'
 import { SelectItem } from '@/components/ui/select'
 
-type Inputs = z.infer<typeof referralFormSchema>
+const renderSelectOptions = (options: string[]) =>
+  options.map((option) => (
+    <SelectItem key={option} value={option}>
+      {option}
+    </SelectItem>
+  ))
 
-export const StepReferralContactInfo = ({
-  form,
-  delta,
-  header,
-  subtitle,
-}: {
-  form: UseFormReturn<Inputs>
-  delta: number
-  header: string
-  subtitle: string
-}) => {
+export const StepReferralContactInfo = ({ form, delta, header, subtitle }: ReferralFormStepProps) => {
   return (
     <MotionContainer delta={delta} header={header} subtitle={subtitle}>
       <FormInput
@@ -46,11 +39,7 @@ export const StepReferralContactInfo = ({
         fieldName="referrerRelationship"
         formLabel="Referrer Relationship"
         selectPlaceholder="Select Relationship"
-        children={referrerRelationshipOptions.map((option, index) => (
-          <SelectItem key={index} value={option}>
-            {option}
-          </SelectItem>
-        ))}
+        children={renderSelectOptions(referrerRelationshipOptions)}
       />
     </MotionContainer>
   )

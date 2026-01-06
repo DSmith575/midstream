@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { formatElapsed } from '@/lib/functions/functions'
 
 interface AudioRecordingModalProps {
   open: boolean
@@ -31,13 +32,6 @@ export const AudioRecordingModal = ({
   const intervalRef = useRef<number | null>(null)
   const startTimeRef = useRef<number | null>(null)
   const recordedFileRef = useRef<File | null>(null)
-
-  const formatElapsed = (ms: number) => {
-    const totalSec = Math.floor(ms / 1000)
-    const mm = String(Math.floor(totalSec / 60)).padStart(2, '0')
-    const ss = String(totalSec % 60).padStart(2, '0')
-    return `${mm}:${ss}`
-  }
 
   const startRecording = async () => {
     try {

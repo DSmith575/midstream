@@ -7,6 +7,7 @@ import {
   NavigationMenu,
   NavigationMenuList,
 } from '@/components/ui/navigation-menu'
+import { Button } from '@/components/ui/button'
 
 import { routeConstants } from '@/lib/constants'
 // import { postChangeUserRole } from '@/lib/api/devTools/postChangeUserRole'
@@ -51,14 +52,14 @@ export const Header = () => {
             </div>
           )}
 
-          <button
+          <Button
             className="rounded-md p-2 text-foreground transition-colors hover:bg-accent md:hidden"
             onClick={() => setOpen(!open)}
             aria-label="Toggle menu"
             aria-expanded={open}
           >
             {open ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          </Button>
         </div>
 
         {/* Desktop Nav */}
@@ -87,9 +88,9 @@ export const Header = () => {
               </div>
             )}
 
-            <LinkComponent linkRef={routeConstants.home} linkName="Home" />
+            {/* <LinkComponent linkRef={routeConstants.home} linkName="Home" />
 
-            <LinkComponent linkRef={routeConstants.about} linkName="About" />
+            <LinkComponent linkRef={routeConstants.about} linkName="About" /> */}
           </NavigationMenuList>
         </NavigationMenu>
       </nav>
@@ -109,7 +110,7 @@ export const Header = () => {
                 />
               </>
             )}
-            <LinkComponent
+            {/* <LinkComponent
               linkRef={routeConstants.home}
               linkName="Home"
               onClick={() => setOpen(false)}
@@ -123,7 +124,7 @@ export const Header = () => {
               linkRef={routeConstants.about}
               linkName="About"
               onClick={() => setOpen(false)}
-            />
+            /> */}
           </div>
         </div>
       )}

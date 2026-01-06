@@ -23,14 +23,27 @@ import {
   FormStepNavigation,
 } from '@/components/forms/formComponents'
 import { useCreateUserProfile } from '@/hooks/userProfile/useCreateUserProfile'
+import { UploadSpinner } from '@/components/spinner'
 
 type Inputs = z.infer<typeof profileFormSchema>
 type FieldName = keyof Inputs
 
+const renderSelectOptions = (options: string[]) =>
+  options.map((option) => (
+    <SelectItem key={option} value={option}>
+      {option}
+    </SelectItem>
+  ))
+
+const formatFieldLabel = (fieldName: string): string =>
+  fieldName
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .replace(/^./, (str) => str.toUpperCase())
+
 export const ProfileForm = () => {
   const user = useUser()
   const navigate = useNavigate()
-  const { mutate, isPending, isSuccess } = useCreateUserProfile(
+  const { mutate, isPending } = useCreateUserProfile(
     user.user?.id as string,
     () => {
       navigate({ to: `/dashboard` })
@@ -63,35 +76,14 @@ export const ProfileForm = () => {
 
   const onSubmit = (values: z.infer<typeof profileFormSchema>) => {
     const googleUserId = user.user?.id
-    if (!googleUserId) {
-      return
-    }
+    if (!googleUserId) return
+
     const userDetails: CreateUserProps = {
       googleId: googleUserId,
-      firstName: values.firstName,
-      lastName: values.lastName,
-      title: values.title,
-      preferredName: values.preferredName,
-      gender: values.gender,
-      dateOfBirth: values.dateOfBirth,
-      email: values.email,
-      phone: values.phone,
-      address: values.address,
-      suburb: values.suburb,
-      city: values.city,
-      postCode: values.postCode,
-      country: values.country,
+      ...values,
     }
 
-    try {
-      mutate(userDetails)
-
-      if (isSuccess) {
-        navigate({ to: '/dashboard' })
-      }
-    } catch (error) {
-      console.error(error)
-    }
+    mutate(userDetails)
   }
 
   const next = async () => {
@@ -117,6 +109,10 @@ export const ProfileForm = () => {
 
   return (
     <section className="flex flex-col justify-between px-10 py-10">
+      {isPending && (
+        <UploadSpinner text="Submitting your profile information..." />
+      )}
+
       <FormStepNavigation steps={profileFormSteps} currentStep={currentStep} />
 
       {/* Form */}
@@ -140,48 +136,40 @@ export const ProfileForm = () => {
 
               <FormInput
                 control={form.control}
-                fieldName={'lastName'}
-                formLabel={'Last Name'}
-                placeholder={'Doe'}
+                fieldName="lastName"
+                formLabel="Last Name"
+                placeholder="Doe"
               />
 
               <FormSelect
                 control={form.control}
-                fieldName={'title'}
-                formLabel={'Title'}
-                selectPlaceholder={'Title'}
-                children={titleSelectOptions.map((title, index) => (
-                  <SelectItem key={index} value={title}>
-                    {title}
-                  </SelectItem>
-                ))}
+                fieldName="title"
+                formLabel="Title"
+                selectPlaceholder="Title"
+                children={renderSelectOptions(titleSelectOptions)}
               />
 
               <FormInput
                 control={form.control}
-                fieldName={'preferredName'}
-                formLabel={'Preferred Name'}
-                placeholder={'Optional'}
+                fieldName="preferredName"
+                formLabel="Preferred Name"
+                placeholder="Optional"
               />
 
               <FormInput
                 control={form.control}
-                fieldName={'dateOfBirth'}
-                formLabel={'Date of Birth'}
-                placeholder={'DD/MM/YYYY'}
-                type={'date'}
+                fieldName="dateOfBirth"
+                formLabel="Date of Birth"
+                placeholder="DD/MM/YYYY"
+                type="date"
               />
 
               <FormSelect
                 control={form.control}
-                fieldName={'gender'}
-                formLabel={'Gender'}
-                selectPlaceholder={'Gender'}
-                children={genderSelectOptions.map((gender, index) => (
-                  <SelectItem key={index} value={gender}>
-                    {gender}
-                  </SelectItem>
-                ))}
+                fieldName="gender"
+                formLabel="Gender"
+                selectPlaceholder="Gender"
+                children={renderSelectOptions(genderSelectOptions)}
               />
             </MotionContainer>
           )}
@@ -194,17 +182,17 @@ export const ProfileForm = () => {
             >
               <FormInput
                 control={form.control}
-                fieldName={'email'}
-                formLabel={'Email'}
-                type={'email'}
-                placeholder={'JohnDoe@email.com'}
+                fieldName="email"
+                formLabel="Email"
+                type="email"
+                placeholder="JohnDoe@email.com"
               />
 
               <FormInput
                 control={form.control}
-                fieldName={'phone'}
-                formLabel={'Phone Number'}
-                placeholder={'Home or Mobile'}
+                fieldName="phone"
+                formLabel="Phone Number"
+                placeholder="Home or Mobile"
               />
             </MotionContainer>
           )}
@@ -217,38 +205,38 @@ export const ProfileForm = () => {
             >
               <FormInput
                 control={form.control}
-                fieldName={'address'}
-                formLabel={'Address'}
-                placeholder={'123 Example Street'}
+                fieldName="address"
+                formLabel="Address"
+                placeholder="123 Example Street"
               />
 
               <FormInput
                 control={form.control}
-                fieldName={'suburb'}
-                formLabel={'Suburb'}
-                placeholder={'Richmond'}
+                fieldName="suburb"
+                formLabel="Suburb"
+                placeholder="Richmond"
               />
 
               <FormInput
                 control={form.control}
-                fieldName={'city'}
-                formLabel={'City'}
-                placeholder={'Christchurch'}
+                fieldName="city"
+                formLabel="City"
+                placeholder="Christchurch"
               />
 
               <FormInput
                 control={form.control}
-                fieldName={'postCode'}
-                formLabel={'Post Code'}
-                placeholder={'1234'}
-                type={'string'}
+                fieldName="postCode"
+                formLabel="Post Code"
+                placeholder="1234"
+                type="string"
               />
 
               <FormInput
                 control={form.control}
-                fieldName={'country'}
-                formLabel={'Country'}
-                placeholder={'New Zealand'}
+                fieldName="country"
+                formLabel="Country"
+                placeholder="New Zealand"
               />
             </MotionContainer>
           )}
@@ -262,13 +250,7 @@ export const ProfileForm = () => {
               {Object.entries(form.getValues()).map(([key, value]) => (
                 <div key={key} className="sm:col-span-3">
                   <FormItem>
-                    <FormLabel>
-                      {key
-                        // Adds space between camelCase words
-                        .replace(/([a-z])([A-Z])/g, '$1 $2')
-                        // Capitalize first letter
-                        .replace(/^./, (str) => str.toUpperCase())}
-                    </FormLabel>
+                    <FormLabel>{formatFieldLabel(key)}</FormLabel>
                     <FormControl>
                       <Input
                         value={value}
@@ -282,18 +264,15 @@ export const ProfileForm = () => {
             </MotionContainer>
           )}
 
-          {/* This could be handled better, refactor when time allows */}
           <FormStepButtons
             currentStep={currentStep}
-            profileFormStepsLength={profileFormSteps.length}
-            prevButtonType={'button'}
-            nextButtonType={'button'}
-            prevButtonText={'Previous'}
-            nextButtonText={'Next'}
+            stepsLength={profileFormSteps.length}
+            prevButtonText="Previous"
+            nextButtonText="Next"
+            submitButtonText={isPending ? 'Submitting' : 'Submit'}
+            isSubmitting={isPending}
             onClickPrev={prev}
             onClickNext={next}
-            submitButtonText={isPending ? 'Submitting' : 'Submit'}
-            submitButtonType={'submit'}
           />
         </form>
       </Form>
