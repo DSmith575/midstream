@@ -24,6 +24,10 @@ const API_BASE_URL = `/api/${CURRENT_VERSION}`;
 app.use(express.json());
 app.use(cors());
 
+// Trust the first proxy (Render/hosting) so rate limiters and auth can
+// correctly use X-Forwarded-For to identify client IPs
+app.set('trust proxy', 1);
+
 // Apply rate limiting to all API routes
 app.use(API_BASE_URL, apiLimiter);
 

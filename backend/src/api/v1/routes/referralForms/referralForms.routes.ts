@@ -10,21 +10,21 @@ import { userReferralRoutes } from '@/constants';
 
 const router = express.Router();
 
-// Apply authentication to all routes
-router.use(authenticate);
+// Do not apply blanket authentication; use per-route auth so
+// service calls can access specific endpoints via API key
 
 // Create referral form - strict rate limit + validation + authorization
-router.post(userReferralRoutes.createUserReferral, strictLimiter, validateBody(createReferralFormSchema), authorizeUserAccess, createReferralForm);
+router.post(userReferralRoutes.createUserReferral, authenticate, strictLimiter, validateBody(createReferralFormSchema), authorizeUserAccess, createReferralForm);
 
 // Get user's own referrals - verify user can only access their own data
-router.get(userReferralRoutes.getUserReferrals, authorizeUserAccess, getUserReferrals);
+router.get(userReferralRoutes.getUserReferrals, authenticate, authorizeUserAccess, getUserReferrals);
 
 // Generate PDF - rate limited
-router.post(userReferralRoutes.generateUserFullForm, uploadLimiter, generateFullReferralForm);
+router.post(userReferralRoutes.generateUserFullForm, authenticate, uploadLimiter, generateFullReferralForm);
 
 // Staff-only endpoints
-router.get(userReferralRoutes.getAllReferrals, authorizeStaffAccess, getAllReferrals);
-router.get(userReferralRoutes.getCaseWorkerReferrals, authorizeStaffAccess, getCaseWorkerReferrals);
+router.get(userReferralRoutes.getAllReferrals, authenticate, authorizeStaffAccess, getAllReferrals);
+router.get(userReferralRoutes.getCaseWorkerReferrals, authenticate, authorizeStaffAccess, getCaseWorkerReferrals);
 
 // Service endpoints (Python API) - allow service authentication
 router.patch(userReferralRoutes.updateReferralChecklist, authenticateFlexible, validateBody(updateChecklistSchema), updateReferralChecklist);
