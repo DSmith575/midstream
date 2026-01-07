@@ -25,10 +25,11 @@ router.post(userReferralRoutes.generateUserFullForm, uploadLimiter, generateFull
 // Staff-only endpoints
 router.get(userReferralRoutes.getAllReferrals, authorizeStaffAccess, getAllReferrals);
 router.get(userReferralRoutes.getCaseWorkerReferrals, authorizeStaffAccess, getCaseWorkerReferrals);
-// Update checklist - validation required
-router.patch(userReferralRoutes.updateReferralChecklist, validateBody(updateChecklistSchema), updateReferralChecklist);
 
-// Create note - validation required
-router.post(userReferralRoutes.createReferralNote, validateBody(createReferralNoteSchema), createReferralNote);
+// Update checklist - validation + authorization required
+router.patch(userReferralRoutes.updateReferralChecklist, validateBody(updateChecklistSchema), authorizeUserAccess, updateReferralChecklist);
+
+// Create note - validation + authorization required
+router.post(userReferralRoutes.createReferralNote, validateBody(createReferralNoteSchema), authorizeUserAccess, createReferralNote);
 
 export default router;
