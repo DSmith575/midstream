@@ -9,7 +9,7 @@ export const useReferralForm = () => {
   const form = useForm<z.infer<typeof referralFormSchema>>({
     resolver: zodResolver(referralFormSchema),
     values: referralFormStore.state.referralFormData,
-    mode: 'onBlur',
+    mode: 'onChange', // Validate on every change for real-time validation
   })
 
   return form

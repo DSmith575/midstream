@@ -6,7 +6,7 @@ import type { UseFormReturn } from 'react-hook-form'
 export const useIsReferralFormComplete = (form: UseFormReturn<any>) => {
   const values = useWatch({ control: form.control })
 
-  const optionalFields = ['preferredName']
+  const optionalFields = ['preferredName', 'disabilityDetails']
 
   return Object.entries(values).every(([key, value]) => {
     if (optionalFields.includes(key)) return true

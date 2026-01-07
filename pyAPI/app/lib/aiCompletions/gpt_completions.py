@@ -18,6 +18,18 @@ client = OpenAI(api_key=api_key)
 async def process_referral_with_openai(metadata: dict, pdf_paths: List[str]):
     extracted_text = []
 
+    # Extract text from structured referral data fields
+    referral_fields = ['communication', 'disability', 'additionalInformation']
+    for field_name in referral_fields:
+        if field_name in metadata and metadata[field_name]:
+            field_data = metadata[field_name]
+            if isinstance(field_data, dict):
+                print(f"Processing {field_name} data")
+                for key, value in field_data.items():
+                    if key != 'id' and value:
+                        label = key.replace('_', ' ').title()
+                        extracted_text.append(f"{label}: {value}")
+
     # Extract text from notes if available
     if 'notes' in metadata and metadata['notes']:
         print(f"Processing {len(metadata['notes'])} notes")
