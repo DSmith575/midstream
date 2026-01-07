@@ -1,7 +1,7 @@
 import express from 'express';
 import { createReferralForm, getUserReferrals, getAllReferrals, getCaseWorkerReferrals, updateReferralChecklist, createReferralNote } from '@/api/v1/controllers/referralForms/referralForms.controllers';
 import { generateFullReferralForm } from '@/api/v1/controllers/referralForms/referralFormFullForm.controllers';
-import { authenticate, authorizeUserAccess, authorizeStaffAccess } from '@/middleware/auth.middleware';
+import { authenticate, authenticateFlexible, authorizeUserAccess, authorizeStaffAccess } from '@/middleware/auth.middleware';
 import { validateBody } from '@/middleware/validation.middleware';
 import { createReferralFormSchema, createReferralNoteSchema, updateChecklistSchema } from '@/validation/schemas';
 import { strictLimiter, uploadLimiter } from '@/middleware/rateLimit.middleware';
@@ -26,10 +26,8 @@ router.post(userReferralRoutes.generateUserFullForm, uploadLimiter, generateFull
 router.get(userReferralRoutes.getAllReferrals, authorizeStaffAccess, getAllReferrals);
 router.get(userReferralRoutes.getCaseWorkerReferrals, authorizeStaffAccess, getCaseWorkerReferrals);
 
-// Update checklist - validation + authorization required
-router.patch(userReferralRoutes.updateReferralChecklist, validateBody(updateChecklistSchema), authorizeUserAccess, updateReferralChecklist);
-
-// Create note - validation + authorization required
-router.post(userReferralRoutes.createReferralNote, validateBody(createReferralNoteSchema), authorizeUserAccess, createReferralNote);
+// Service endpoints (Python API) - allow service authentication
+router.patch(userReferralRoutes.updateReferralChecklist, authenticateFlexible, validateBody(updateChecklistSchema), updateReferralChecklist);
+router.post(userReferralRoutes.createReferralNote, authenticateFlexible, validateBody(createReferralNoteSchema), createReferralNote);
 
 export default router;

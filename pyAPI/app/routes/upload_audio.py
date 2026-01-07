@@ -89,12 +89,20 @@ async def upload_audio(
         
         # Upload to Node backend (sending JSON)
         async with httpx.AsyncClient() as client:
-            response = await client.post(NODE_API_URL, json=payload)
+            # Get service API key for backend authentication
+            service_api_key = os.getenv('SERVICE_API_KEY')
+            if not service_api_key:
+                logger.error("SERVICE_API_KEY environment variable not set")
+                raise HTTPException(status_code=500, detail="Server configuration error")
+            
+            headers = {"x-api-key": service_api_key}
+            
+            response = await client.post(NODE_API_URL, json=payload, headers=headers)
             response.raise_for_status()
 
             # Update checklist flag on Node backend
             checklist_url = f"{BASE_API_URL}referralForms/checklist/{referralId}"
-            checklist_resp = await client.patch(checklist_url, json={"audio": True})
+            checklist_resp = await client.patch(checklist_url, json={"audio": True}, headers=headers)
             checklist_resp.raise_for_status()
 
         logger.info(f"Uploaded transcription and updated checklist for referralId {referralId}")
