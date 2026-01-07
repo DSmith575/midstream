@@ -5,7 +5,7 @@ import { fetchUserProfile } from '@/lib/api/fetchUser'
 
 export const useUserProfile = (userId: string) => {
   const { getToken } = useAuth()
-  
+
   const { isError, data, error, isFetched, isLoading } = useQuery({
     queryKey: ['userProfile', userId],
     queryFn: async () => {

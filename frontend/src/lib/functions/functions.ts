@@ -7,15 +7,15 @@ export const splitAndCapitalize = (label: string) => {
 }
 
 export const formatDate = (dateString: string) => {
-    if (!dateString) return 'N/A'
-    return new Date(dateString).toLocaleDateString('en-NZ', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    })
-  }
+  if (!dateString) return 'N/A'
+  return new Date(dateString).toLocaleDateString('en-NZ', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
 
 export const getUserAge = (dateOfBirth: string) => {
   const userAge = new Date().getFullYear() - new Date(dateOfBirth).getFullYear()
@@ -51,8 +51,8 @@ export const getIconForKey = (key: string): React.ComponentType => {
 }
 
 export const formatElapsed = (ms: number) => {
-    const totalSec = Math.floor(ms / 1000)
-    const mm = String(Math.floor(totalSec / 60)).padStart(2, '0')
-    const ss = String(totalSec % 60).padStart(2, '0')
-    return `${mm}:${ss}`
-  }
+  const totalSec = Math.floor(ms / 1000)
+  const mm = String(Math.floor(totalSec / 60)).padStart(2, '0')
+  const ss = String(totalSec % 60).padStart(2, '0')
+  return `${mm}:${ss}`
+}

@@ -11,7 +11,12 @@ const renderSelectOptions = (options: string[]) =>
     </SelectItem>
   ))
 
-export const StepDisabilityInfo = ({ form, delta, header, subtitle }: ReferralFormStepProps) => {
+export const StepDisabilityInfo = ({
+  form,
+  delta,
+  header,
+  subtitle,
+}: ReferralFormStepProps) => {
   return (
     <MotionContainer delta={delta} header={header} subtitle={subtitle}>
       <FormSelect

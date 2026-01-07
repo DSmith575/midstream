@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import { FileAudio2, FileText, FileUp, Wand2 } from 'lucide-react'
 
 import { ChecklistItem } from './ChecklistItem'
@@ -32,13 +31,14 @@ const STATUS_STYLES = {
   pending: 'border-amber-200 bg-amber-50 text-amber-800',
 } as const
 
-const BUTTON_GRADIENT_CLASS = 'border border-primary/20 hover:text-white bg-gradient-to-b from-primary/5 to-primary/10 text-primary font-medium shadow-sm hover:shadow-md hover:from-primary/10 hover:to-primary/15 transition-all duration-200'
-const GENERATE_BUTTON_CLASS = 'border border-primary/15 hover:text-white bg-gradient-to-b from-primary/10 to-primary/5 text-primary font-medium shadow-sm hover:shadow-md hover:from-primary/15 hover:to-primary/10 transition-all duration-200'
+const BUTTON_GRADIENT_CLASS =
+  'border border-primary/20 hover:text-white bg-gradient-to-b from-primary/5 to-primary/10 text-primary font-medium shadow-sm hover:shadow-md hover:from-primary/10 hover:to-primary/15 transition-all duration-200'
+const GENERATE_BUTTON_CLASS =
+  'border border-primary/15 hover:text-white bg-gradient-to-b from-primary/10 to-primary/5 text-primary font-medium shadow-sm hover:shadow-md hover:from-primary/15 hover:to-primary/10 transition-all duration-200'
 
 const ErrorMessage = ({ message }: { message: string }) => (
   <p className="px-6 pt-2 text-sm text-destructive">{message}</p>
 )
-
 
 export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
   const { error, isLoading, referralForms } = useGetReferralForms(userId)
@@ -202,10 +202,11 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
                           Post-creation checklist
                         </p>
                         <span className="text-xs text-muted-foreground">
-                          Complete these steps to finalize the referral form. The more information you provide,
-                          the better the support worker can assist.
+                          Complete these steps to finalize the referral form.
+                          The more information you provide, the better the
+                          support worker can assist.
                         </span>
-                        
+
                         <div className="grid gap-3 sm:grid-cols-2">
                           <ChecklistItem
                             checked={checklistValues.audio}

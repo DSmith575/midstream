@@ -21,9 +21,7 @@ export const RecordAudioButton = ({ formId, userId, disabled }: Props) => {
   }
 
   if (isPending) {
-    return (
-      <UploadSpinner text="Uploading your audio recording..." />
-    )
+    return <UploadSpinner text="Uploading your audio recording..." />
   }
 
   return (

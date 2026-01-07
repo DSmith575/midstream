@@ -36,8 +36,6 @@ export const DocumentAccordion = ({
     return 'unknown'
   }
 
-
-
   if (!documents || documents.length === 0) {
     return null
   }
@@ -79,17 +77,17 @@ export const DocumentAccordion = ({
                 </div>
               </AccordionTrigger>
               <AccordionContent className="px-4 pb-4">
-                    <AudioTranscribedContentViewer
-                      document={doc}
-                      transcribedContent={doc.transcribedContent || ''}
-                      editable={editable}
-                      onUpdate={(docId, content) => {
-                        updateDocument({
-                          documentId: docId,
-                          transcribedContent: content,
-                        })
-                      }}
-                    />
+                <AudioTranscribedContentViewer
+                  document={doc}
+                  transcribedContent={doc.transcribedContent || ''}
+                  editable={editable}
+                  onUpdate={(docId, content) => {
+                    updateDocument({
+                      documentId: docId,
+                      transcribedContent: content,
+                    })
+                  }}
+                />
               </AccordionContent>
             </AccordionItem>
           )

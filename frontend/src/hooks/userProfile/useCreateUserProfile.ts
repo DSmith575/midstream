@@ -3,13 +3,14 @@ import { useAuth } from '@clerk/clerk-react'
 import type { CreateUserProps } from '@/lib/interfaces'
 import { postUserProfile } from '@/lib/api/postCreateUserProfile'
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const useCreateUserProfile = (
   userId: string,
   onSuccessCallback: () => void,
 ) => {
   const queryClient = useQueryClient()
   const { getToken } = useAuth()
-  
+
   const mutation = useMutation({
     mutationFn: async (userData: CreateUserProps) => {
       const token = await getToken()

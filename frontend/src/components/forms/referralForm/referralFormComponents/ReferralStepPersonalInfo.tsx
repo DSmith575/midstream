@@ -2,7 +2,12 @@ import type { ReferralFormStepProps } from '@/lib/interfaces'
 import { MotionContainer } from '@/components/animation/MotionContainer'
 import { FormInput } from '@/components/forms/formComponents/'
 
-export const StepPersonalInfo = ({ form, delta, header, subtitle }: ReferralFormStepProps) => {
+export const StepPersonalInfo = ({
+  form,
+  delta,
+  header,
+  subtitle,
+}: ReferralFormStepProps) => {
   return (
     <MotionContainer delta={delta} header={header} subtitle={subtitle}>
       <FormInput

@@ -8,8 +8,6 @@ interface ReferralFormViewProps {
 }
 
 export const ReferralFormView = ({ referralForm }: ReferralFormViewProps) => {
-
-
   const InfoRow = ({ label, value }: { label: string; value: any }) => (
     <div className="flex flex-col gap-1">
       <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">

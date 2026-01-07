@@ -4,7 +4,7 @@ import { fetchUserReferralForm } from '@/lib/api/fetchUserReferralForm'
 
 export const useGetReferralForms = (userId: string) => {
   const { getToken } = useAuth()
-  
+
   const { isLoading, isError, data, error, isFetched } = useQuery({
     queryKey: ['referralForms', userId],
     queryFn: async () => {

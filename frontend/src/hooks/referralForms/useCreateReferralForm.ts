@@ -9,7 +9,7 @@ export const useCreateReferralForm = (
 ) => {
   const queryClient = useQueryClient()
   const { getToken } = useAuth()
-  
+
   const mutation = useMutation({
     mutationFn: async (referralData: CreateReferralProps) => {
       const token = await getToken()

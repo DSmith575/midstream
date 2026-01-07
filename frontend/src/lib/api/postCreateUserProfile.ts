@@ -2,13 +2,16 @@ import type { CreateUserProps } from '@/lib/interfaces'
 
 const apiKey = import.meta.env.VITE_API_BACKEND_URL
 
-export const postUserProfile = async (userData: CreateUserProps, token: string) => {
+export const postUserProfile = async (
+  userData: CreateUserProps,
+  token: string,
+) => {
   try {
     const response = await fetch(`${apiKey}userProfiles/createUserProfile`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(userData),
     })
