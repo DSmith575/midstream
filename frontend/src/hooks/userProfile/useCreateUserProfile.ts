@@ -3,8 +3,8 @@ import { useAuth } from '@clerk/clerk-react'
 import type { CreateUserProps } from '@/lib/interfaces'
 import { postUserProfile } from '@/lib/api/postCreateUserProfile'
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const useCreateUserProfile = (
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   userId: string,
   onSuccessCallback: () => void,
 ) => {
