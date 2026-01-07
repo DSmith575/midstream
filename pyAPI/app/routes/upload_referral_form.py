@@ -11,14 +11,12 @@ router = APIRouter()
 
 @router.post(APIRoutes.GENERATE_REFERRAL.value)
 async def generate_referral(
-  metadata: str = Form(...),
-  files: List[UploadFile] = File(...)
+  metadata: str = Form(...)
 ):
   
   """
   Receives:
-  - metadata: Json str from Node containing referral info
-  - files: list of uploaded PDFs
+  - metadata: Json str from Node containing referral info (includes documents with transcribedContent)
   """
 
   try:
@@ -26,14 +24,8 @@ async def generate_referral(
   except json.JSONDecodeError:
     return JSONResponse(status_code=400, content={"error": "Invalid JSON in metadata"})
   
-  saved_files = []
-  for file in files:
-    suffix = Path(file.filename).suffix
-    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as temp_file:
-      content = await file.read()
-      temp_file.write(content)
-      saved_files.append(temp_file.name)
-  built_pdf = await process_referral_with_openai(metadata_dict, saved_files)
+  # No need to handle files anymore - documents are included as transcribedContent in metadata
+  built_pdf = await process_referral_with_openai(metadata_dict, [])
   return built_pdf
 
 # upload referralForm data from prisma database and the audio file pdf

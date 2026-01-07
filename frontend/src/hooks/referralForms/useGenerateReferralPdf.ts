@@ -1,9 +1,15 @@
 import { useMutation } from '@tanstack/react-query'
+import { useAuth } from '@clerk/clerk-react'
 import { generateReferralPdf } from '@/lib/api/generateReferralPdf'
 
 export const useGenerateReferralPdf = () => {
+  const { getToken } = useAuth()
   return useMutation({
-    mutationFn: async (formId: string) => generateReferralPdf(formId),
+    mutationFn: async (formId: string) => {
+      const token = await getToken()
+      if (!token) throw new Error('Not authenticated')
+      return generateReferralPdf(formId, token)
+    },
     onSuccess: (blob, formId) => {
       const url = window.URL.createObjectURL(blob)
       const link = document.createElement('a')

@@ -18,11 +18,27 @@ client = OpenAI(api_key=api_key)
 async def process_referral_with_openai(metadata: dict, pdf_paths: List[str]):
     extracted_text = []
 
+    # Extract text from notes if available
+    if 'notes' in metadata and metadata['notes']:
+        print(f"Processing {len(metadata['notes'])} notes")
+        for note in metadata['notes']:
+            if 'content' in note and note['content']:
+                extracted_text.append(f"Note: {note['content']}")
+
+    # Extract text from documents' transcribedContent if available
+    if 'documents' in metadata and metadata['documents']:
+        for doc in metadata['documents']:
+            if 'transcribedContent' in doc and doc['transcribedContent']:
+                print(f"Using transcribed content from document: {doc.get('name', 'unknown')}")
+                extracted_text.append(doc['transcribedContent'])
+    
+    # Fallback: Process any PDF files if provided (for backwards compatibility)
     for pdf_path in pdf_paths:
         print(f"Extracting text from PDF: {pdf_path}")
         with fitz.open(pdf_path) as doc:
             for page in doc:
                 extracted_text.append(page.get_text())
+    
     extracted_text = "\n".join(extracted_text)
     form_data = await analyze_completions_for_form(extracted_text)
     built_pdf_data = generate_full_referral_form(metadata, form_data)

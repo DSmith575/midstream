@@ -93,31 +93,127 @@ def generate_pdf_with_audio_transcript(paragraphs: list[str], filename: str) -> 
 
 def generate_full_referral_form(metadata: dict, extracted_ai_text: dict):
     pdf_buffer = BytesIO()
-    doc = SimpleDocTemplate(pdf_buffer, pagesize=A4,
-                            rightMargin=50, leftMargin=50,
-                            topMargin=50, bottomMargin=50)
+    doc = SimpleDocTemplate(
+        pdf_buffer, 
+        pagesize=A4,
+        rightMargin=0.75*inch, 
+        leftMargin=0.75*inch,
+        topMargin=0.75*inch, 
+        bottomMargin=0.75*inch
+    )
     
     styles = getSampleStyleSheet()
-    heading_style = ParagraphStyle('ColoredHeading', parent=styles['Heading2'], textColor=colors.black)
-    paragraph_style = styles['BodyText']
+    
+    # Professional color scheme
+    primary_color = colors.HexColor('#2563eb')  # Blue
+    heading_color = colors.HexColor('#1e293b')  # Dark slate
+    text_color = colors.HexColor('#334155')     # Slate
+    meta_color = colors.HexColor('#64748b')     # Light slate
+    
+    # Custom styles
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Title'],
+        fontSize=28,
+        textColor=heading_color,
+        spaceAfter=12,
+        fontName='Helvetica-Bold',
+        alignment=1  # CENTER
+    )
+    
+    subtitle_style = ParagraphStyle(
+        'Subtitle',
+        parent=styles['Normal'],
+        fontSize=14,
+        textColor=primary_color,
+        spaceAfter=20,
+        fontName='Helvetica-Bold',
+        alignment=1  # CENTER
+    )
+    
+    section_heading_style = ParagraphStyle(
+        'SectionHeading',
+        parent=styles['Heading2'],
+        fontSize=16,
+        textColor=primary_color,
+        spaceAfter=10,
+        spaceBefore=16,
+        fontName='Helvetica-Bold',
+        borderWidth=0,
+        borderColor=primary_color,
+        borderPadding=6,
+        backColor=colors.HexColor('#f1f5f9')  # Light background
+    )
+    
+    subsection_heading_style = ParagraphStyle(
+        'SubsectionHeading',
+        parent=styles['Heading3'],
+        fontSize=13,
+        textColor=heading_color,
+        spaceAfter=6,
+        spaceBefore=10,
+        fontName='Helvetica-Bold'
+    )
+    
+    body_style = ParagraphStyle(
+        'CustomBody',
+        parent=styles['BodyText'],
+        fontSize=11,
+        leading=16,
+        textColor=text_color,
+        spaceAfter=10,
+        alignment=4  # JUSTIFY
+    )
+    
+    metadata_style = ParagraphStyle(
+        'Metadata',
+        parent=styles['Normal'],
+        fontSize=10,
+        textColor=meta_color,
+        spaceAfter=4,
+        fontName='Helvetica'
+    )
+    
+    bullet_style = ParagraphStyle(
+        'BulletText',
+        parent=styles['BodyText'],
+        fontSize=10,
+        leading=14,
+        textColor=text_color,
+        spaceAfter=4,
+        leftIndent=20
+    )
 
     story = []
 
-    # Add title
-    story.append(Paragraph(f"{metadata.get('firstName', '')} {metadata.get('lastName', '')} Full Referral Form", styles['Title']))
-    story.append(Spacer(1, 12))
+    # Professional header with horizontal line
+    story.append(Paragraph("Client Referral Form", title_style))
+    story.append(Paragraph(
+        f"{metadata.get('firstName', '')} {metadata.get('lastName', '')}", 
+        subtitle_style
+    ))
+    
+    # Add a visual separator
+    from reportlab.platypus import HRFlowable
+    story.append(HRFlowable(width="100%", thickness=2, color=primary_color, spaceBefore=6, spaceAfter=12))
+    
+    # Add generation metadata
+    story.append(Paragraph(
+        f"<b>Generated:</b> {datetime.now().strftime('%B %d, %Y at %I:%M %p')}", 
+        metadata_style
+    ))
+    story.append(Spacer(1, 20))
 
-    # --- Metadata Section with bullets ---
-    story.append(Paragraph("Referral Metadata", heading_style))
+    # --- Client Information Section ---
+    story.append(Paragraph("Client Information", section_heading_style))
     story.append(Spacer(1, 6))
 
-    def create_bullet_items(data):
+    def create_professional_bullet_items(data):
         items = []
         for section, content in data.items():
-            if not isinstance(content, dict):
+            if not isinstance(content, dict) or section in ['documents', 'notes']:
                 continue
 
-            # Top-level bullet (section title)
             section_title = section.replace('_', ' ').title()
             section_items = []
 
@@ -125,34 +221,52 @@ def generate_full_referral_form(metadata: dict, extracted_ai_text: dict):
                 if key == 'id' or value is None:
                     continue
                 label = key.replace('_', ' ').title()
-                section_items.append(ListItem(Paragraph(f"<b>{label}:</b> {value}", paragraph_style)))
+                section_items.append(
+                    ListItem(Paragraph(f"<b>{label}:</b> {value}", bullet_style))
+                )
 
             if section_items:
-                # Add main bullet for the section
-                items.append(ListItem(Paragraph(f"<b>{section_title}:</b>", paragraph_style)))
-                # Add nested bullets
+                items.append(ListItem(Paragraph(f"<b>{section_title}</b>", bullet_style)))
                 items.extend(section_items)
         return items
 
-    story.append(ListFlowable(create_bullet_items(metadata), bulletType='bullet', leftIndent=12))
-    story.append(Spacer(1, 12))
+    bullet_items = create_professional_bullet_items(metadata)
+    if bullet_items:
+        story.append(ListFlowable(
+            bullet_items, 
+            bulletType='bullet',
+            leftIndent=12,
+            bulletFontSize=8,
+            bulletColor=primary_color
+        ))
+    story.append(Spacer(1, 16))
 
-    # --- AI Extracted Text Section ---
-    story.append(Paragraph("AI Extracted Information", heading_style))
-    story.append(Spacer(1, 6))
+    # --- Notes Section ---
+    if 'notes' in metadata and metadata['notes']:
+        story.append(Paragraph("Case Notes", section_heading_style))
+        story.append(Spacer(1, 6))
+        for i, note in enumerate(metadata['notes'], 1):
+            if isinstance(note, dict) and 'content' in note:
+                story.append(Paragraph(f"<b>Note {i}:</b>", subsection_heading_style))
+                story.append(Paragraph(note['content'], body_style))
+        story.append(Spacer(1, 16))
+
+    # --- AI Extracted Information Section ---
+    story.append(Paragraph("Assessment Summary", section_heading_style))
+    story.append(Spacer(1, 8))
 
     for section, items in extracted_ai_text.items():
-        story.append(Paragraph(section, heading_style))
-        story.append(Spacer(1, 6))
+        section_title = section.replace('_', ' ').title()
+        story.append(Paragraph(section_title, subsection_heading_style))
+        story.append(Spacer(1, 4))
 
         for item, response in items.items():
-            # Add item as the subheading
-            story.append(Paragraph(item, styles['Heading3']))
-
-            # Add the response as a paragraph
-            story.append(Paragraph(
-                str(response) if response else "No relevant information found.", paragraph_style))
-            story.append(Spacer(1, 6))
+            item_label = item.replace('_', ' ').title()
+            story.append(Paragraph(f"<b>{item_label}</b>", bullet_style))
+            
+            response_text = str(response) if response else "No relevant information found."
+            story.append(Paragraph(response_text, body_style))
+            story.append(Spacer(1, 8))
 
     doc.build(story)
     pdf_buffer.seek(0)

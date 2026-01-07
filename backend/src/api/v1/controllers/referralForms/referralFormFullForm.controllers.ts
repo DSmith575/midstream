@@ -11,6 +11,7 @@ const REFERRAL_FORM_INCLUDE = {
 	disability: true,
 	additionalInformation: true,
 	documents: true,
+	notes: true,
 };
 
 // Helper functions
@@ -18,22 +19,11 @@ const sendError = (res: Response, status: number, message: string) => {
 	return res.status(status).json({ message });
 };
 
-const createPdfBlob = (doc: any): Blob => {
-	const byteArray = Object.values(doc.rawBytes);
-	const uint8Array = new Uint8Array(byteArray as any);
-	return new Blob([uint8Array], { type: "application/pdf" });
-};
-
 const sendReferralToPythonService = async (referralForm: any) => {
 	const form = new FormData();
-	const { documents, ...metadataWithoutDocs } = referralForm;
-
-	form.append("metadata", JSON.stringify(metadataWithoutDocs));
-
-	for (const doc of documents) {
-		const blob = createPdfBlob(doc);
-		form.append("files", blob, doc.name);
-	}
+	
+	// Send the entire referralForm as metadata (including documents as transcribed content)
+	form.append("metadata", JSON.stringify(referralForm));
 
 	const response = await fetch(`${PYTHON_API_URL}generate-referral`, {
 		method: "POST",
@@ -41,7 +31,9 @@ const sendReferralToPythonService = async (referralForm: any) => {
 	});
 
 	if (!response.ok) {
-		throw new Error(`Python API error: ${response.statusText}`);
+		const errorText = await response.text();
+		console.error("Python API error response:", errorText);
+		throw new Error(`Python API error: ${response.statusText} - ${errorText}`);
 	}
 
 	return response;
@@ -85,6 +77,7 @@ const generateFullReferralForm = async (
 			disability: referralFormData.disability,
 			additionalInformation: referralFormData.additionalInformation,
 			documents: referralFormData.documents,
+			notes: referralFormData.notes || [],
 		};
 
 		const pythonResponse = await sendReferralToPythonService(referralForm);
