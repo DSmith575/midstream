@@ -103,8 +103,27 @@ export const createReferralNoteSchema = z.object({
 
 /**
  * Validation schema for checklist update
+ * Accepts either a specific field/value pair OR a partial object
+ * with one or more boolean fields (audio, notes, review, submit).
  */
-export const updateChecklistSchema = z.object({
-  checklistField: z.enum(['audio', 'notes', 'review', 'submit']),
-  value: z.boolean(),
-});
+export const updateChecklistSchema = z.union([
+  z.object({
+    checklistField: z.enum(['audio', 'notes', 'review', 'submit']),
+    value: z.boolean(),
+  }),
+  z
+    .object({
+      audio: z.boolean().optional(),
+      notes: z.boolean().optional(),
+      review: z.boolean().optional(),
+      submit: z.boolean().optional(),
+    })
+    .refine(
+      (obj) =>
+        typeof obj.audio === 'boolean' ||
+        typeof obj.notes === 'boolean' ||
+        typeof obj.review === 'boolean' ||
+        typeof obj.submit === 'boolean',
+      { message: 'At least one checklist field must be provided' }
+    ),
+]);
