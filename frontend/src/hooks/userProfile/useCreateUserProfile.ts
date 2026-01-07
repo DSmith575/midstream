@@ -4,12 +4,13 @@ import type { CreateUserProps } from '@/lib/interfaces'
 import { postUserProfile } from '@/lib/api/postCreateUserProfile'
 
 export const useCreateUserProfile = (
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   userId: string,
   onSuccessCallback: () => void,
 ) => {
   const queryClient = useQueryClient()
   const { getToken } = useAuth()
+  // Mark parameter as intentionally unused for TypeScript (TS6133)
+  void userId
 
   const mutation = useMutation({
     mutationFn: async (userData: CreateUserProps) => {
