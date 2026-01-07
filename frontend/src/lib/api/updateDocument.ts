@@ -3,6 +3,7 @@ const apiKey = import.meta.env.VITE_API_BACKEND_URL
 export const updateDocumentTranscribedContent = async (
   documentId: string,
   transcribedContent: string,
+  token: string,
 ): Promise<any> => {
   const response = await fetch(
     `${apiKey}referral-documents/document/${documentId}`,
@@ -10,6 +11,7 @@ export const updateDocumentTranscribedContent = async (
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
       },
       body: JSON.stringify({ transcribedContent }),
     },
