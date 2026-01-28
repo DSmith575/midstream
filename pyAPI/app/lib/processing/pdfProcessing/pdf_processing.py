@@ -268,6 +268,32 @@ def generate_full_referral_form(metadata: dict, extracted_ai_text: dict):
             story.append(Paragraph(response_text, body_style))
             story.append(Spacer(1, 8))
 
+    story.append(PageBreak())
+
+    # --- PDF Summary Section ---
+    if 'pdf_summary' in metadata and metadata['pdf_summary']:
+        story.append(Paragraph("Overall Assessment Summary", section_heading_style))
+        story.append(Spacer(1, 8))
+        story.append(Paragraph(metadata['pdf_summary'], body_style))
+        story.append(Spacer(1, 16))
+
+    # --- Support Keywords Section ---
+    if 'support_keywords' in metadata and metadata['support_keywords']:
+        story.append(Paragraph("Recommended Areas of Support", section_heading_style))
+        story.append(Spacer(1, 8))
+        
+        support_data = metadata['support_keywords']
+        if isinstance(support_data, dict) and 'primary_needs' in support_data:
+            for need in support_data['primary_needs']:
+                if isinstance(need, dict):
+                    category = need.get('category', 'Support Area')
+                    description = need.get('description', '')
+                    story.append(Paragraph(f"<b>{category}</b>", subsection_heading_style))
+                    story.append(Paragraph(description, body_style))
+                    story.append(Spacer(1, 8))
+        
+        story.append(Spacer(1, 16))
+
     doc.build(story)
     pdf_buffer.seek(0)
     pdf_buffer.name = f"{metadata.get('firstName', '')}-{metadata.get('lastName', '')}-full-referral-form.pdf"
