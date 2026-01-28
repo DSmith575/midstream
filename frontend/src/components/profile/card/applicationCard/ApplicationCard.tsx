@@ -4,6 +4,7 @@ import { ChecklistItem } from './ChecklistItem'
 import { RecordAudioButton } from './RecordAudioButton'
 import { ApplicationCardHeader } from './ApplicationCardHeader'
 import { AddNotesDialog } from './AddNotesDialog'
+import { MobilityParkingDialog } from './MobilityParkingDialog'
 import { UserReferralFormView } from '@/components/referralForms/UserReferralFormView'
 import { Spinner } from '@/components/spinner/Spinner'
 import { UploadSpinner } from '@/components/spinner'
@@ -194,6 +195,13 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
                             <FileUp className="h-4 w-4" />
                             Generate file
                           </Button>
+
+                          {form?.mobilityIssues && (
+                            <MobilityParkingDialog
+                              referralForm={form}
+                              disabled={generatePending}
+                            />
+                          )}
                         </div>
                       </div>
 

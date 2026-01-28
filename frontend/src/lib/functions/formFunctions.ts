@@ -147,6 +147,7 @@ export const buildReferralDetails = (
     disabilityDetails,
     disabilityReasonForReferral,
     disabilitySupportRequired,
+    hasMobilityIssues,
     safety,
     otherImportantInformation,
     referrerFirstName,
@@ -204,6 +205,7 @@ export const buildReferralDetails = (
     },
     disabilityInfo: {
       disabilityType,
+      hasMobilityIssues,
       disabilityDetails,
       disabilityReasonForReferral,
       disabilitySupportRequired,

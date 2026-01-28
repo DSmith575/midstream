@@ -86,6 +86,7 @@ const createReferralForm = async (
 
 		const { googleId, companyId, languageInfo, doctorInfo, disabilityInfo, additionalInfo, referrerInfo, emergencyContactInfo, consentInfo } = req.body;
 
+
 		const userExists = await findUserByGoogleId(googleId);
 		if (!userExists) {
 			return sendError(res, statusCodes.badRequest, "User does not exist");
@@ -109,6 +110,7 @@ const createReferralForm = async (
 				},
 			});
 
+
 			const referralDoctorData = await prisma.referralMedical.create({
 				data: {
 					doctorName: doctorInfo.doctorName,
@@ -129,6 +131,7 @@ const createReferralForm = async (
 					disabilitySupportRequired: disabilityInfo.disabilitySupportRequired,
 				},
 			});
+
 
 			const referralAdditionalData = await prisma.additionalInformation.create({
 				data: {
@@ -167,6 +170,8 @@ const createReferralForm = async (
 				},
 			});
 
+
+
 			return prisma.referralForm.create({
 				data: {
 					userId: userExists.id,
@@ -182,6 +187,7 @@ const createReferralForm = async (
 					checklistNotesComplete: false,
 					checklistReviewComplete: false,
 					checklistSubmitComplete: false,
+					mobilityIssues: disabilityInfo.hasMobilityIssues === "Yes",
 				},
 			});
 		});

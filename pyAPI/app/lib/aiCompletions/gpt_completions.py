@@ -94,6 +94,8 @@ async def get_relevant_information(section, text):
               f"If there is nothing related to {section}, please just return No information found."
               )
     
+    # prioity list, suggest what services the person may need
+    
     try:
         response = client.chat.completions.create(
             model="gpt-3.5-turbo",

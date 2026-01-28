@@ -57,6 +57,9 @@ export const referralFormSchema = z
       .string()
       .nonempty({ message: 'Please select an option.' }),
     disabilityDetails: z.string().optional(),
+    hasMobilityIssues: z
+      .string()
+      .nonempty({ message: 'Please select an option.' }),
     disabilityReasonForReferral: z.string().max(150).nonempty({
       message: 'Please enter the reason you are filling this application.',
     }),

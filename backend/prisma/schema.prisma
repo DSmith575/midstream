@@ -32,27 +32,27 @@ enum UserRole {
   MIDSTREAM
 }
 
-enum  DocumentType {
+enum DocumentType {
   PDF
 }
 
 model User {
-  id                  String               @id @default(uuid())
-  googleId            String               @unique
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @default(now()) @updatedAt
+  id                  String                    @id @default(uuid())
+  googleId            String                    @unique
+  createdAt           DateTime                  @default(now())
+  updatedAt           DateTime                  @default(now()) @updatedAt
   contactInformation  ContactInformation?
   personalInformation PersonalInformation?
   addressInformation  AddressInformation?
   companyId           String?
-  company             Company?             @relation(fields: [companyId], references: [id])
-  createdReferrals    ReferralForm[]       @relation("CreatedReferrals")
-  assignedReferrals   ReferralForm[]       @relation("AssignedReferrals")
-  casesCompleted      Int?                 @default(0)
-  casesAssigned       Int?                 @default(0)
-  role                UserRole             @default(CLIENT)
-  serviceCase         ServiceCase[]        @relation("userServiceCase")
-  workerServiceCases  ServiceCase[]        @relation("caseWorkerServiceCase")
+  company             Company?                  @relation(fields: [companyId], references: [id])
+  createdReferrals    ReferralForm[]            @relation("CreatedReferrals")
+  assignedReferrals   ReferralForm[]            @relation("AssignedReferrals")
+  casesCompleted      Int?                      @default(0)
+  casesAssigned       Int?                      @default(0)
+  role                UserRole                  @default(CLIENT)
+  serviceCase         ServiceCase[]             @relation("userServiceCase")
+  workerServiceCases  ServiceCase[]             @relation("caseWorkerServiceCase")
   servicePlanComments ServicePlanEntryComment[]
 }
 
@@ -105,6 +105,7 @@ model ReferralForm {
   checklistNotesComplete  Boolean                @default(false)
   checklistReviewComplete Boolean                @default(false)
   checklistSubmitComplete Boolean                @default(false)
+  mobilityIssues          Boolean                @default(false)
   communicationId         String                 @unique
   medicalId               String                 @unique
   disabilityId            String                 @unique
@@ -235,52 +236,52 @@ model ReferralNote {
 }
 
 model ServicePlan {
-  id            String              @id @default(uuid())
-  createdAt     DateTime            @default(now())
-  updatedAt     DateTime            @default(now()) @updatedAt
-  serviceCaseId String              @unique
+  id            String             @id @default(uuid())
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @default(now()) @updatedAt
+  serviceCaseId String             @unique
   services      ServicePlanEntry[]
-  serviceCase   ServiceCase         @relation(fields: [serviceCaseId], references: [id])
+  serviceCase   ServiceCase        @relation(fields: [serviceCaseId], references: [id])
 }
 
 model ServiceCategory {
-  id                  String            @id @default(uuid())
-  serviceName         String            @unique
-  flexibleHours       Boolean
+  id                 String             @id @default(uuid())
+  serviceName        String             @unique
+  flexibleHours      Boolean
   // Might be useful down the line
   // parentCategoryId    String?
   // parentCategory      ServiceCategory   @relation(fields: [parentCategoryId], references: [id])
-  servicePlanEntries  ServicePlanEntry[]
+  servicePlanEntries ServicePlanEntry[]
 }
 
 model ServicePlanEntry {
-  id                String          @id @default(uuid())
+  id                String                    @id @default(uuid())
   servicePlanId     String
   serviceCategoryId String
-  allocatedMinutes  Int             // Store as int minutes, convert to fractional hours in code
-  servicePlan       ServicePlan     @relation(fields: [servicePlanId], references: [id])
-  serviceCategory   ServiceCategory @relation(fields: [serviceCategoryId], references: [id])
+  allocatedMinutes  Int // Store as int minutes, convert to fractional hours in code
+  servicePlan       ServicePlan               @relation(fields: [servicePlanId], references: [id])
+  serviceCategory   ServiceCategory           @relation(fields: [serviceCategoryId], references: [id])
   comments          ServicePlanEntryComment[]
 }
 
 model ServicePlanEntryComment {
-  id                  String            @id @default(uuid())
-  servicePlanEntryId  String
-  comment             String
-  authorId            String
-  servicePlanEntry    ServicePlanEntry  @relation(fields: [servicePlanEntryId], references: [id])
-  author              User              @relation(fields: [authorId], references: [id])
+  id                 String           @id @default(uuid())
+  servicePlanEntryId String
+  comment            String
+  authorId           String
+  servicePlanEntry   ServicePlanEntry @relation(fields: [servicePlanEntryId], references: [id])
+  author             User             @relation(fields: [authorId], references: [id])
 }
 
 model ServiceCase {
-  id                  String            @id @default(uuid())
-  userId              String
-  workerId            String
-  referralFormId      String?           @unique
+  id             String        @id @default(uuid())
+  userId         String
+  workerId       String
+  referralFormId String?       @unique
   // assessmentId     String
-  user                User              @relation("userServiceCase", fields: [userId], references: [id])
-  caseWorker          User              @relation("caseWorkerServiceCase", fields: [workerId], references: [id])
-  referralForm        ReferralForm?     @relation(fields: [referralFormId], references: [id])
+  user           User          @relation("userServiceCase", fields: [userId], references: [id])
+  caseWorker     User          @relation("caseWorkerServiceCase", fields: [workerId], references: [id])
+  referralForm   ReferralForm? @relation(fields: [referralFormId], references: [id])
   // assessment       Assessment        @relation(fields: [assessmentId], references: [id])
-  servicePlan         ServicePlan?
+  servicePlan    ServicePlan?
 }

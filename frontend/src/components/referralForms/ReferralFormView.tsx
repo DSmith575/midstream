@@ -160,6 +160,11 @@ export const ReferralFormView = ({ referralForm }: ReferralFormViewProps) => {
             label="Disability Type"
             value={referralForm.disability?.disabilityType}
           />
+
+          <InfoRow
+            label="Has Mobility Issues"
+            value={referralForm.mobilityIssues ? 'Yes' : 'No'}
+          />
           {referralForm.disability?.disabilityDetails && (
             <InfoRow
               label="Details"

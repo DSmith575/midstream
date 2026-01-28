@@ -1,7 +1,7 @@
 import type { ReferralFormStepProps } from '@/lib/interfaces'
 import { MotionContainer } from '@/components/animation/MotionContainer'
 import { FormInput, FormSelect } from '@/components/forms/formComponents/'
-import { referralFormDisabilityOptions } from '@/lib/formOptions/referralFormOptions'
+import { referralFormDisabilityOptions, yesOrNo } from '@/lib/formOptions/referralFormOptions'
 import { SelectItem } from '@/components/ui/select'
 
 const renderSelectOptions = (options: string[]) =>
@@ -31,6 +31,13 @@ export const StepDisabilityInfo = ({
         fieldName="disabilityDetails"
         formLabel="Disability Details/Other Medical/Health Issues (if any)"
         placeholder="Sleep disturbances, Sensory processing issues"
+      />
+      <FormSelect
+        control={form.control}
+        fieldName="hasMobilityIssues"
+        formLabel="Does the person have mobility issues?"
+        selectPlaceholder="Select Yes or No"
+        children={renderSelectOptions(yesOrNo)}
       />
       <FormInput
         control={form.control}

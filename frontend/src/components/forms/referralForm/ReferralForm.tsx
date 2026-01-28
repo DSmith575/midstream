@@ -53,6 +53,9 @@ export const ReferralForm = () => {
     if (valid) next()
   }
 
+  console.log(form.getValues())
+
+
   return (
     <FormProvider {...form}>
       <Form {...form}>
