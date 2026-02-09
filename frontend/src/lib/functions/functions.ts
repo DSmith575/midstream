@@ -18,7 +18,19 @@ export const formatDate = (dateString: string) => {
 }
 
 export const getUserAge = (dateOfBirth: string) => {
-  const userAge = new Date().getFullYear() - new Date(dateOfBirth).getFullYear()
+  if (!dateOfBirth) return 'N/A'
+  const dob = new Date(dateOfBirth)
+  if (Number.isNaN(dob.getTime())) return 'N/A'
+
+  const today = new Date()
+  let userAge = today.getFullYear() - dob.getFullYear()
+
+  const hasHadBirthdayThisYear =
+    today.getMonth() > dob.getMonth() ||
+    (today.getMonth() === dob.getMonth() && today.getDate() >= dob.getDate())
+
+  if (!hasHadBirthdayThisYear) userAge -= 1
+
   return userAge.toString()
 }
 

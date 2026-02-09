@@ -5,6 +5,8 @@ from reportlab.lib.units import inch
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, ListFlowable, ListItem, PageBreak
 import os
 import pymupdf
+import json
+import re
 from datetime import datetime
 from fastapi.responses import StreamingResponse
 from io import BytesIO
@@ -208,19 +210,26 @@ def generate_full_referral_form(metadata: dict, extracted_ai_text: dict):
     story.append(Paragraph("Client Information", section_heading_style))
     story.append(Spacer(1, 6))
 
+    def format_label(text: str) -> str:
+        if not text:
+            return ''
+        spaced = re.sub(r'(?<!^)([A-Z])', r' \1', str(text))
+        spaced = spaced.replace('_', ' ')
+        return spaced.title().strip()
+
     def create_professional_bullet_items(data):
         items = []
         for section, content in data.items():
-            if not isinstance(content, dict) or section in ['documents', 'notes']:
+            if not isinstance(content, dict) or section in ['documents', 'notes', 'pdf_summary', 'support_keywords']:
                 continue
 
-            section_title = section.replace('_', ' ').title()
+            section_title = format_label(section)
             section_items = []
 
             for key, value in content.items():
                 if key == 'id' or value is None:
                     continue
-                label = key.replace('_', ' ').title()
+                label = format_label(key)
                 section_items.append(
                     ListItem(Paragraph(f"<b>{label}:</b> {value}", bullet_style))
                 )
@@ -256,12 +265,12 @@ def generate_full_referral_form(metadata: dict, extracted_ai_text: dict):
     story.append(Spacer(1, 8))
 
     for section, items in extracted_ai_text.items():
-        section_title = section.replace('_', ' ').title()
+        section_title = format_label(section)
         story.append(Paragraph(section_title, subsection_heading_style))
         story.append(Spacer(1, 4))
 
         for item, response in items.items():
-            item_label = item.replace('_', ' ').title()
+            item_label = format_label(item)
             story.append(Paragraph(f"<b>{item_label}</b>", bullet_style))
             
             response_text = str(response) if response else "No relevant information found."
@@ -274,8 +283,54 @@ def generate_full_referral_form(metadata: dict, extracted_ai_text: dict):
     if 'pdf_summary' in metadata and metadata['pdf_summary']:
         story.append(Paragraph("Overall Assessment Summary", section_heading_style))
         story.append(Spacer(1, 8))
-        story.append(Paragraph(metadata['pdf_summary'], body_style))
-        story.append(Spacer(1, 16))
+
+        def stringify_summary_value(value):
+            if isinstance(value, dict):
+                parts = []
+                for key, inner_value in value.items():
+                    label = str(key).replace('_', ' ').title()
+                    inner_text = stringify_summary_value(inner_value)
+                    if inner_text:
+                        parts.append(f"{label}: {inner_text}")
+                return "; ".join(parts)
+            if isinstance(value, list):
+                return "; ".join([str(item) for item in value if item])
+            if value is None:
+                return ""
+            return str(value)
+
+        def normalize_pdf_summary(summary_value):
+            if isinstance(summary_value, dict):
+                if isinstance(summary_value.get('paragraphs'), list):
+                    return [p for p in summary_value['paragraphs'] if p]
+                if 'summary' in summary_value:
+                    return normalize_pdf_summary(summary_value['summary'])
+                paragraphs = []
+                for key, value in summary_value.items():
+                    label = str(key).replace('_', ' ').title()
+                    text = stringify_summary_value(value)
+                    if text:
+                        paragraphs.append(f"{label}: {text}")
+                return paragraphs
+            if isinstance(summary_value, list):
+                return [str(item) for item in summary_value if item]
+            if isinstance(summary_value, str):
+                stripped = summary_value.strip()
+                if stripped.startswith('{') or stripped.startswith('['):
+                    try:
+                        parsed = json.loads(stripped)
+                        return normalize_pdf_summary(parsed)
+                    except json.JSONDecodeError:
+                        return [summary_value]
+                return [summary_value]
+            return [str(summary_value)]
+
+        summary_paragraphs = normalize_pdf_summary(metadata['pdf_summary'])
+        for paragraph in summary_paragraphs:
+            story.append(Paragraph(paragraph, body_style))
+            story.append(Spacer(1, 6))
+
+        story.append(Spacer(1, 10))
 
     # --- Support Keywords Section ---
     if 'support_keywords' in metadata and metadata['support_keywords']:
@@ -284,13 +339,22 @@ def generate_full_referral_form(metadata: dict, extracted_ai_text: dict):
         
         support_data = metadata['support_keywords']
         if isinstance(support_data, dict) and 'primary_needs' in support_data:
-            for need in support_data['primary_needs']:
-                if isinstance(need, dict):
-                    category = need.get('category', 'Support Area')
-                    description = need.get('description', '')
-                    story.append(Paragraph(f"<b>{category}</b>", subsection_heading_style))
-                    story.append(Paragraph(description, body_style))
-                    story.append(Spacer(1, 8))
+            primary_needs = support_data.get('primary_needs', [])
+            if isinstance(primary_needs, list):
+                for need in primary_needs:
+                    if isinstance(need, dict):
+                        category = need.get('category', 'Support Area')
+                        description = need.get('description', '')
+                        story.append(Paragraph(f"<b>{category}</b>", subsection_heading_style))
+                        if description:
+                            story.append(Paragraph(description, body_style))
+                        story.append(Spacer(1, 8))
+                    elif need:
+                        story.append(Paragraph(str(need), body_style))
+                        story.append(Spacer(1, 6))
+            else:
+                story.append(Paragraph(str(primary_needs), body_style))
+                story.append(Spacer(1, 6))
         
         story.append(Spacer(1, 16))
 

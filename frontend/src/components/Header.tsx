@@ -83,7 +83,7 @@ export const Header = () => {
                 </SignedIn>
                 <LinkComponent
                   linkRef={routeConstants.dashboard}
-                  linkName="Dashboard"
+                  linkName="My Story"
                 />
               </div>
             )}
