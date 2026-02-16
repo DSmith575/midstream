@@ -156,6 +156,24 @@ def generate_full_referral_form(metadata: dict, extracted_ai_text: dict):
         spaceBefore=10,
         fontName='Helvetica-Bold'
     )
+
+    assessment_subsection_palette = [
+        colors.HexColor('#0f766e'),
+        colors.HexColor('#1d4ed8'),
+        colors.HexColor('#7c3aed'),
+        colors.HexColor('#be123c'),
+        colors.HexColor('#b45309'),
+        colors.HexColor('#15803d')
+    ]
+
+    def get_colored_subsection_style(color, index):
+        return ParagraphStyle(
+            f'AssessmentSubsection_{index}',
+            parent=subsection_heading_style,
+            backColor=color,
+            textColor=colors.white,
+            borderPadding=4
+        )
     
     body_style = ParagraphStyle(
         'CustomBody',
@@ -264,9 +282,13 @@ def generate_full_referral_form(metadata: dict, extracted_ai_text: dict):
     story.append(Paragraph("Assessment Summary", section_heading_style))
     story.append(Spacer(1, 8))
 
-    for section, items in extracted_ai_text.items():
+    for idx, (section, items) in enumerate(extracted_ai_text.items()):
         section_title = format_label(section)
-        story.append(Paragraph(section_title, subsection_heading_style))
+        subsection_color = assessment_subsection_palette[idx % len(assessment_subsection_palette)]
+        story.append(Paragraph(
+            section_title,
+            get_colored_subsection_style(subsection_color, idx)
+        ))
         story.append(Spacer(1, 4))
 
         for item, response in items.items():

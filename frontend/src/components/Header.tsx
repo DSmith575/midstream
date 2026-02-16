@@ -105,7 +105,7 @@ export const Header = () => {
               <>
                 <LinkComponent
                   linkRef={routeConstants.dashboard}
-                  linkName="Dashboard"
+                  linkName="My Story"
                   onClick={() => setOpen(false)}
                 />
               </>
