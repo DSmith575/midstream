@@ -10,6 +10,11 @@ import re
 from datetime import datetime
 from fastapi.responses import StreamingResponse
 from io import BytesIO
+from app.lib.utils.color_mapping import (
+    highlight_keywords_in_text, 
+    get_category_color_object,
+    detect_categories_in_text
+)
 
 def generate_pdf_with_audio_transcript(paragraphs: list[str], filename: str) -> BytesIO:
     """
@@ -95,71 +100,100 @@ def generate_pdf_with_audio_transcript(paragraphs: list[str], filename: str) -> 
 
 def generate_full_referral_form(metadata: dict, extracted_ai_text: dict):
     pdf_buffer = BytesIO()
+    
+    # Create a template with header and footer support
+    class NumberedCanvas:
+        def __init__(self, *args, **kwargs):
+            self.page_number = 0
+    
     doc = SimpleDocTemplate(
         pdf_buffer, 
         pagesize=A4,
-        rightMargin=0.75*inch, 
-        leftMargin=0.75*inch,
-        topMargin=0.75*inch, 
-        bottomMargin=0.75*inch
+        rightMargin=0.8*inch, 
+        leftMargin=0.8*inch,
+        topMargin=1.0*inch, 
+        bottomMargin=0.8*inch,
+        title="Client Referral Form",
+        creator="Midstream"
     )
     
     styles = getSampleStyleSheet()
     
-    # Professional color scheme
-    primary_color = colors.HexColor('#2563eb')  # Blue
-    heading_color = colors.HexColor('#1e293b')  # Dark slate
-    text_color = colors.HexColor('#334155')     # Slate
+    # Professional color scheme - refined
+    primary_color = colors.HexColor('#1e40af')  # Professional blue
+    heading_color = colors.HexColor('#0f172a')  # Almost black
+    accent_color = colors.HexColor('#0369a1')   # Lighter blue
+    text_color = colors.HexColor('#1e293b')     # Dark slate
+    light_text = colors.HexColor('#475569')     # Medium slate
     meta_color = colors.HexColor('#64748b')     # Light slate
+    border_color = colors.HexColor('#cbd5e1')   # Very light slate
     
-    # Custom styles
+    # Custom styles with professional typography
     title_style = ParagraphStyle(
         'CustomTitle',
         parent=styles['Title'],
-        fontSize=28,
+        fontSize=32,
         textColor=heading_color,
-        spaceAfter=12,
+        spaceAfter=6,
+        spaceBefore=0,
         fontName='Helvetica-Bold',
-        alignment=1  # CENTER
+        alignment=0,  # LEFT for professional look
+        leading=38
     )
     
     subtitle_style = ParagraphStyle(
         'Subtitle',
         parent=styles['Normal'],
-        fontSize=14,
+        fontSize=18,
         textColor=primary_color,
-        spaceAfter=20,
+        spaceAfter=2,
         fontName='Helvetica-Bold',
-        alignment=1  # CENTER
+        alignment=0
+    )
+    
+    metadata_header_style = ParagraphStyle(
+        'MetadataHeader',
+        parent=styles['Normal'],
+        fontSize=9,
+        textColor=meta_color,
+        spaceAfter=10,
+        fontName='Helvetica',
+        alignment=0,
+        leading=11
     )
     
     section_heading_style = ParagraphStyle(
         'SectionHeading',
         parent=styles['Heading2'],
-        fontSize=16,
-        textColor=primary_color,
-        spaceAfter=10,
-        spaceBefore=16,
+        fontSize=14,
+        textColor=colors.white,
+        spaceAfter=6,
+        spaceBefore=12,
         fontName='Helvetica-Bold',
-        borderWidth=0,
+        borderWidth=1,
         borderColor=primary_color,
-        borderPadding=6,
-        backColor=colors.HexColor('#f1f5f9')  # Light background
+        borderPadding=8,
+        backColor=primary_color,
+        borderRadius=4
     )
     
     subsection_heading_style = ParagraphStyle(
         'SubsectionHeading',
         parent=styles['Heading3'],
-        fontSize=13,
+        fontSize=12,
         textColor=heading_color,
-        spaceAfter=6,
-        spaceBefore=10,
-        fontName='Helvetica-Bold'
+        spaceAfter=3,
+        spaceBefore=6,
+        fontName='Helvetica-Bold',
+        borderBottomWidth=2,
+        borderBottomColor=accent_color,
+        borderBottomStyle='solid',
+        paddingBottom=4
     )
 
     assessment_subsection_palette = [
         colors.HexColor('#0f766e'),
-        colors.HexColor('#1d4ed8'),
+        colors.HexColor('#1e40af'),
         colors.HexColor('#7c3aed'),
         colors.HexColor('#be123c'),
         colors.HexColor('#b45309'),
@@ -172,26 +206,34 @@ def generate_full_referral_form(metadata: dict, extracted_ai_text: dict):
             parent=subsection_heading_style,
             backColor=color,
             textColor=colors.white,
-            borderPadding=4
+            fontName='Helvetica-Bold',
+            fontSize=11,
+            borderWidth=0,
+            borderPadding=6,
+            spaceBefore=12,
+            spaceAfter=6
         )
     
     body_style = ParagraphStyle(
         'CustomBody',
         parent=styles['BodyText'],
-        fontSize=11,
-        leading=16,
+        fontSize=10,
+        leading=15,
         textColor=text_color,
-        spaceAfter=10,
-        alignment=4  # JUSTIFY
+        spaceAfter=3,
+        alignment=4,  # JUSTIFY for professional appearance
+        leftIndent=0,
+        rightIndent=0
     )
     
     metadata_style = ParagraphStyle(
         'Metadata',
         parent=styles['Normal'],
-        fontSize=10,
+        fontSize=9,
         textColor=meta_color,
-        spaceAfter=4,
-        fontName='Helvetica'
+        spaceAfter=3,
+        fontName='Helvetica',
+        leading=11
     )
     
     bullet_style = ParagraphStyle(
@@ -200,33 +242,55 @@ def generate_full_referral_form(metadata: dict, extracted_ai_text: dict):
         fontSize=10,
         leading=14,
         textColor=text_color,
-        spaceAfter=4,
-        leftIndent=20
+        spaceAfter=3,
+        leftIndent=20,
+        rightIndent=0
+    )
+    
+    info_row_style = ParagraphStyle(
+        'InfoRow',
+        parent=styles['Normal'],
+        fontSize=10,
+        textColor=text_color,
+        spaceAfter=6,
+        leading=13
     )
 
     story = []
-
-    # Professional header with horizontal line
-    story.append(Paragraph("Client Referral Form", title_style))
+    
+    # ============= PROFESSIONAL HEADER =============
+    
+    # Title and client name
+    story.append(Paragraph("CLIENT REFERRAL FORM", title_style))
+    story.append(Spacer(1, 4))
     story.append(Paragraph(
         f"{metadata.get('firstName', '')} {metadata.get('lastName', '')}", 
         subtitle_style
     ))
+    story.append(Spacer(1, 10))
     
-    # Add a visual separator
+    # Metadata bar
+    generated_date = datetime.now().strftime('%B %d, %Y')
+    generated_time = datetime.now().strftime('%I:%M %p')
+    metadata_text = f"<b>Generated:</b> {generated_date} | <b>Time:</b> {generated_time}"
+    story.append(Paragraph(metadata_text, metadata_header_style))
+    
+    # Professional divider
     from reportlab.platypus import HRFlowable
-    story.append(HRFlowable(width="100%", thickness=2, color=primary_color, spaceBefore=6, spaceAfter=12))
+    story.append(HRFlowable(width="100%", thickness=2, color=primary_color, spaceBefore=4, spaceAfter=12))
+
+    story.append(Spacer(1, 8))
     
-    # Add generation metadata
+    # Add color coding explanation - professional note
     story.append(Paragraph(
-        f"<b>Generated:</b> {datetime.now().strftime('%B %d, %Y at %I:%M %p')}", 
+        "<i>Visual Mapping: Keywords are color-coded by assessment category throughout this document for consistent cross-referencing between clinical notes and recommendations.</i>",
         metadata_style
     ))
-    story.append(Spacer(1, 20))
+    story.append(Spacer(1, 10))
 
-    # --- Client Information Section ---
+    # ============= CLIENT INFORMATION SECTION =============
     story.append(Paragraph("Client Information", section_heading_style))
-    story.append(Spacer(1, 6))
+    story.append(Spacer(1, 10))
 
     def format_label(text: str) -> str:
         if not text:
@@ -235,76 +299,202 @@ def generate_full_referral_form(metadata: dict, extracted_ai_text: dict):
         spaced = spaced.replace('_', ' ')
         return spaced.title().strip()
 
-    def create_professional_bullet_items(data):
+    def format_value(value):
+        """Format value: convert True to 'Yes', False to 'No', handle None"""
+        if value is None:
+            return None
+        if isinstance(value, bool):
+            return "Yes" if value is True else "No"
+        return str(value)
+
+    def render_section_items(section_name, content, story_items):
+        """Render a section with its items, converting booleans to Yes/No"""
+        if not isinstance(content, dict):
+            return
+        
         items = []
-        for section, content in data.items():
-            if not isinstance(content, dict) or section in ['documents', 'notes', 'pdf_summary', 'support_keywords']:
+        for key, value in content.items():
+            if key == 'id' or value is None:
                 continue
+            
+            formatted_value = format_value(value)
+            if formatted_value is None:  # Skip only truly None values
+                continue
+            
+            label = format_label(key)
+            items.append(
+                ListItem(Paragraph(f"<b>{label}:</b> {formatted_value}", bullet_style))
+            )
+        
+        if items:
+            story_items.append(ListItem(Paragraph(f"<b>{section_name}</b>", bullet_style)))
+            story_items.extend(items)
 
-            section_title = format_label(section)
-            section_items = []
+    # Special handling for Communication, Disability, and Additional Information sections
+    sections_to_skip = ['documents', 'notes', 'pdf_summary', 'support_keywords', 'goals', '_category_mapping', 'communication', 'disability', 'additionalInformation', 'firstName', 'lastName', 'middleName', 'id', 'createdAt', 'updatedAt']
+    
+    # Render Communication section
+    if 'communication' in metadata and metadata['communication']:
+        story.append(Paragraph("Communication", subsection_heading_style))
+        story.append(Spacer(1, 6))
+        comm_items = []
+        render_section_items("", metadata['communication'], comm_items)
+        if comm_items:
+            story.append(ListFlowable(
+                comm_items,
+                bulletType='bullet',
+                leftIndent=12,
+                bulletFontSize=7,
+                bulletColor=primary_color
+            ))
+        story.append(Spacer(1, 6))
 
-            for key, value in content.items():
-                if key == 'id' or value is None:
-                    continue
-                label = format_label(key)
-                section_items.append(
-                    ListItem(Paragraph(f"<b>{label}:</b> {value}", bullet_style))
-                )
+    # Render Disability section
+    if 'disability' in metadata and metadata['disability']:
+        story.append(Paragraph("Disability", subsection_heading_style))
+        story.append(Spacer(1, 6))
+        disability_items = []
+        render_section_items("", metadata['disability'], disability_items)
+        if disability_items:
+            story.append(ListFlowable(
+                disability_items,
+                bulletType='bullet',
+                leftIndent=12,
+                bulletFontSize=7,
+                bulletColor=primary_color
+            ))
+        story.append(Spacer(1, 6))
 
-            if section_items:
-                items.append(ListItem(Paragraph(f"<b>{section_title}</b>", bullet_style)))
-                items.extend(section_items)
-        return items
+    # Render Additional Information section
+    if 'additionalInformation' in metadata and metadata['additionalInformation']:
+        story.append(Paragraph("Additional Information", subsection_heading_style))
+        story.append(Spacer(1, 6))
+        additional_items = []
+        render_section_items("", metadata['additionalInformation'], additional_items)
+        if additional_items:
+            story.append(ListFlowable(
+                additional_items,
+                bulletType='bullet',
+                leftIndent=12,
+                bulletFontSize=7,
+                bulletColor=primary_color
+            ))
+        story.append(Spacer(1, 6))
 
-    bullet_items = create_professional_bullet_items(metadata)
+    # Render other sections (excluding the ones we've handled specifically)
+    bullet_items = []
+    for section, content in metadata.items():
+        if not isinstance(content, dict) or section in sections_to_skip:
+            continue
+        
+        section_title = format_label(section)
+        render_section_items(section_title, content, bullet_items)
+
     if bullet_items:
         story.append(ListFlowable(
-            bullet_items, 
+            bullet_items,
             bulletType='bullet',
             leftIndent=12,
-            bulletFontSize=8,
+            bulletFontSize=7,
             bulletColor=primary_color
         ))
-    story.append(Spacer(1, 16))
+    
+    story.append(Spacer(1, 8))
 
-    # --- Notes Section ---
+    # ============= GOALS & ASPIRATIONS SECTION =============
+    if 'goals' in metadata and metadata['goals']:
+        story.append(Paragraph("Goals & Aspirations", section_heading_style))
+        story.append(Spacer(1, 8))
+        goals_data = metadata['goals']
+        if isinstance(goals_data, dict):
+            if 'whanauGoal' in goals_data and goals_data['whanauGoal']:
+                story.append(Paragraph("<b>Whanau/Person Goal:</b>", subsection_heading_style))
+                story.append(Paragraph(goals_data['whanauGoal'], body_style))
+                story.append(Spacer(1, 6))
+            if 'aspiration' in goals_data and goals_data['aspiration']:
+                story.append(Paragraph("<b>Aspiration:</b>", subsection_heading_style))
+                story.append(Paragraph(goals_data['aspiration'], body_style))
+                story.append(Spacer(1, 6))
+            if 'biggestBarrier' in goals_data and goals_data['biggestBarrier']:
+                story.append(Paragraph("<b>Biggest Barrier:</b>", subsection_heading_style))
+                story.append(Paragraph(goals_data['biggestBarrier'], body_style))
+
+    # ============= CLINICAL NOTES SECTION =============
     if 'notes' in metadata and metadata['notes']:
-        story.append(Paragraph("Case Notes", section_heading_style))
+        story.append(Paragraph("Clinical Notes", section_heading_style))
         story.append(Spacer(1, 6))
         for i, note in enumerate(metadata['notes'], 1):
             if isinstance(note, dict) and 'content' in note:
-                story.append(Paragraph(f"<b>Note {i}:</b>", subsection_heading_style))
-                story.append(Paragraph(note['content'], body_style))
-        story.append(Spacer(1, 16))
-
-    # --- AI Extracted Information Section ---
+                story.append(Paragraph(f"Note {i}", subsection_heading_style))
+                note_content = note['content']
+                # Apply keyword highlighting to note content
+                detected_categories = detect_categories_in_text(note_content)
+                if detected_categories:
+                    note_content = highlight_keywords_in_text(note_content, list(detected_categories))
+                story.append(Paragraph(note_content, body_style))
+                
+                # Add timestamp if available
+                if 'createdAt' in note and note['createdAt']:
+                    try:
+                        # Parse the timestamp and format it nicely
+                        if isinstance(note['createdAt'], str):
+                            timestamp = datetime.fromisoformat(note['createdAt'].replace('Z', '+00:00'))
+                        else:
+                            timestamp = note['createdAt']
+                        formatted_date = timestamp.strftime('%B %d, %Y at %I:%M %p')
+                        story.append(Paragraph(f"<i>Created: {formatted_date}</i>", metadata_style))
+                    except (ValueError, AttributeError):
+                        # If timestamp parsing fails, just skip it
+                        pass
+                
+    # ============= ASSESSMENT SUMMARY SECTION =============
+    # story.append(PageBreak())
     story.append(Paragraph("Assessment Summary", section_heading_style))
     story.append(Spacer(1, 8))
 
+    # Extract category mapping if available
+    category_mapping = extracted_ai_text.get('_category_mapping', {})
+    
     for idx, (section, items) in enumerate(extracted_ai_text.items()):
+        # Skip the internal category mapping
+        if section == '_category_mapping':
+            continue
+            
         section_title = format_label(section)
-        subsection_color = assessment_subsection_palette[idx % len(assessment_subsection_palette)]
+        
+        # Use category color if section matches a category, otherwise use palette
+        section_color = get_category_color_object(section)
+        if section_color == colors.HexColor('#64748b'):  # Default color means no match
+            section_color = assessment_subsection_palette[idx % len(assessment_subsection_palette)]
+        else:
+            section_color = section_color
+        
         story.append(Paragraph(
             section_title,
-            get_colored_subsection_style(subsection_color, idx)
+            get_colored_subsection_style(section_color, idx)
         ))
-        story.append(Spacer(1, 4))
+        story.append(Spacer(1, 6))
 
         for item, response in items.items():
             item_label = format_label(item)
             story.append(Paragraph(f"<b>{item_label}</b>", bullet_style))
             
             response_text = str(response) if response else "No relevant information found."
+            
+            # Highlight keywords in the response text based on detected categories
+            detected_categories = detect_categories_in_text(response_text)
+            if detected_categories:
+                response_text = highlight_keywords_in_text(response_text, list(detected_categories))
+            
             story.append(Paragraph(response_text, body_style))
-            story.append(Spacer(1, 8))
+            story.append(Spacer(1, 4))
 
-    story.append(PageBreak())
+    # story.append(PageBreak())
 
     # --- PDF Summary Section ---
     if 'pdf_summary' in metadata and metadata['pdf_summary']:
         story.append(Paragraph("Overall Assessment Summary", section_heading_style))
-        story.append(Spacer(1, 8))
+        story.append(Spacer(1, 6))
 
         def stringify_summary_value(value):
             if isinstance(value, dict):
@@ -348,16 +538,21 @@ def generate_full_referral_form(metadata: dict, extracted_ai_text: dict):
             return [str(summary_value)]
 
         summary_paragraphs = normalize_pdf_summary(metadata['pdf_summary'])
-        for paragraph in summary_paragraphs:
+        for i, paragraph in enumerate(summary_paragraphs):
+            # Apply keyword highlighting to summary text
+            detected_categories = detect_categories_in_text(paragraph)
+            if detected_categories:
+                paragraph = highlight_keywords_in_text(paragraph, list(detected_categories))
             story.append(Paragraph(paragraph, body_style))
-            story.append(Spacer(1, 6))
+            if i < len(summary_paragraphs) - 1:
+                story.append(Spacer(1, 8))
 
-        story.append(Spacer(1, 10))
+        story.append(Spacer(1, 12))
 
     # --- Support Keywords Section ---
     if 'support_keywords' in metadata and metadata['support_keywords']:
         story.append(Paragraph("Recommended Areas of Support", section_heading_style))
-        story.append(Spacer(1, 8))
+        story.append(Spacer(1, 10))
         
         support_data = metadata['support_keywords']
         if isinstance(support_data, dict) and 'primary_needs' in support_data:
@@ -369,119 +564,82 @@ def generate_full_referral_form(metadata: dict, extracted_ai_text: dict):
                         description = need.get('description', '')
                         story.append(Paragraph(f"<b>{category}</b>", subsection_heading_style))
                         if description:
+                            # Apply keyword highlighting to description
+                            detected_categories = detect_categories_in_text(description)
+                            if detected_categories:
+                                description = highlight_keywords_in_text(description, list(detected_categories))
                             story.append(Paragraph(description, body_style))
-                        story.append(Spacer(1, 8))
+                        story.append(Spacer(1, 10))
                     elif need:
-                        story.append(Paragraph(str(need), body_style))
-                        story.append(Spacer(1, 6))
+                        # Apply keyword highlighting to need text
+                        need_text = str(need)
+                        detected_categories = detect_categories_in_text(need_text)
+                        if detected_categories:
+                            need_text = highlight_keywords_in_text(need_text, list(detected_categories))
+                        story.append(Paragraph(need_text, body_style))
+                        story.append(Spacer(1, 8))
             else:
                 story.append(Paragraph(str(primary_needs), body_style))
-                story.append(Spacer(1, 6))
+                story.append(Spacer(1, 8))
         
-        story.append(Spacer(1, 16))
+        story.append(Spacer(1, 12))
 
-    doc.build(story)
+    # ============= PROFESSIONAL FOOTER =============
+    # story.append(PageBreak())
+    story.append(Spacer(1, 20))
+    
+    # Professional closing statements
+    story.append(Paragraph(
+        "Document Confidentiality",
+        subsection_heading_style
+    ))
+    story.append(Spacer(1, 6))
+    
+    footer_text = (
+        "This referral form contains confidential and sensitive personal health information. "
+        "It is intended solely for the use of authorized healthcare and social service professionals "
+        "involved in the care and assessment of the named individual. Unauthorized access, use, or disclosure "
+        "is strictly prohibited and may violate privacy laws and regulations."
+    )
+    story.append(Paragraph(footer_text, body_style))
+    story.append(Spacer(1, 12))
+    
+    # Document information
+    footer_info = f"""
+    <b>Document Information:</b><br/>
+    <b>Generated:</b> {datetime.now().strftime('%B %d, %Y at %I:%M %p')}<br/>
+    <b>System:</b> Midstream Referral Management System<br/>
+    <b>Version:</b> 1.0
+    """
+    story.append(Paragraph(footer_info, metadata_style))
+    
+    # Build the PDF with page numbers
+    def add_page_number(canvas, doc):
+        """Add page numbers to the footer"""
+        canvas.saveState()
+        canvas.setFont('Helvetica', 9)
+        canvas.setFillColor(colors.HexColor('#64748b'))
+        
+        # Page number at bottom right
+        page_num = f"Page {doc.page}"
+        canvas.drawString(A4[0] - 1*inch, 0.5*inch, page_num)
+        
+        # Divider line
+        canvas.setLineWidth(0.5)
+        canvas.setStrokeColor(colors.HexColor('#cbd5e1'))
+        canvas.line(0.8*inch, 0.75*inch, A4[0] - 0.8*inch, 0.75*inch)
+        
+        canvas.restoreState()
+
+    doc.build(story, onFirstPage=add_page_number, onLaterPages=add_page_number)
     pdf_buffer.seek(0)
     pdf_buffer.name = f"{metadata.get('firstName', '')}-{metadata.get('lastName', '')}-full-referral-form.pdf"
 
     return pdf_buffer
 
 
-#     output_filepath = os.path.join(uploads_dir, filename)
-
-#     try:
-#         doc = SimpleDocTemplate(output_filepath, pagesize=A4)
-#         story = []
-
-#         styles = getSampleStyleSheet()
-#         heading_style = ParagraphStyle(
-#             'ColoredHeading',
-#             parent=styles['Heading2'],
-#             textColor=colors.blue
-#         )
-
-#         subheading_style = ParagraphStyle(
-#             'ColoredSubheading',
-#             parent=styles['Heading3'],
-#             textColor=colors.black
-#         )
-
-#         paragraph_style = styles['BodyText']
-
-#         story.append(Paragraph('Processed AI Transcription', styles['Title']))
-#         story.append(Spacer(1, 12))
-
-#         for section, items in form_data.items():
-
-#             story.append(Paragraph(section, heading_style))
-#             story.append(Spacer(1, 6))
-
-#             for item, response in items.items():
-#                 # Add item as the subheading
-#                 story.append(Paragraph(item, subheading_style))
-
-#                 # Add the response as a paragraph
-#                 story.append(Paragraph(
-#                     str(response) if response else "No relevant information found.", paragraph_style))
-
-#                 story.append(Spacer(1, 6))
-
-#         doc.build(story)
-#         return output_filepath
-
-#     except Exception as e:
-#         print(f"Failed to write processed data: {e}")
-#         return None
-
-# def save_form_data_to_pdf(form_data, filename, uploads_dir):
-#     output_filepath = os.path.join(uploads_dir, filename)
-
-#     try:
-#         doc = SimpleDocTemplate(output_filepath, pagesize=A4)
-#         story = []
-
-#         styles = getSampleStyleSheet()
-#         heading_style = ParagraphStyle(
-#             'ColoredHeading',
-#             parent=styles['Heading2'],
-#             textColor=colors.blue
-#         )
-
-#         subheading_style = ParagraphStyle(
-#             'ColoredSubheading',
-#             parent=styles['Heading3'],
-#             textColor=colors.black
-#         )
-
-#         paragraph_style = styles['BodyText']
-
-#         story.append(Paragraph('Processed AI Transcription', styles['Title']))
-#         story.append(Spacer(1, 12))
-
-#         for section, items in form_data.items():
-
-#             story.append(Paragraph(section, heading_style))
-#             story.append(Spacer(1, 6))
-
-#             for item, response in items.items():
-#                 # Add item as the subheading
-#                 story.append(Paragraph(item, subheading_style))
-
-#                 # Add the response as a paragraph
-#                 story.append(Paragraph(
-#                     str(response) if response else "No relevant information found.", paragraph_style))
-
-#                 story.append(Spacer(1, 6))
-
-#         doc.build(story)
-#         return output_filepath
-
-#     except Exception as e:
-#         print(f"Failed to write processed data: {e}")
-#         return None
-
-
 def extract_text_from_pdf(filepath):
+    """Extract text content from a PDF file."""
     if not os.path.isfile(filepath):
         print(f"File does not exist: {filepath}")
         return None
@@ -491,169 +649,11 @@ def extract_text_from_pdf(filepath):
             text = ""
             for page in doc:
                 text += page.get_text("text")
-
             return text
 
     except Exception as e:
         print(f"Error extracting text from PDF: {e} - File: {filepath}")
         return None
-
-
-def extract_referral_form_data_from_pdf(filepath):
-    if not os.path.isfile(filepath):
-        print(f"File does not exist: {filepath}")
-        return None
-
-    try:
-        with pymupdf.open(filepath) as doc:
-            # Initialize an empty dictionary to store the form data
-            form_data = {}
-            section_key = None
-
-            # Iterate through pdf, if line contains "Section", then set as dict key
-            for page in doc:
-                lines = page.get_text("text").split("\n")
-                for line in lines:
-                    # If the line contains "Section", then set as dict key
-                    if "Section" in line:
-                        section_key = line.split(
-                            ": ", 1)[1].strip()  # Clean up whitespace
-                        # Initialize a new dictionary for the section
-                        form_data[section_key] = {}
-                    elif section_key is not None:
-                        # Add the line to the current section
-                        # Split the line into key-value pairs if applicable
-                        # Split at the first occurrence of ": "
-                        key_value = line.split(": ", 1)
-                        if len(key_value) == 2:
-                            key = key_value[0].strip()
-                            value = key_value[1].strip()
-                            # Store in the corresponding section
-                            form_data[section_key][key] = value
-
-            return form_data
-
-    except Exception as e:
-        print(f"Error extracting text from PDF: {e} - File: {filepath}")
-        return None
-
-
-def save_referral_form_to_pdf(form_data, first_name, last_name, processed_dir):
-    pdf_filename = f"{first_name}-{last_name}-referral-form.pdf"
-    print(f"Saving referral form to PDF: {pdf_filename}")
-    pdf_filepath = os.path.join(processed_dir, pdf_filename)
-
-    try:
-        doc = SimpleDocTemplate(pdf_filepath, pagesize=A4)
-        story = []
-
-        styles = getSampleStyleSheet()
-        heading_style = ParagraphStyle(
-            'ColoredHeading',
-            parent=styles['Heading2'],
-            textColor=colors.black
-        )
-        paragraph_style = styles['BodyText']
-
-        # Add title
-        story.append(
-            Paragraph(f'{first_name} {last_name} Referral Form', styles['Title']))
-        story.append(Spacer(1, 12))
-
-        # Iterate through each section in the data object
-        for section_key, section_value in form_data.items():
-            # Add the section header
-            story.append(Paragraph(section_value['header'], heading_style))
-
-            story.append(Spacer(1, 6))
-
-            # Add the content of the section
-            for field, value in section_value.items():
-                # Skip the header field
-                if field != 'header':
-                    # Create a combined paragraph for the field name and value
-                    combined_paragraph = Paragraph(
-                        f"<b>{field.replace('_', ' ').title(
-                        ) if field != 'NHI' else 'NHI'}:</b> {value}",
-                        paragraph_style
-                    )
-                    story.append(combined_paragraph)
-
-            story.append(Spacer(1, 12))
-
-        doc.build(story)
-
-        return pdf_filepath
-    except Exception as e:
-        print(f"An error occurred while creating the PDF: {e}")
-
-
-def build_assessment_form(audio_data, referral_data, process_path, filename):
-    output_filepath = os.path.join(process_path, filename)
-
-    try:
-        doc = SimpleDocTemplate(output_filepath, pagesize=A4)
-        story = []
-
-        styles = getSampleStyleSheet()
-        heading_style = ParagraphStyle(
-            'ColoredHeading',
-            parent=styles['Heading2'],
-            textColor=colors.black
-        )
-
-        subheading_style = ParagraphStyle(
-            'ColoredSubheading',
-            parent=styles['Heading3'],
-            textColor=colors.black
-        )
-
-        paragraph_style = styles['BodyText']
-
-        story.append(Paragraph('Assessment Information', styles['Title']))
-        story.append(Spacer(1, 8))
-
-        assessment_completion_date = Paragraph(
-            f"<b>Assessment completion date:</b> {
-                datetime.now().strftime('%Y-%m-%d')}",
-            paragraph_style
-        )
-
-        story.append(assessment_completion_date)
-
-        for section, items in referral_data.items():
-            story.append(Paragraph(section, heading_style))
-            story.append(Spacer(1, 4))
-
-            for item, response in items.items():
-                combined_paragraph = Paragraph(
-                    f"<b>{item}:</b> {response}",
-                    paragraph_style
-                )
-                story.append(combined_paragraph)
-
-        story.append(Spacer(1, 12))
-
-        for section, items in audio_data.items():
-            story.append(Paragraph(section, heading_style))
-            story.append(Spacer(1, 6))
-
-            for item, response in items.items():
-                # Add item as the subheading
-                story.append(Paragraph(item, subheading_style))
-
-                # Add the response as a paragraph
-                story.append(Paragraph(
-                    str(response) if response else "No relevant information found.", paragraph_style))
-
-                story.append(Spacer(1, 6))
-
-        doc.build(story)
-        return output_filepath
-
-    except Exception as e:
-        print(f"Failed to write assessment form to PDF: {e}")
-        raise
 
 
 def create_pdf(text: str, title: str = "Referral Form") -> StreamingResponse:
@@ -664,7 +664,7 @@ def create_pdf(text: str, title: str = "Referral Form") -> StreamingResponse:
     :param title: The title of the document.
     :return: FastAPI StreamingResponse containing the PDF.
     """
-    buffer = io.BytesIO()
+    buffer = BytesIO()
     doc = SimpleDocTemplate(buffer)
     styles = getSampleStyleSheet()
 

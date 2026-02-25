@@ -8,6 +8,7 @@ const PYTHON_API_URL = process.env.PYTHON_API_KEY;
 // Include object for referral form data
 const REFERRAL_FORM_INCLUDE = {
 	communication: true,
+	goals: true,
 	disability: true,
 	additionalInformation: true,
 	documents: true,
@@ -75,6 +76,7 @@ const generateFullReferralForm = async (
 			lastName: userData.personalInformation?.lastName,
 			communication: referralFormData.communication,
 			disability: referralFormData.disability,
+			goals: referralFormData.goals,
 			additionalInformation: referralFormData.additionalInformation,
 			documents: referralFormData.documents,
 			notes: referralFormData.notes || [],

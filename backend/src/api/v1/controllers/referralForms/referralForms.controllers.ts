@@ -23,6 +23,7 @@ const REFERRAL_FORM_INCLUDE = {
 	emergencyContact: true,
 	consent: true,
 	additionalInformation: true,
+	goals: true,
 	notes: {
 		orderBy: {
 			createdAt: 'desc' as const,
@@ -49,6 +50,7 @@ const REFERRAL_FORM_INCLUDE_NO_NOTES = {
 	medical: true,
 	disability: true,
 	consent: true,
+	goals: true,
 	assignedToWorker: {
 		include: {
 			personalInformation: true,
@@ -84,7 +86,7 @@ const createReferralForm = async (
 			return sendError(res, statusCodes.badRequest, "Content cannot be empty!");
 		}
 
-		const { googleId, companyId, languageInfo, doctorInfo, disabilityInfo, additionalInfo, referrerInfo, emergencyContactInfo, consentInfo } = req.body;
+		const { googleId, companyId, languageInfo, doctorInfo, disabilityInfo, additionalInfo, referrerInfo, emergencyContactInfo, consentInfo, goalsInfo } = req.body;
 
 		const userExists = await findUserByGoogleId(googleId);
 		if (!userExists) {
@@ -108,6 +110,14 @@ const createReferralForm = async (
 					communicationNeedsDetails: languageInfo.communicationNeeds === "Yes" ? languageInfo.communicationNeedsDetails : null,
 				},
 			});
+
+		const referralGoalsData = await prisma.referralGoals.create({
+						data: {
+							whanauGoal: goalsInfo.whanauGoal,
+							aspiration: goalsInfo.aspiration,
+							biggestBarrier: goalsInfo.biggestBarrier,
+						},
+					});
 
 			const referralDoctorData = await prisma.referralMedical.create({
 				data: {
@@ -173,6 +183,7 @@ const createReferralForm = async (
 					communicationId: languageData.id,
 					medicalId: referralDoctorData.id,
 					disabilityId: referralDisabilityData.id,
+					goalsId: referralGoalsData?.id || null,
 					referrerId: referralReferrerData.id,
 					emergencyContactId: referralEmergencyContactData.id,
 					consentId: consentData.id,

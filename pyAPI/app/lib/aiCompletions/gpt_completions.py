@@ -2,9 +2,10 @@ import os
 from dotenv import load_dotenv
 from openai import OpenAI
 from io import BytesIO
-from app.lib.constants.gptCompletions import GPT_COMPLETION_SECTIONS
+from app.lib.constants.gptCompletions import GPT_COMPLETION_SECTIONS, CATEGORY_COLORS
 from app.lib.processing.pdfProcessing.pdf_processing import create_pdf, generate_full_referral_form
 from app.lib.processing.audio.audio_processing import transcribe_audio_to_paragraphs
+from app.lib.utils.color_mapping import detect_categories_in_text, get_primary_category
 from typing import List
 import fitz
 from fastapi.responses import StreamingResponse
@@ -19,7 +20,7 @@ async def process_referral_with_openai(metadata: dict, pdf_paths: List[str]):
     extracted_text = []
 
     # Extract text from structured referral data fields
-    referral_fields = ['communication', 'disability', 'additionalInformation']
+    referral_fields = ['communication', 'disability', 'additionalInformation', 'goals']
     for field_name in referral_fields:
         if field_name in metadata and metadata[field_name]:
             field_data = metadata[field_name]
@@ -120,6 +121,7 @@ async def get_relevant_information(section, text):
 
 async def analyze_completions_for_form(text):
     form_data = {}
+    category_mapping = {}  # Track which category each response belongs to
 
     print("Analyzing PDF for form data...")
 
@@ -135,9 +137,19 @@ async def analyze_completions_for_form(text):
                 print(f"Warning: No relevant information found for {item}")
             else:
                 print(f"Found relevant information for {item}: {response}")
+                # Detect categories mentioned in the response
+                detected_categories = detect_categories_in_text(response)
+                if detected_categories:
+                    primary_category = get_primary_category(response)
+                    category_mapping[f"{section}:{item}"] = primary_category
 
             form_data[section][item] = response  # Update the item-response pair
-    print('FORM_DATA',form_data)
+    
+    print('FORM_DATA', form_data)
+    print('CATEGORY_MAPPING', category_mapping)
+
+    # Store category mapping in form_data for PDF generation
+    form_data['_category_mapping'] = category_mapping
 
     return form_data
 

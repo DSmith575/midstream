@@ -21,6 +21,18 @@ export const referralFormSchema = z
     city: z.string({ message: 'Please enter a valid city' }).nonempty(),
     postCode: z.string().regex(/^\d{4}$/, { message: 'Invalid postcode' }),
     country: z.string().nonempty(),
+    whanauGoal: z
+      .string()
+      .nonempty({ message: 'Please enter the whanau/person goal.' })
+      .max(500, { message: '500 character limit' }),
+    aspiration: z
+      .string()
+      .nonempty({ message: 'Please enter your aspiration.' })
+      .max(500, { message: '500 character limit' }),
+    biggestBarrier: z
+      .string()
+      .nonempty({ message: 'Please enter the biggest barrier.' })
+      .max(500, { message: '500 character limit' }),
     firstLanguage: z
       .string()
       .nonempty({ message: 'A language must be selected' }),

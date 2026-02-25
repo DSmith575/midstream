@@ -112,6 +112,7 @@ model ReferralForm {
   emergencyContactId      String                 @unique
   consentId               String                 @unique
   additionalInformationId String                 @unique
+  goalsId                 String?                @unique
   // audioDocumentId         String?
   user                    User                   @relation("CreatedReferrals", fields: [userId], references: [id])
   assignedToWorker        User?                  @relation("AssignedReferrals", fields: [assignedToWorkerId], references: [id])
@@ -122,6 +123,7 @@ model ReferralForm {
   disability              ReferralDisability     @relation(fields: [disabilityId], references: [id])
   consent                 ReferralConsent        @relation(fields: [consentId], references: [id])
   additionalInformation   AdditionalInformation? @relation(fields: [additionalInformationId], references: [id])
+  goals                   ReferralGoals?         @relation(fields: [goalsId], references: [id])
   company                 Company?               @relation(fields: [companyId], references: [id])
   // documents               Document?              @relation(fields: [audioDocumentId], references: [id])
   documents               Document[]             @relation("ReferralDocuments")
@@ -195,6 +197,16 @@ model ReferralConsent {
   provideStatisticalConsent       Boolean
   provideCorrectInformation       Boolean
   referral                        ReferralForm?
+}
+
+model ReferralGoals {
+  id               String        @id @default(uuid())
+  whanauGoal       String        @db.Text
+  aspiration       String        @db.Text
+  biggestBarrier   String        @db.Text
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @default(now()) @updatedAt
+  referral         ReferralForm?
 }
 
 model Company {

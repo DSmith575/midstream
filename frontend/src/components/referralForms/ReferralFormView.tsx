@@ -8,6 +8,7 @@ interface ReferralFormViewProps {
 }
 
 export const ReferralFormView = ({ referralForm }: ReferralFormViewProps) => {
+  console.log('ReferralFormView - referralForm:', referralForm)
   const InfoRow = ({ label, value }: { label: string; value: any }) => (
     <div className="flex flex-col gap-1">
       <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
@@ -68,6 +69,8 @@ export const ReferralFormView = ({ referralForm }: ReferralFormViewProps) => {
         </CardContent>
       </Card>
 
+
+
       {/* Contact Information */}
       <Card>
         <CardHeader>
@@ -90,6 +93,29 @@ export const ReferralFormView = ({ referralForm }: ReferralFormViewProps) => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Goals & Aspirations */}
+      {referralForm.goals && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Goals & Aspirations</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <InfoRow
+              label="Whanau/Person Goal"
+              value={referralForm.goals?.whanauGoal}
+            />
+            <InfoRow
+              label="Aspiration"
+              value={referralForm.goals?.aspiration}
+            />
+            <InfoRow
+              label="Biggest Barrier"
+              value={referralForm.goals?.biggestBarrier}
+            />
+          </CardContent>
+        </Card>
+      )}
 
       {/* Communication Needs */}
       <Card>

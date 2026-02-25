@@ -78,6 +78,9 @@ export const preLoadedData = (
     postCode: address.postCode ? String(address.postCode) : '',
     country: address.country ?? '',
 
+    whanauGoal: '',
+    aspiration: '',
+    biggestBarrier: '',
     firstLanguage: '',
     interpreter: '',
     culturalSupport: '',
@@ -132,6 +135,9 @@ export const buildReferralDetails = (
     country,
     email,
     phone,
+    whanauGoal,
+    aspiration,
+    biggestBarrier,
     firstLanguage,
     interpreter,
     culturalSupport,
@@ -186,6 +192,11 @@ export const buildReferralDetails = (
     contactInformation: {
       email,
       phone,
+    },
+    goalsInfo: {
+      whanauGoal,
+      aspiration,
+      biggestBarrier,
     },
     languageInfo: {
       firstLanguage,

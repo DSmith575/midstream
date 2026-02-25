@@ -1,4 +1,5 @@
 export { StepPersonalInfo } from './ReferralStepPersonalInfo'
+export { StepGoalsInfo } from './ReferralStepGoalsInfo'
 export { StepLanguageInfo } from './ReferralStepLanguageInfo'
 export { StepMedicalInfo } from './ReferralStepMedicalInfo'
 export { StepDisabilityInfo } from './ReferralStepDisabilityInfo'

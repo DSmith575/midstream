@@ -72,6 +72,7 @@ export interface CreateReferralProps {
   userProfile: UserInformationProps
   addressInformation: AddressInformationProps
   contactInformation: ContactInformationProps
+  goalsInfo: ReferralFormGoalsInfoProps
   languageInfo: ReferralFormLanguageProps
   doctorInfo: ReferralFormDoctorProps
   disabilityInfo: ReferralFormDisabilityProps
@@ -79,6 +80,12 @@ export interface CreateReferralProps {
   referrerInfo: ReferralFormReferrerProps
   emergencyContactInfo: ReferralFormEmergencyContactProps
   consentInfo: ReferralConsentProps
+}
+
+export interface ReferralFormGoalsInfoProps {
+  whanauGoal: string
+  aspiration: string
+  biggestBarrier: string
 }
 
 export interface ReferralFormLanguageProps {

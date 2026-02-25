@@ -40,6 +40,7 @@ export const preloadReferralFormData = (
     interpreter: '',
     culturalSupport: '',
     communicationNeeds: '',
+
     doctorName: '',
     doctorPhone: '',
     doctorAddress: '',
@@ -67,5 +68,8 @@ export const preloadReferralFormData = (
     contactedForAdditionalInformation: '',
     statisticalInformation: '',
     correctInformationProvided: '',
+    whanauGoal: '',
+    aspiration: '',
+    biggestBarrier: '',
   }
 }

@@ -87,6 +87,16 @@ export const referralFormSteps: Array<Steps> = [
   },
   {
     id: 'Step 2',
+    name: 'Goals & Aspirations',
+    subtitle: 'Tell us about your goals and aspirations',
+    fields: [
+      'whanauGoal',
+      'aspiration',
+      'biggestBarrier',
+    ],
+  },
+  {
+    id: 'Step 3',
     name: 'Language Information',
     subtitle: 'Provide your info type here',
     fields: [
@@ -98,7 +108,7 @@ export const referralFormSteps: Array<Steps> = [
     ],
   },
   {
-    id: 'Step 3',
+    id: 'Step 4',
     name: 'Medical Information',
     subtitle: 'Provide your medical information.',
     fields: [
@@ -111,7 +121,7 @@ export const referralFormSteps: Array<Steps> = [
     ],
   },
   {
-    id: 'Step 4',
+    id: 'Step 5',
     name: 'Disability Information',
     subtitle: 'Subtitle Information',
     fields: [
@@ -122,13 +132,13 @@ export const referralFormSteps: Array<Steps> = [
     ],
   },
   {
-    id: 'Step 5',
+    id: 'Step 6',
     name: 'Additional Information',
     subtitle: 'Provide your medical information.',
     fields: ['safety', 'otherImportantInformation'],
   },
   {
-    id: 'Step 6',
+    id: 'Step 7',
     name: 'Referrer Contact Details',
     subtitle: '',
     fields: [
@@ -140,7 +150,7 @@ export const referralFormSteps: Array<Steps> = [
     ],
   },
   {
-    id: 'Step 7',
+    id: 'Step 8',
     name: 'Emergency Contact Details',
     subtitle: 'Subtitle Information',
     fields: [
@@ -152,7 +162,7 @@ export const referralFormSteps: Array<Steps> = [
     ],
   },
   {
-    id: 'Step 8',
+    id: 'Step 9',
     name: 'Consent',
     subtitle: 'Subtitle Information',
     fields: [

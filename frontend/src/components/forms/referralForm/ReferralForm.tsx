@@ -6,6 +6,7 @@ import {
   StepConsentInfo,
   StepDisabilityInfo,
   StepEmergencyContactInfo,
+  StepGoalsInfo,
   StepLanguageInfo,
   StepMedicalInfo,
   StepPersonalInfo,
@@ -27,6 +28,7 @@ import {
 
 const stepComponents = [
   StepPersonalInfo,
+  StepGoalsInfo,
   StepLanguageInfo,
   StepMedicalInfo,
   StepDisabilityInfo,
@@ -50,7 +52,7 @@ export const ReferralForm = () => {
 
   const onNext = async () => {
     const valid = await form.trigger(fields)
-    if (valid) next()
+    if (valid) next() 
   }
 
   return (
