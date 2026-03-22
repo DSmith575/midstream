@@ -36,6 +36,12 @@ enum  DocumentType {
   PDF
 }
 
+enum SupportFolderItemType {
+  FILE
+  AUDIO
+  TEXT
+}
+
 model User {
   id                  String               @id @default(uuid())
   googleId            String               @unique
@@ -54,6 +60,7 @@ model User {
   serviceCase         ServiceCase[]        @relation("userServiceCase")
   workerServiceCases  ServiceCase[]        @relation("caseWorkerServiceCase")
   servicePlanComments ServicePlanEntryComment[]
+  supportFolderItems  SupportFolderItem[]
 }
 
 model ContactInformation {
@@ -295,4 +302,18 @@ model ServiceCase {
   referralForm        ReferralForm?     @relation(fields: [referralFormId], references: [id])
   // assessment       Assessment        @relation(fields: [assessmentId], references: [id])
   servicePlan         ServicePlan?
+}
+
+model SupportFolderItem {
+  id         String                @id @default(uuid())
+  userId     String
+  name       String
+  type       SupportFolderItemType @default(FILE)
+  mimeType   String?
+  sizeBytes  Int?
+  content    String?               @db.Text
+  fileData   Bytes?
+  createdAt  DateTime              @default(now())
+  updatedAt  DateTime              @default(now()) @updatedAt
+  user       User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

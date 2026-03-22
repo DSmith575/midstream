@@ -1,6 +1,6 @@
-import { IconDashboard, IconListDetails } from '@tabler/icons-react'
+import { IconDashboard, IconListDetails, IconFolder } from '@tabler/icons-react'
 import { UserView } from '@/components/dashboard/UserViewDashboard'
-import { ApplicationView } from '@/components/dashboard/UserApplicationViewDashboard'
+import { ApplicationView, SupportFolderView } from '@/components/dashboard'
 
 export const SIDEBAR_VIEWS = {
   user: {
@@ -13,6 +13,11 @@ export const SIDEBAR_VIEWS = {
     icon: IconListDetails,
     component: ApplicationView,
   },
+  supportFolder: {
+    label: 'Support Folder',
+    icon: IconFolder,
+    component: SupportFolderView,
+  }
 }
 
 export type SidebarViewKey = keyof typeof SIDEBAR_VIEWS

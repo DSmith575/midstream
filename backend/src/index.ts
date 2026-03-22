@@ -9,6 +9,7 @@ import assignCasesRouter from '@/api/v1/routes/assignCases/assignCases.routes';
 import companyRouter from '@/api/v1/routes/company/company.routes';
 import devRouter from '@/api/v1/routes/devTools/userRoles.routes';
 import documentRouter from '@/api/v1/routes/audioDocuments/audioDocuments.routes';
+import supportFolderRouter from '@/api/v1/routes/supportFolder/supportFolder.routes';
 import serviceCaseRouter from '@/api/v1/routes/serviceCase/serviceCase.routes';
 import servicePlanRouter from '@/api/v1/routes/servicePlan/servicePlan.routes';
 import { apiLimiter } from '@/middleware/rateLimit.middleware';
@@ -44,6 +45,7 @@ app.use(`${API_BASE_URL}${endPointRoutes.assignCases}`, assignCasesRouter);
 app.use(`${API_BASE_URL}${endPointRoutes.company}`, companyRouter);
 app.use(`${API_BASE_URL}${endPointRoutes.devTools}`, devRouter);
 app.use(`${API_BASE_URL}${endPointRoutes.referralDocuments}`, documentRouter);
+app.use(`${API_BASE_URL}${endPointRoutes.supportFolder}`, supportFolderRouter);
 
 app.use(`${API_BASE_URL}${endPointRoutes.serviceCase}`, serviceCaseRouter);
 app.use(`${API_BASE_URL}${endPointRoutes.servicePlan}`, servicePlanRouter);

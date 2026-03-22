@@ -20,6 +20,7 @@ export const statusCodes = {
 
 export const endPointRoutes = {
   userProfile: '/userProfiles',
+  supportFolder: '/support-folder',
   analytics: '/analytics',
   referralForms: '/referralForms',
   assignCases: '/assignCases',
