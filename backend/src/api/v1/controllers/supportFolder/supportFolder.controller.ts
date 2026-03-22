@@ -1,4 +1,4 @@
-import { PrismaClient, SupportFolderItemType } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import { Request, Response } from 'express';
 import { statusCodes } from '@/constants';
 
@@ -14,11 +14,13 @@ const findUserByGoogleId = async (googleId: string) => {
   });
 };
 
-const parseSupportType = (mimeType?: string | null): SupportFolderItemType => {
-  if (!mimeType) return SupportFolderItemType.FILE;
-  if (mimeType.startsWith('audio/')) return SupportFolderItemType.AUDIO;
-  return SupportFolderItemType.FILE;
+const parseSupportType = (mimeType?: string | null): 'FILE' | 'AUDIO' => {
+  if (!mimeType) return 'FILE';
+  if (mimeType.startsWith('audio/')) return 'AUDIO';
+  return 'FILE';
 };
+
+const supportFolderItemModel = (prisma as any).supportFolderItem;
 
 const getSupportFolderItems = async (req: Request, res: Response): Promise<any> => {
   try {
@@ -33,7 +35,11 @@ const getSupportFolderItems = async (req: Request, res: Response): Promise<any> 
       return sendError(res, statusCodes.notFound, 'User not found');
     }
 
-    const items = await prisma.supportFolderItem.findMany({
+    if (!supportFolderItemModel) {
+      return sendError(res, statusCodes.internalServerError, 'Support folder model is not available. Run prisma generate.');
+    }
+
+    const items = await supportFolderItemModel.findMany({
       where: { userId: user.id },
       orderBy: { createdAt: 'desc' },
       select: {
@@ -77,11 +83,15 @@ const createSupportFolderTextItem = async (req: Request, res: Response): Promise
       return sendError(res, statusCodes.notFound, 'User not found');
     }
 
-    const item = await prisma.supportFolderItem.create({
+    if (!supportFolderItemModel) {
+      return sendError(res, statusCodes.internalServerError, 'Support folder model is not available. Run prisma generate.');
+    }
+
+    const item = await supportFolderItemModel.create({
       data: {
         userId: user.id,
         name: name.trim(),
-        type: SupportFolderItemType.TEXT,
+        type: 'TEXT',
         mimeType: 'text/plain',
         sizeBytes: Buffer.byteLength(content, 'utf8'),
         content: content.trim(),
@@ -123,7 +133,11 @@ const uploadSupportFolderFile = async (req: Request, res: Response): Promise<any
       return sendError(res, statusCodes.notFound, 'User not found');
     }
 
-    const item = await prisma.supportFolderItem.create({
+    if (!supportFolderItemModel) {
+      return sendError(res, statusCodes.internalServerError, 'Support folder model is not available. Run prisma generate.');
+    }
+
+    const item = await supportFolderItemModel.create({
       data: {
         userId: user.id,
         name: file.originalname,
@@ -164,7 +178,11 @@ const downloadSupportFolderItem = async (req: Request, res: Response): Promise<a
       return sendError(res, statusCodes.notFound, 'User not found');
     }
 
-    const item = await prisma.supportFolderItem.findFirst({
+    if (!supportFolderItemModel) {
+      return sendError(res, statusCodes.internalServerError, 'Support folder model is not available. Run prisma generate.');
+    }
+
+    const item = await supportFolderItemModel.findFirst({
       where: {
         id: String(itemId),
         userId: user.id,
@@ -177,7 +195,7 @@ const downloadSupportFolderItem = async (req: Request, res: Response): Promise<a
 
     const fileName = item.name || `support-item-${item.id}`;
 
-    if (item.type === SupportFolderItemType.TEXT) {
+    if (item.type === 'TEXT') {
       res.setHeader('Content-Type', item.mimeType || 'text/plain');
       res.setHeader('Content-Disposition', `attachment; filename="${fileName.endsWith('.txt') ? fileName : `${fileName}.txt`}"`);
       return res.status(statusCodes.success).send(item.content || '');
@@ -209,7 +227,11 @@ const deleteSupportFolderItem = async (req: Request, res: Response): Promise<any
       return sendError(res, statusCodes.notFound, 'User not found');
     }
 
-    const item = await prisma.supportFolderItem.findFirst({
+    if (!supportFolderItemModel) {
+      return sendError(res, statusCodes.internalServerError, 'Support folder model is not available. Run prisma generate.');
+    }
+
+    const item = await supportFolderItemModel.findFirst({
       where: {
         id: String(itemId),
         userId: user.id,
@@ -221,7 +243,7 @@ const deleteSupportFolderItem = async (req: Request, res: Response): Promise<any
       return sendError(res, statusCodes.notFound, 'Support folder item not found');
     }
 
-    await prisma.supportFolderItem.delete({
+    await supportFolderItemModel.delete({
       where: { id: item.id },
     });
 
