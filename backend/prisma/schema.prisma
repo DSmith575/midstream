@@ -42,6 +42,12 @@ enum SupportFolderItemType {
   TEXT
 }
 
+enum UpcomingSupportUrgency {
+  LOW
+  MEDIUM
+  HIGH
+}
+
 model User {
   id                  String               @id @default(uuid())
   googleId            String               @unique
@@ -61,6 +67,7 @@ model User {
   workerServiceCases  ServiceCase[]        @relation("caseWorkerServiceCase")
   servicePlanComments ServicePlanEntryComment[]
   supportFolderItems  SupportFolderItem[]
+  upcomingSupportNotifications UpcomingSupportNotification[]
 }
 
 model ContactInformation {
@@ -316,4 +323,28 @@ model SupportFolderItem {
   createdAt  DateTime              @default(now())
   updatedAt  DateTime              @default(now()) @updatedAt
   user       User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model UpcomingSupportNotification {
+  id             String                 @id @default(uuid())
+  userId         String
+  fingerprint    String
+  title          String
+  summary        String
+  dueDateISO     DateTime?
+  urgency        UpcomingSupportUrgency @default(MEDIUM)
+  confidence     Float                  @default(0.5)
+  sourceItemId   String?
+  sourceItemName String?
+  reason         String?
+  isRead         Boolean                @default(false)
+  isDismissed    Boolean                @default(false)
+  scannedAt      DateTime               @default(now())
+  createdAt      DateTime               @default(now())
+  updatedAt      DateTime               @default(now()) @updatedAt
+  user           User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, fingerprint])
+  @@index([userId, dueDateISO])
+  @@index([userId, isDismissed])
 }

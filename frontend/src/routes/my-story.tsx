@@ -22,6 +22,6 @@ const RouteComponent = () => {
   )
 }
 
-export const Route = createFileRoute('/dashboard')({
+export const Route = createFileRoute('/my-story')({
   component: RouteComponent,
 })

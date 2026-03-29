@@ -5,6 +5,6 @@ const RouteComponent = () => {
   return <ReferralForm />
 }
 
-export const Route = createFileRoute('/dashboard_/referral/$userId')({
+export const Route = createFileRoute('/my-story_/referral/$userId')({
   component: RouteComponent,
 })

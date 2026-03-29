@@ -6,6 +6,6 @@ const RouteComponent = () => {
   return <ServicePlanEditor servicePlanId={servicePlanId} />
 }
 
-export const Route = createFileRoute('/dashboard_/servicePlan/$servicePlanId')({
+export const Route = createFileRoute('/my-story_/servicePlan/$servicePlanId')({
   component: RouteComponent,
 })

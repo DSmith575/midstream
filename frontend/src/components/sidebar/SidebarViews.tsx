@@ -1,22 +1,27 @@
 import { IconDashboard, IconListDetails, IconFolder } from '@tabler/icons-react'
 import { UserView } from '@/components/dashboard/UserViewDashboard'
-import { ApplicationView, SupportFolderView } from '@/components/dashboard'
+import { ApplicationView, SupportFolderView, UserUpcomingSupportViewDashboard } from '@/components/dashboard'
 
 export const SIDEBAR_VIEWS = {
   user: {
-    label: 'Profile',
+    label: 'About Me',
     icon: IconDashboard,
     component: UserView,
   },
   application: {
-    label: 'Applications',
+    label: 'Get Support',
     icon: IconListDetails,
     component: ApplicationView,
   },
   supportFolder: {
-    label: 'Support Folder',
+    label: 'My Support Records',
     icon: IconFolder,
     component: SupportFolderView,
+  },
+  upcomingSupport: {
+    label: 'Upcoming Support',
+    icon: IconFolder,
+    component: UserUpcomingSupportViewDashboard,
   }
 }
 

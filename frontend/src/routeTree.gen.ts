@@ -12,19 +12,25 @@
 
 import { Route as rootRoute } from './routes/__root'
 import { Route as SignupImport } from './routes/signup'
+import { Route as MyStoryImport } from './routes/my-story'
 import { Route as LoginImport } from './routes/login'
 import { Route as FeaturesImport } from './routes/features'
-import { Route as DashboardImport } from './routes/dashboard'
 import { Route as AboutImport } from './routes/about'
 import { Route as IndexImport } from './routes/index'
-import { Route as DashboardServicePlanServicePlanIdImport } from './routes/dashboard_.servicePlan.$servicePlanId'
-import { Route as DashboardReferralUserIdImport } from './routes/dashboard_.referral.$userId'
+import { Route as MyStoryServicePlanServicePlanIdImport } from './routes/my-story_.servicePlan.$servicePlanId'
+import { Route as MyStoryReferralUserIdImport } from './routes/my-story_.referral.$userId'
 
 // Create/Update Routes
 
 const SignupRoute = SignupImport.update({
   id: '/signup',
   path: '/signup',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const MyStoryRoute = MyStoryImport.update({
+  id: '/my-story',
+  path: '/my-story',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -40,12 +46,6 @@ const FeaturesRoute = FeaturesImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const DashboardRoute = DashboardImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => rootRoute,
-} as any)
-
 const AboutRoute = AboutImport.update({
   id: '/about',
   path: '/about',
@@ -58,16 +58,16 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const DashboardServicePlanServicePlanIdRoute =
-  DashboardServicePlanServicePlanIdImport.update({
-    id: '/dashboard_/servicePlan/$servicePlanId',
-    path: '/dashboard/servicePlan/$servicePlanId',
+const MyStoryServicePlanServicePlanIdRoute =
+  MyStoryServicePlanServicePlanIdImport.update({
+    id: '/my-story_/servicePlan/$servicePlanId',
+    path: '/my-story/servicePlan/$servicePlanId',
     getParentRoute: () => rootRoute,
   } as any)
 
-const DashboardReferralUserIdRoute = DashboardReferralUserIdImport.update({
-  id: '/dashboard_/referral/$userId',
-  path: '/dashboard/referral/$userId',
+const MyStoryReferralUserIdRoute = MyStoryReferralUserIdImport.update({
+  id: '/my-story_/referral/$userId',
+  path: '/my-story/referral/$userId',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -89,13 +89,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutImport
       parentRoute: typeof rootRoute
     }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardImport
-      parentRoute: typeof rootRoute
-    }
     '/features': {
       id: '/features'
       path: '/features'
@@ -110,6 +103,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginImport
       parentRoute: typeof rootRoute
     }
+    '/my-story': {
+      id: '/my-story'
+      path: '/my-story'
+      fullPath: '/my-story'
+      preLoaderRoute: typeof MyStoryImport
+      parentRoute: typeof rootRoute
+    }
     '/signup': {
       id: '/signup'
       path: '/signup'
@@ -117,18 +117,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignupImport
       parentRoute: typeof rootRoute
     }
-    '/dashboard_/referral/$userId': {
-      id: '/dashboard_/referral/$userId'
-      path: '/dashboard/referral/$userId'
-      fullPath: '/dashboard/referral/$userId'
-      preLoaderRoute: typeof DashboardReferralUserIdImport
+    '/my-story_/referral/$userId': {
+      id: '/my-story_/referral/$userId'
+      path: '/my-story/referral/$userId'
+      fullPath: '/my-story/referral/$userId'
+      preLoaderRoute: typeof MyStoryReferralUserIdImport
       parentRoute: typeof rootRoute
     }
-    '/dashboard_/servicePlan/$servicePlanId': {
-      id: '/dashboard_/servicePlan/$servicePlanId'
-      path: '/dashboard/servicePlan/$servicePlanId'
-      fullPath: '/dashboard/servicePlan/$servicePlanId'
-      preLoaderRoute: typeof DashboardServicePlanServicePlanIdImport
+    '/my-story_/servicePlan/$servicePlanId': {
+      id: '/my-story_/servicePlan/$servicePlanId'
+      path: '/my-story/servicePlan/$servicePlanId'
+      fullPath: '/my-story/servicePlan/$servicePlanId'
+      preLoaderRoute: typeof MyStoryServicePlanServicePlanIdImport
       parentRoute: typeof rootRoute
     }
   }
@@ -139,35 +139,35 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/dashboard': typeof DashboardRoute
   '/features': typeof FeaturesRoute
   '/login': typeof LoginRoute
+  '/my-story': typeof MyStoryRoute
   '/signup': typeof SignupRoute
-  '/dashboard/referral/$userId': typeof DashboardReferralUserIdRoute
-  '/dashboard/servicePlan/$servicePlanId': typeof DashboardServicePlanServicePlanIdRoute
+  '/my-story/referral/$userId': typeof MyStoryReferralUserIdRoute
+  '/my-story/servicePlan/$servicePlanId': typeof MyStoryServicePlanServicePlanIdRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/dashboard': typeof DashboardRoute
   '/features': typeof FeaturesRoute
   '/login': typeof LoginRoute
+  '/my-story': typeof MyStoryRoute
   '/signup': typeof SignupRoute
-  '/dashboard/referral/$userId': typeof DashboardReferralUserIdRoute
-  '/dashboard/servicePlan/$servicePlanId': typeof DashboardServicePlanServicePlanIdRoute
+  '/my-story/referral/$userId': typeof MyStoryReferralUserIdRoute
+  '/my-story/servicePlan/$servicePlanId': typeof MyStoryServicePlanServicePlanIdRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/dashboard': typeof DashboardRoute
   '/features': typeof FeaturesRoute
   '/login': typeof LoginRoute
+  '/my-story': typeof MyStoryRoute
   '/signup': typeof SignupRoute
-  '/dashboard_/referral/$userId': typeof DashboardReferralUserIdRoute
-  '/dashboard_/servicePlan/$servicePlanId': typeof DashboardServicePlanServicePlanIdRoute
+  '/my-story_/referral/$userId': typeof MyStoryReferralUserIdRoute
+  '/my-story_/servicePlan/$servicePlanId': typeof MyStoryServicePlanServicePlanIdRoute
 }
 
 export interface FileRouteTypes {
@@ -175,56 +175,55 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
-    | '/dashboard'
     | '/features'
     | '/login'
+    | '/my-story'
     | '/signup'
-    | '/dashboard/referral/$userId'
-    | '/dashboard/servicePlan/$servicePlanId'
+    | '/my-story/referral/$userId'
+    | '/my-story/servicePlan/$servicePlanId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
-    | '/dashboard'
     | '/features'
     | '/login'
+    | '/my-story'
     | '/signup'
-    | '/dashboard/referral/$userId'
-    | '/dashboard/servicePlan/$servicePlanId'
+    | '/my-story/referral/$userId'
+    | '/my-story/servicePlan/$servicePlanId'
   id:
     | '__root__'
     | '/'
     | '/about'
-    | '/dashboard'
     | '/features'
     | '/login'
+    | '/my-story'
     | '/signup'
-    | '/dashboard_/referral/$userId'
-    | '/dashboard_/servicePlan/$servicePlanId'
+    | '/my-story_/referral/$userId'
+    | '/my-story_/servicePlan/$servicePlanId'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
-  DashboardRoute: typeof DashboardRoute
   FeaturesRoute: typeof FeaturesRoute
   LoginRoute: typeof LoginRoute
+  MyStoryRoute: typeof MyStoryRoute
   SignupRoute: typeof SignupRoute
-  DashboardReferralUserIdRoute: typeof DashboardReferralUserIdRoute
-  DashboardServicePlanServicePlanIdRoute: typeof DashboardServicePlanServicePlanIdRoute
+  MyStoryReferralUserIdRoute: typeof MyStoryReferralUserIdRoute
+  MyStoryServicePlanServicePlanIdRoute: typeof MyStoryServicePlanServicePlanIdRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
-  DashboardRoute: DashboardRoute,
   FeaturesRoute: FeaturesRoute,
   LoginRoute: LoginRoute,
+  MyStoryRoute: MyStoryRoute,
   SignupRoute: SignupRoute,
-  DashboardReferralUserIdRoute: DashboardReferralUserIdRoute,
-  DashboardServicePlanServicePlanIdRoute:
-    DashboardServicePlanServicePlanIdRoute,
+  MyStoryReferralUserIdRoute: MyStoryReferralUserIdRoute,
+  MyStoryServicePlanServicePlanIdRoute: MyStoryServicePlanServicePlanIdRoute,
 }
 
 export const routeTree = rootRoute
@@ -239,12 +238,12 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/about",
-        "/dashboard",
         "/features",
         "/login",
+        "/my-story",
         "/signup",
-        "/dashboard_/referral/$userId",
-        "/dashboard_/servicePlan/$servicePlanId"
+        "/my-story_/referral/$userId",
+        "/my-story_/servicePlan/$servicePlanId"
       ]
     },
     "/": {
@@ -253,23 +252,23 @@ export const routeTree = rootRoute
     "/about": {
       "filePath": "about.tsx"
     },
-    "/dashboard": {
-      "filePath": "dashboard.tsx"
-    },
     "/features": {
       "filePath": "features.tsx"
     },
     "/login": {
       "filePath": "login.tsx"
     },
+    "/my-story": {
+      "filePath": "my-story.tsx"
+    },
     "/signup": {
       "filePath": "signup.tsx"
     },
-    "/dashboard_/referral/$userId": {
-      "filePath": "dashboard_.referral.$userId.tsx"
+    "/my-story_/referral/$userId": {
+      "filePath": "my-story_.referral.$userId.tsx"
     },
-    "/dashboard_/servicePlan/$servicePlanId": {
-      "filePath": "dashboard_.servicePlan.$servicePlanId.tsx"
+    "/my-story_/servicePlan/$servicePlanId": {
+      "filePath": "my-story_.servicePlan.$servicePlanId.tsx"
     }
   }
 }

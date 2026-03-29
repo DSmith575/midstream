@@ -1,9 +1,18 @@
 import { type ChangeEvent, useRef, useState } from 'react'
-import { Download, FileText, Music2, Paperclip, Trash2, Upload } from 'lucide-react'
+import { Camera, Download, FileText, Music2, Paperclip, Trash2, Upload } from 'lucide-react'
 import { Spinner } from '@/components/spinner/Spinner'
 import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { useIsMobile } from '@/hooks/use-mobile'
 import { useSupportFolder } from '@/hooks/userProfile'
 
 interface SupportFolderCardProps {
@@ -11,9 +20,15 @@ interface SupportFolderCardProps {
 }
 
 export const SupportFolderCard = ({ userId }: SupportFolderCardProps) => {
+  const isMobile = useIsMobile()
   const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const cameraInputRef = useRef<HTMLInputElement | null>(null)
   const [textName, setTextName] = useState('Support note')
   const [textContent, setTextContent] = useState('')
+  const [itemPendingDelete, setItemPendingDelete] = useState<{
+    id: string
+    name: string
+  } | null>(null)
   const {
     items,
     isLoading,
@@ -34,6 +49,13 @@ export const SupportFolderCard = ({ userId }: SupportFolderCardProps) => {
     event.target.value = ''
   }
 
+  const onCameraChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+    uploadFile(file)
+    event.target.value = ''
+  }
+
   const onCreateText = () => {
     if (!textContent.trim()) return
     createText({
@@ -41,6 +63,16 @@ export const SupportFolderCard = ({ userId }: SupportFolderCardProps) => {
       content: textContent.trim(),
     })
     setTextContent('')
+  }
+
+  const requestDelete = (id: string, name: string) => {
+    setItemPendingDelete({ id, name })
+  }
+
+  const onConfirmDelete = () => {
+    if (!itemPendingDelete) return
+    deleteItem(itemPendingDelete.id)
+    setItemPendingDelete(null)
   }
 
   const formatFileSize = (sizeBytes: number | null) => {
@@ -79,15 +111,33 @@ export const SupportFolderCard = ({ userId }: SupportFolderCardProps) => {
             onChange={onFileChange}
             className="hidden"
           />
-          <Button
-            type="button"
-            className="mt-3"
-            disabled={uploadPending}
-            onClick={() => fileInputRef.current?.click()}
-          >
-            <Upload className="mr-2 h-4 w-4" />
-            {uploadPending ? 'Uploading...' : 'Upload file'}
-          </Button>
+          <Input
+            ref={cameraInputRef}
+            type="file"
+            accept="image/*"
+            capture={isMobile ? 'environment' : undefined}
+            onChange={onCameraChange}
+            className="hidden"
+          />
+          <div className="mt-3 flex flex-wrap gap-2">
+            <Button
+              type="button"
+              disabled={uploadPending}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              <Upload className="mr-2 h-4 w-4" />
+              {uploadPending ? 'Uploading...' : 'Upload file'}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={uploadPending}
+              onClick={() => cameraInputRef.current?.click()}
+            >
+              <Camera className="mr-2 h-4 w-4" />
+              {uploadPending ? 'Uploading...' : isMobile ? 'Take photo' : 'Upload image'}
+            </Button>
+          </div>
         </section>
 
         <section className="rounded-xl border border-border/70 bg-card/80 p-4">
@@ -160,7 +210,7 @@ export const SupportFolderCard = ({ userId }: SupportFolderCardProps) => {
                       size="sm"
                       variant="destructive"
                       disabled={deletePending}
-                      onClick={() => deleteItem(item.id)}
+                      onClick={() => requestDelete(item.id, item.name)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -171,6 +221,41 @@ export const SupportFolderCard = ({ userId }: SupportFolderCardProps) => {
           )}
         </section>
       </div>
+
+      <Dialog
+        open={Boolean(itemPendingDelete)}
+        onOpenChange={(open) => {
+          if (!open) setItemPendingDelete(null)
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Delete support item?</DialogTitle>
+            <DialogDescription>
+              {itemPendingDelete
+                ? `Are you sure you want to delete "${itemPendingDelete.name}"? This action cannot be undone.`
+                : 'Are you sure you want to delete this item? This action cannot be undone.'}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setItemPendingDelete(null)}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              disabled={deletePending}
+              onClick={onConfirmDelete}
+            >
+              {deletePending ? 'Deleting...' : 'Delete'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </article>
   )
 }

@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.lib.constants.routes import APIRoutes, CORS_CONFIG
 from app.routes import upload_audio
 from app.routes import upload_referral_form
+from app.routes import upcoming_support
 
 
 app = FastAPI()
@@ -26,3 +27,4 @@ async def main():
 
 app.include_router(upload_audio.router)
 app.include_router(upload_referral_form.router)
+app.include_router(upcoming_support.router)
