@@ -22,7 +22,7 @@ export const SpringModal = ({
 }: SpringModalProps) => {
   const navigate = useNavigate()
   const { mutate } = useJoinCompany(userId, () => {
-    navigate({ to: `/dashboard` })
+    navigate({ to: `/my-story` })
   })
 
   const joinCompanyHandler = (companyId: number, userId: string) => {

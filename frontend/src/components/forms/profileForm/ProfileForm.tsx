@@ -46,7 +46,7 @@ export const ProfileForm = () => {
   const { mutate, isPending } = useCreateUserProfile(
     user.user?.id as string,
     () => {
-      navigate({ to: `/dashboard` })
+      navigate({ to: `/my-story` })
     },
   )
 
