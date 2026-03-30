@@ -28,6 +28,31 @@ NODE_API_URL = f"{BASE_API_URL}referral-documents/upload-audio"
 router = APIRouter()
 
 
+def _validate_upload_payload(file: UploadFile | None, referral_id: str) -> None:
+    if not referral_id:
+        logger.warning("Upload attempt made without referral ID")
+        raise HTTPException(status_code=400, detail="Referral ID is required")
+
+    if file is None or not file.filename:
+        logger.warning("Upload attempt for referralId %s with no file", referral_id)
+        raise HTTPException(status_code=400, detail="No file provided")
+
+    if not allowed_file(filename=file.filename, allowed_extensions=ALLOWED_EXTENSIONS_AUDIO):
+        logger.warning("Invalid file type: %s for referralId %s", file.filename, referral_id)
+        raise HTTPException(
+            status_code=400,
+            detail=f"Invalid file type, allowed types are: {', '.join(ALLOWED_EXTENSIONS_AUDIO)}",
+        )
+
+
+def _build_service_headers() -> dict[str, str]:
+    service_api_key = os.getenv('SERVICE_API_KEY')
+    if not service_api_key:
+        logger.error("SERVICE_API_KEY environment variable not set")
+        raise HTTPException(status_code=500, detail="Server configuration error")
+    return {"x-api-key": service_api_key}
+
+
 @router.post(APIRoutes.UPLOAD_AUDIO.value)
 async def upload_audio(
     file: UploadFile = File(default=None),
@@ -46,26 +71,10 @@ async def upload_audio(
     Raises:
         HTTPException: If file validation, processing, or upload fails
     """
-    # Validate referral ID
-    if not referralId:
-        logger.warning("Upload attempt made without referral ID")
-        raise HTTPException(status_code=400, detail="Referral ID is required")
-    
-    # Validate file presence
-    if file is None or not file.filename:
-        logger.warning(f"Upload attempt for referralId {referralId} with no file")
-        raise HTTPException(status_code=400, detail="No file provided")
-    
-    # Validate file type
-    if not allowed_file(filename=file.filename, allowed_extensions=ALLOWED_EXTENSIONS_AUDIO):
-        logger.warning(f"Invalid file type: {file.filename} for referralId {referralId}")
-        raise HTTPException(
-            status_code=400,
-            detail=f"Invalid file type, allowed types are: {', '.join(ALLOWED_EXTENSIONS_AUDIO)}"
-        )
+    _validate_upload_payload(file, referralId)
     
     try:
-        logger.info(f"Processing audio file {file.filename} for referralId {referralId}")
+        logger.info("Processing audio file %s for referralId %s", file.filename, referralId)
         
         # Convert to WAV format
         sanitize_file = sanitize_filename(file.filename) + '.' + file.filename.rsplit('.', 1)[1].lower()
@@ -74,7 +83,7 @@ async def upload_audio(
         
         # Transcribe audio to paragraphs
         transcription = await process_client_audio(wav_buffer)
-        logger.info(f"Successfully transcribed {filename}: {len(transcription)} paragraphs")
+        logger.info("Successfully transcribed %s: %s paragraphs", filename, len(transcription))
         
         # Convert transcription list to string
         transcribed_text = "\n\n".join(transcription)
@@ -89,13 +98,7 @@ async def upload_audio(
         
         # Upload to Node backend (sending JSON)
         async with httpx.AsyncClient() as client:
-            # Get service API key for backend authentication
-            service_api_key = os.getenv('SERVICE_API_KEY')
-            if not service_api_key:
-                logger.error("SERVICE_API_KEY environment variable not set")
-                raise HTTPException(status_code=500, detail="Server configuration error")
-            
-            headers = {"x-api-key": service_api_key}
+            headers = _build_service_headers()
             
             response = await client.post(NODE_API_URL, json=payload, headers=headers)
             response.raise_for_status()
@@ -105,14 +108,14 @@ async def upload_audio(
             checklist_resp = await client.patch(checklist_url, json={"audio": True}, headers=headers)
             checklist_resp.raise_for_status()
 
-        logger.info(f"Uploaded transcription and updated checklist for referralId {referralId}")
+        logger.info("Uploaded transcription and updated checklist for referralId %s", referralId)
         return {"detail": "Audio file processed and uploaded successfully"}
 
     except HTTPException:
         # Re-raise HTTP exceptions
         raise
     except Exception as e:
-        logger.error(f"Error processing audio for referralId {referralId}: {str(e)}", exc_info=True)
+        logger.error("Error processing audio for referralId %s: %s", referralId, str(e), exc_info=True)
         raise HTTPException(
             status_code=500,
             detail=f"Error processing audio: {str(e)}"

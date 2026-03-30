@@ -1,58 +1,127 @@
+import json
+import logging
 import os
-from dotenv import load_dotenv
-from openai import OpenAI
 from io import BytesIO
-from app.lib.constants.gptCompletions import GPT_COMPLETION_SECTIONS, CATEGORY_COLORS
-from app.lib.processing.pdfProcessing.pdf_processing import create_pdf, generate_full_referral_form
-from app.lib.processing.audio.audio_processing import transcribe_audio_to_paragraphs
-from app.lib.utils.color_mapping import detect_categories_in_text, get_primary_category
 from typing import List
+
 import fitz
+from dotenv import load_dotenv
 from fastapi.responses import StreamingResponse
+from openai import OpenAI
+
+from app.lib.constants.gptCompletions import GPT_COMPLETION_SECTIONS
+from app.lib.processing.audio.audio_processing import transcribe_audio_to_paragraphs
+from app.lib.processing.pdfProcessing.pdf_processing import generate_full_referral_form
+from app.lib.utils.color_mapping import detect_categories_in_text, get_primary_category
 
 load_dotenv()
 
 api_key = os.getenv('OPENAI_API_KEY')
 
 client = OpenAI(api_key=api_key)
+logger = logging.getLogger(__name__)
 
-async def process_referral_with_openai(metadata: dict, pdf_paths: List[str]):
-    extracted_text = []
+DEFAULT_CHAT_MODEL = "gpt-3.5-turbo"
 
-    # Extract text from structured referral data fields
+
+def _chat_completion(
+    system_prompt: str,
+    user_prompt: str,
+    model: str = DEFAULT_CHAT_MODEL,
+    temperature: float | None = None,
+):
+    payload = {
+        "model": model,
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
+        ],
+    }
+    if temperature is not None:
+        payload["temperature"] = temperature
+
+    return client.chat.completions.create(**payload)
+
+
+def _extract_referral_fields_text(metadata: dict) -> list[str]:
+    extracted_text: list[str] = []
     referral_fields = ['communication', 'disability', 'additionalInformation', 'goals']
+
     for field_name in referral_fields:
-        if field_name in metadata and metadata[field_name]:
-            field_data = metadata[field_name]
-            if isinstance(field_data, dict):
-                print(f"Processing {field_name} data")
-                for key, value in field_data.items():
-                    if key != 'id' and value:
-                        label = key.replace('_', ' ').title()
-                        extracted_text.append(f"{label}: {value}")
+        field_data = metadata.get(field_name)
+        if not isinstance(field_data, dict):
+            continue
 
-    # Extract text from notes if available
-    if 'notes' in metadata and metadata['notes']:
-        print(f"Processing {len(metadata['notes'])} notes")
-        for note in metadata['notes']:
-            if 'content' in note and note['content']:
-                extracted_text.append(f"Note: {note['content']}")
+        logger.info("Processing %s data", field_name)
+        for key, value in field_data.items():
+            if key != 'id' and value:
+                label = key.replace('_', ' ').title()
+                extracted_text.append(f"{label}: {value}")
 
-    # Extract text from documents' transcribedContent if available
-    if 'documents' in metadata and metadata['documents']:
-        for doc in metadata['documents']:
-            if 'transcribedContent' in doc and doc['transcribedContent']:
-                print(f"Using transcribed content from document: {doc.get('name', 'unknown')}")
-                extracted_text.append(doc['transcribedContent'])
-    
-    # Fallback: Process any PDF files if provided (for backwards compatibility)
+    return extracted_text
+
+
+def _extract_notes_text(metadata: dict) -> list[str]:
+    extracted_text: list[str] = []
+    notes = metadata.get('notes')
+    if not notes:
+        return extracted_text
+
+    logger.info("Processing %s notes", len(notes))
+    for note in notes:
+        content = note.get('content') if isinstance(note, dict) else None
+        if content:
+            extracted_text.append(f"Note: {content}")
+
+    return extracted_text
+
+
+def _extract_documents_text(metadata: dict) -> list[str]:
+    extracted_text: list[str] = []
+    documents = metadata.get('documents')
+    if not documents:
+        return extracted_text
+
+    for doc in documents:
+        if not isinstance(doc, dict):
+            continue
+        transcribed_content = doc.get('transcribedContent')
+        if transcribed_content:
+            logger.info("Using transcribed content from document: %s", doc.get('name', 'unknown'))
+            extracted_text.append(transcribed_content)
+
+    return extracted_text
+
+
+def _extract_pdf_paths_text(pdf_paths: List[str]) -> list[str]:
+    extracted_text: list[str] = []
     for pdf_path in pdf_paths:
-        print(f"Extracting text from PDF: {pdf_path}")
+        logger.info("Extracting text from PDF: %s", pdf_path)
         with fitz.open(pdf_path) as doc:
             for page in doc:
                 extracted_text.append(page.get_text())
-    
-    extracted_text = "\n".join(extracted_text)
+    return extracted_text
+
+
+def _build_structured_assessment_text(form_data: dict) -> str:
+    parts = ["REFERRAL ASSESSMENT SUMMARY\n"]
+    for section, items in form_data.items():
+        if not isinstance(items, dict):
+            continue
+        parts.append(f"\n{section.upper()}:\n")
+        for item, response in items.items():
+            if response and response != "No information found":
+                parts.append(f"- {item}: {response}\n")
+    return "".join(parts)
+
+async def process_referral_with_openai(metadata: dict, pdf_paths: List[str]):
+    extracted_parts = []
+    extracted_parts.extend(_extract_referral_fields_text(metadata))
+    extracted_parts.extend(_extract_notes_text(metadata))
+    extracted_parts.extend(_extract_documents_text(metadata))
+    extracted_parts.extend(_extract_pdf_paths_text(pdf_paths))
+
+    extracted_text = "\n".join(extracted_parts)
     form_data = await analyze_completions_for_form(extracted_text)
     
     # Generate summary and support keywords
@@ -105,17 +174,14 @@ async def get_relevant_information(section, text):
               )
     
     try:
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": prompt}
-            ],
+        response = _chat_completion(
+            system_prompt="You are a helpful assistant.",
+            user_prompt=prompt,
         )
         return response.choices[0].message.content.strip()
 
     except Exception as e:
-        print(f"Error getting response from OpenAI: {e}")
+        logger.error("Error getting response from OpenAI: %s", e)
         return None
     
 
@@ -123,20 +189,20 @@ async def analyze_completions_for_form(text):
     form_data = {}
     category_mapping = {}  # Track which category each response belongs to
 
-    print("Analyzing PDF for form data...")
+    logger.info("Analyzing PDF for form data")
 
     for section, items in GPT_COMPLETION_SECTIONS.items():
         if section not in form_data:
             form_data[section] = {}
         
         for item in items:
-            print(f"Looking for item: {item}") 
+            logger.info("Looking for item: %s", item)
             response = await get_relevant_information(item, text)
             
             if response is None:
-                print(f"Warning: No relevant information found for {item}")
+                logger.warning("No relevant information found for %s", item)
             else:
-                print(f"Found relevant information for {item}: {response}")
+                logger.info("Found relevant information for %s", item)
                 # Detect categories mentioned in the response
                 detected_categories = detect_categories_in_text(response)
                 if detected_categories:
@@ -145,8 +211,8 @@ async def analyze_completions_for_form(text):
 
             form_data[section][item] = response  # Update the item-response pair
     
-    print('FORM_DATA', form_data)
-    print('CATEGORY_MAPPING', category_mapping)
+    logger.debug('FORM_DATA %s', form_data)
+    logger.debug('CATEGORY_MAPPING %s', category_mapping)
 
     # Store category mapping in form_data for PDF generation
     form_data['_category_mapping'] = category_mapping
@@ -164,14 +230,7 @@ async def generate_pdf_summary(form_data: dict) -> str:
     Returns:
         A summarized narrative suitable for PDF inclusion
     """
-    # Build a structured text from form data
-    structured_text = "REFERRAL ASSESSMENT SUMMARY\n\n"
-    
-    for section, items in form_data.items():
-        structured_text += f"\n{section.upper()}:\n"
-        for item, response in items.items():
-            if response and response != "No information found":
-                structured_text += f"• {item}: {response}\n"
+    structured_text = _build_structured_assessment_text(form_data)
     
     prompt = (
         "You are a professional social worker creating a concise summary for a PDF referral document. "
@@ -182,17 +241,14 @@ async def generate_pdf_summary(form_data: dict) -> str:
     )
     
     try:
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "You are a professional social worker and healthcare advocate creating formal assessments."},
-                {"role": "user", "content": prompt}
-            ],
+        response = _chat_completion(
+            system_prompt="You are a professional social worker and healthcare advocate creating formal assessments.",
+            user_prompt=prompt,
         )
         return response.choices[0].message.content.strip()
     
     except Exception as e:
-        print(f"Error generating PDF summary: {e}")
+        logger.error("Error generating PDF summary: %s", e)
         return "Summary could not be generated at this time."
 
 
@@ -220,24 +276,19 @@ async def extract_support_keywords(summary: str, form_data: dict) -> dict:
     )
     
     try:
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "You are a healthcare professional. Always respond with valid JSON only."},
-                {"role": "user", "content": prompt}
-            ],
+        response = _chat_completion(
+            system_prompt="You are a healthcare professional. Always respond with valid JSON only.",
+            user_prompt=prompt,
         )
         
         response_text = response.choices[0].message.content.strip()
         
-        # Parse JSON response
-        import json
         support_data = json.loads(response_text)
         
         return support_data
     
     except Exception as e:
-        print(f"Error extracting support keywords: {e}")
+        logger.error("Error extracting support keywords: %s", e)
         return {
             "primary_needs": [
                 {"category": "Assessment Required", "description": "Full assessment needed to determine support areas"}

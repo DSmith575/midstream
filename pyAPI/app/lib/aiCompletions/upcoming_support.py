@@ -1,6 +1,7 @@
 import base64
 import io
 import json
+import logging
 import os
 import re
 from datetime import datetime, timezone
@@ -16,9 +17,36 @@ load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=api_key)
 MODEL_NAME = os.getenv("OPENAI_MODEL_UPCOMING_SUPPORT", "gpt-4o-mini")
+MODEL_NAME_MEDICAL_IMAGE = os.getenv("OPENAI_MODEL_UPCOMING_SUPPORT_MEDICAL", MODEL_NAME)
 MAX_SOURCE_CHARS = 5000
 MAX_IMAGE_DIMENSION = 1600
 MAX_IMAGE_BYTES = 1_000_000
+
+logger = logging.getLogger(__name__)
+
+MEDICAL_IMAGE_KEYWORDS = {
+    "medical",
+    "clinic",
+    "hospital",
+    "doctor",
+    "dr",
+    "appointment",
+    "follow up",
+    "follow-up",
+    "visit",
+    "referral",
+    "patient",
+    "prescription",
+    "rx",
+    "radiology",
+    "xray",
+    "x-ray",
+    "mri",
+    "ct",
+    "ultrasound",
+    "lab",
+    "bloodwork",
+}
 
 MONTHS = {
     "january": 1,
@@ -87,6 +115,22 @@ TIME_PATTERN = re.compile(
     re.IGNORECASE,
 )
 
+TIME_PATTERN_24H = re.compile(
+    r"\b(?P<hour>[01]?\d|2[0-3])[:.](?P<minute>[0-5]\d)\b",
+    re.IGNORECASE,
+)
+
+TIME_KEYWORD_PATTERN = re.compile(r"\b(?P<keyword>noon|midnight)\b", re.IGNORECASE)
+
+DATE_LINE_PATTERN = re.compile(r"^\s*date\s*:\s*(?P<value>.+)$", re.IGNORECASE | re.MULTILINE)
+TIME_LINE_PATTERN = re.compile(r"^\s*time\s*:\s*(?P<value>.+)$", re.IGNORECASE | re.MULTILINE)
+MEETING_WITH_LINE_PATTERN = re.compile(r"^\s*meeting\s+with\s*:\s*(?P<value>.+)$", re.IGNORECASE | re.MULTILINE)
+SUBJECT_LINE_PATTERN = re.compile(r"^\s*subject\s*:\s*(?P<value>.+)$", re.IGNORECASE | re.MULTILINE)
+APPOINTMENT_CONTEXT_PATTERN = re.compile(
+    r"\b(appointment|meeting|visit|hearing|follow\s*-?\s*up|scheduled|deadline|date\s*:|time\s*:|subject\s*:|meeting\s+with\s*:?)\b",
+    re.IGNORECASE,
+)
+
 
 def _safe_json_loads(value: str, default: Any) -> Any:
     try:
@@ -103,6 +147,15 @@ def _extract_pdf_text(file_base64: str) -> str:
         return "\n".join([part for part in parts if part])
     except Exception:
         return ""
+
+
+def _looks_like_medical_image(item_name: str) -> bool:
+    normalized_name = item_name.strip().lower()
+    return any(keyword in normalized_name for keyword in MEDICAL_IMAGE_KEYWORDS)
+
+
+def _image_model_for_item(is_medical_image: bool) -> str:
+    return MODEL_NAME_MEDICAL_IMAGE if is_medical_image else MODEL_NAME
 
 
 def _prepare_image_for_vision(mime_type: str, file_base64: str) -> tuple[str, str]:
@@ -140,26 +193,44 @@ def _prepare_image_for_vision(mime_type: str, file_base64: str) -> tuple[str, st
 
 def _extract_image_text(item_name: str, mime_type: str, file_base64: str) -> str:
     prepared_mime, prepared_b64 = _prepare_image_for_vision(mime_type, file_base64)
+    is_medical_image = _looks_like_medical_image(item_name)
 
-    primary_prompt = (
-        "Transcribe all legible text from this support correspondence image exactly as written. "
-        "Preserve dates, times, headings, numbers, and line breaks where possible. "
-        "Do not summarize. Return plain text only."
-    )
+    if is_medical_image:
+        primary_prompt = (
+            "Transcribe all legible text from this medical document image exactly as written. "
+            "Preserve dates, times, provider names, headings, numbers, and line breaks where possible. "
+            "Do not summarize. Return plain text only."
+        )
+        secondary_prompt = (
+            "If full transcription is difficult, extract appointment and follow-up visit date/time details "
+            "from this medical image. Include exact date/time phrases. Return plain text only."
+        )
+        system_prompt = "You are an OCR extraction assistant for medical documents. Return plain text only."
+        retry_system_prompt = "You extract appointment date/time details from medical documents. Return plain text only."
+    else:
+        primary_prompt = (
+            "Transcribe all legible text from this support correspondence image exactly as written. "
+            "Preserve dates, times, headings, numbers, and line breaks where possible. "
+            "Do not summarize. Return plain text only."
+        )
 
-    secondary_prompt = (
-        "If full transcription is difficult, extract any appointment, deadline, meeting, hearing, "
-        "or due-date details from this image. Include exact date/time phrases. Return plain text only."
-    )
+        secondary_prompt = (
+            "If full transcription is difficult, extract any appointment, deadline, meeting, hearing, "
+            "or due-date details from this image. Include exact date/time phrases. Return plain text only."
+        )
+        system_prompt = "You are an OCR-style extraction assistant for support letters. Return plain text only."
+        retry_system_prompt = "You extract appointment/deadline details from correspondence images. Return plain text only."
+
+    model_name = _image_model_for_item(is_medical_image)
 
     try:
         response = client.chat.completions.create(
-            model=MODEL_NAME,
+            model=model_name,
             temperature=0,
             messages=[
                 {
                     "role": "system",
-                    "content": "You are an OCR-style extraction assistant for support letters. Return plain text only.",
+                    "content": system_prompt,
                 },
                 {
                     "role": "user",
@@ -181,16 +252,25 @@ def _extract_image_text(item_name: str, mime_type: str, file_base64: str) -> str
         )
 
         primary_text = (response.choices[0].message.content or "").strip()
+        logger.info(
+            "Image OCR primary pass completed",
+            extra={
+                "item_name": item_name,
+                "mime_type": mime_type,
+                "is_medical_image": is_medical_image,
+                "char_count": len(primary_text),
+            },
+        )
         if primary_text:
             return primary_text
 
         retry = client.chat.completions.create(
-            model=MODEL_NAME,
+            model=model_name,
             temperature=0,
             messages=[
                 {
                     "role": "system",
-                    "content": "You extract appointment/deadline details from correspondence images. Return plain text only.",
+                    "content": retry_system_prompt,
                 },
                 {
                     "role": "user",
@@ -211,8 +291,26 @@ def _extract_image_text(item_name: str, mime_type: str, file_base64: str) -> str
             ],
         )
 
-        return (retry.choices[0].message.content or "").strip()
+        retry_text = (retry.choices[0].message.content or "").strip()
+        logger.info(
+            "Image OCR retry pass completed",
+            extra={
+                "item_name": item_name,
+                "mime_type": mime_type,
+                "is_medical_image": is_medical_image,
+                "char_count": len(retry_text),
+            },
+        )
+        return retry_text
     except Exception as exc:
+        logger.exception(
+            "Image OCR failed",
+            extra={
+                "item_name": item_name,
+                "mime_type": mime_type,
+                "is_medical_image": is_medical_image,
+            },
+        )
         print(f"Image OCR failed for {item_name}: {exc}")
         return ""
 
@@ -225,11 +323,21 @@ def _extract_image_notifications_direct(
     today_iso: str,
 ) -> list[dict[str, Any]]:
     prepared_mime, prepared_b64 = _prepare_image_for_vision(mime_type, file_base64)
-    prompt = (
-        "Extract upcoming reminders from this support correspondence image. "
-        "Return JSON only with key notifications as an array. "
-        "Each notification must include: title, summary, dueDateISO (ISO or null), urgency (LOW|MEDIUM|HIGH), confidence (0..1), reason."
-    )
+    is_medical_image = _looks_like_medical_image(item_name)
+    model_name = _image_model_for_item(is_medical_image)
+    if is_medical_image:
+        prompt = (
+            "Extract appointment and follow-up visit reminders from this medical document image. "
+            "Only include records with appointment-style date/time information. "
+            "Return JSON only with key notifications as an array. "
+            "Each notification must include: title, summary, dueDateISO (ISO with time when present, or null), urgency (LOW|MEDIUM|HIGH), confidence (0..1), reason."
+        )
+    else:
+        prompt = (
+            "Extract upcoming reminders from this support correspondence image. "
+            "Return JSON only with key notifications as an array. "
+            "Each notification must include: title, summary, dueDateISO (ISO with time when present, or null), urgency (LOW|MEDIUM|HIGH), confidence (0..1), reason."
+        )
 
     payload = {
         "todayISO": today_iso,
@@ -242,7 +350,7 @@ def _extract_image_notifications_direct(
                 {
                     "title": "short reminder title",
                     "summary": "one sentence summary",
-                    "dueDateISO": "ISO datetime or null",
+                    "dueDateISO": "ISO datetime including time when available, or null",
                     "urgency": "LOW|MEDIUM|HIGH",
                     "confidence": 0.5,
                     "reason": "brief extraction rationale",
@@ -253,7 +361,7 @@ def _extract_image_notifications_direct(
 
     try:
         response = client.chat.completions.create(
-            model=MODEL_NAME,
+            model=model_name,
             temperature=0,
             response_format={"type": "json_object"},
             messages=[
@@ -300,6 +408,14 @@ def _extract_image_notifications_direct(
 
         return _sanitize_notifications(normalized_rows)
     except Exception as exc:
+        logger.exception(
+            "Direct image reminder extraction failed",
+            extra={
+                "item_name": item_name,
+                "mime_type": mime_type,
+                "is_medical_image": is_medical_image,
+            },
+        )
         print(f"Direct image reminder extraction failed for {item_name}: {exc}")
         return []
 
@@ -398,6 +514,126 @@ def _urgency_from_due_date(due: datetime, today: datetime) -> str:
     return "LOW"
 
 
+def _parse_time_from_surrounding_text(text: str, start_index: int, end_index: int) -> tuple[int, int]:
+    window_start = max(0, start_index - 40)
+    window_end = min(len(text), end_index + 40)
+    surrounding = text[window_start:window_end]
+    keyword_match = TIME_KEYWORD_PATTERN.search(surrounding)
+    if keyword_match:
+        if keyword_match.group("keyword").lower() == "noon":
+            return 12, 0
+        return 0, 0
+
+    time_match = TIME_PATTERN.search(surrounding)
+    if time_match:
+        hour = int(time_match.group("hour"))
+        minute = int(time_match.group("minute") or 0)
+        ampm = time_match.group("ampm").lower()
+        if ampm == "pm" and hour != 12:
+            hour += 12
+        if ampm == "am" and hour == 12:
+            hour = 0
+        return hour, minute
+
+    time_match_24h = TIME_PATTERN_24H.search(surrounding)
+    if time_match_24h:
+        hour = int(time_match_24h.group("hour"))
+        minute = int(time_match_24h.group("minute") or 0)
+        return hour, minute
+
+    return 0, 0
+
+
+def _parse_time_from_text(text: str) -> tuple[int, int] | None:
+    keyword_match = TIME_KEYWORD_PATTERN.search(text)
+    if keyword_match:
+        if keyword_match.group("keyword").lower() == "noon":
+            return 12, 0
+        return 0, 0
+
+    time_match = TIME_PATTERN.search(text)
+    if time_match:
+        hour = int(time_match.group("hour"))
+        minute = int(time_match.group("minute") or 0)
+        ampm = time_match.group("ampm").lower()
+        if ampm == "pm" and hour != 12:
+            hour += 12
+        if ampm == "am" and hour == 12:
+            hour = 0
+        return hour, minute
+
+    time_match_24h = TIME_PATTERN_24H.search(text)
+    if time_match_24h:
+        hour = int(time_match_24h.group("hour"))
+        minute = int(time_match_24h.group("minute") or 0)
+        return hour, minute
+
+    return None
+
+
+def _has_appointment_context(text: str, start_index: int, end_index: int) -> bool:
+    window_start = max(0, start_index - 100)
+    window_end = min(len(text), end_index + 100)
+    surrounding = text[window_start:window_end]
+    return APPOINTMENT_CONTEXT_PATTERN.search(surrounding) is not None
+
+
+def _parse_labeled_date_time(text: str, today: datetime) -> datetime | None:
+    date_line_match = DATE_LINE_PATTERN.search(text)
+    if not date_line_match:
+        return None
+
+    date_value = date_line_match.group("value").strip()
+    date_match = DATE_PATTERN.search(date_value)
+    parse_fn = _parse_due_datetime_from_match
+
+    if not date_match:
+        date_match = DATE_PATTERN_MONTH_DAY.search(date_value)
+        parse_fn = _parse_due_datetime_from_month_day_match
+    if not date_match:
+        date_match = DATE_PATTERN_NUMERIC.search(date_value)
+        parse_fn = _parse_due_datetime_from_numeric_match
+    if not date_match:
+        date_match = DATE_PATTERN_YMD.search(date_value)
+        parse_fn = _parse_due_datetime_from_ymd_match
+    if not date_match:
+        return None
+
+    due_dt = parse_fn(date_value, date_match, today)
+    if not due_dt:
+        return None
+
+    time_line_match = TIME_LINE_PATTERN.search(text)
+    if not time_line_match:
+        return due_dt
+
+    parsed_time = _parse_time_from_text(time_line_match.group("value"))
+    if not parsed_time:
+        return due_dt
+
+    hour, minute = parsed_time
+    try:
+        return due_dt.replace(hour=hour, minute=minute)
+    except ValueError:
+        return due_dt
+
+
+def _build_appointment_title_from_labeled_fields(text: str, fallback_title: str) -> str:
+    meeting_with_match = MEETING_WITH_LINE_PATTERN.search(text)
+    if meeting_with_match:
+        value = meeting_with_match.group("value").strip(" .")
+        if value:
+            return f"Meeting with {value[:72]}"
+
+    subject_match = SUBJECT_LINE_PATTERN.search(text)
+    if subject_match:
+        value = subject_match.group("value").strip(" .")
+        if value:
+            return f"Subject: {value[:80]}"
+
+    return fallback_title
+
+
 def _parse_due_datetime_from_match(text: str, match: re.Match[str], today: datetime) -> datetime | None:
     day = int(match.group("day"))
     month_name = match.group("month").lower().rstrip(".")
@@ -408,22 +644,7 @@ def _parse_due_datetime_from_match(text: str, match: re.Match[str], today: datet
     year_text = match.group("year")
     year = int(year_text) if year_text else today.year
 
-    # Look around the date phrase for a time like "9pm" or "9:30 pm".
-    start = max(0, match.start() - 40)
-    end = min(len(text), match.end() + 40)
-    surrounding = text[start:end]
-    time_match = TIME_PATTERN.search(surrounding)
-
-    hour = 9
-    minute = 0
-    if time_match:
-        hour = int(time_match.group("hour"))
-        minute = int(time_match.group("minute") or 0)
-        ampm = time_match.group("ampm").lower()
-        if ampm == "pm" and hour != 12:
-            hour += 12
-        if ampm == "am" and hour == 12:
-            hour = 0
+    hour, minute = _parse_time_from_surrounding_text(text, match.start(), match.end())
 
     try:
         due = datetime(year, month, day, hour, minute, tzinfo=timezone.utc)
@@ -449,21 +670,7 @@ def _parse_due_datetime_from_month_day_match(text: str, match: re.Match[str], to
     day = int(match.group("day"))
     year = _normalize_year(match.group("year"), today.year)
 
-    start = max(0, match.start() - 40)
-    end = min(len(text), match.end() + 40)
-    surrounding = text[start:end]
-    time_match = TIME_PATTERN.search(surrounding)
-
-    hour = 9
-    minute = 0
-    if time_match:
-        hour = int(time_match.group("hour"))
-        minute = int(time_match.group("minute") or 0)
-        ampm = time_match.group("ampm").lower()
-        if ampm == "pm" and hour != 12:
-            hour += 12
-        if ampm == "am" and hour == 12:
-            hour = 0
+    hour, minute = _parse_time_from_surrounding_text(text, match.start(), match.end())
 
     try:
         due = datetime(year, month, day, hour, minute, tzinfo=timezone.utc)
@@ -496,21 +703,7 @@ def _parse_due_datetime_from_numeric_match(text: str, match: re.Match[str], toda
     if day < 1 or day > 31 or month < 1 or month > 12:
         return None
 
-    start = max(0, match.start() - 40)
-    end = min(len(text), match.end() + 40)
-    surrounding = text[start:end]
-    time_match = TIME_PATTERN.search(surrounding)
-
-    hour = 9
-    minute = 0
-    if time_match:
-        hour = int(time_match.group("hour"))
-        minute = int(time_match.group("minute") or 0)
-        ampm = time_match.group("ampm").lower()
-        if ampm == "pm" and hour != 12:
-            hour += 12
-        if ampm == "am" and hour == 12:
-            hour = 0
+    hour, minute = _parse_time_from_surrounding_text(text, match.start(), match.end())
 
     try:
         due = datetime(year, month, day, hour, minute, tzinfo=timezone.utc)
@@ -534,21 +727,7 @@ def _parse_due_datetime_from_ymd_match(text: str, match: re.Match[str], _: datet
     if day < 1 or day > 31 or month < 1 or month > 12:
         return None
 
-    start = max(0, match.start() - 40)
-    end = min(len(text), match.end() + 40)
-    surrounding = text[start:end]
-    time_match = TIME_PATTERN.search(surrounding)
-
-    hour = 9
-    minute = 0
-    if time_match:
-        hour = int(time_match.group("hour"))
-        minute = int(time_match.group("minute") or 0)
-        ampm = time_match.group("ampm").lower()
-        if ampm == "pm" and hour != 12:
-            hour += 12
-        if ampm == "am" and hour == 12:
-            hour = 0
+    hour, minute = _parse_time_from_surrounding_text(text, match.start(), match.end())
 
     try:
         return datetime(year, month, day, hour, minute, tzinfo=timezone.utc)
@@ -582,7 +761,29 @@ def _extract_rule_based_notifications(
         if not source_text:
             continue
 
+        labeled_due_dt = _parse_labeled_date_time(source_text, today)
+        if labeled_due_dt:
+            fallback_title = _build_title_from_text(source_text, 0)
+            title = _build_appointment_title_from_labeled_fields(source_text, fallback_title)
+            due_iso = labeled_due_dt.isoformat().replace("+00:00", "Z")
+            urgency = _urgency_from_due_date(labeled_due_dt, today)
+
+            notifications.append(
+                {
+                    "title": title,
+                    "summary": f"Appointment inferred from DATE/TIME fields: {title}",
+                    "dueDateISO": due_iso,
+                    "urgency": urgency,
+                    "confidence": 0.9,
+                    "sourceItemId": source.get("itemId", ""),
+                    "sourceItemName": source.get("itemName", ""),
+                    "reason": "Matched DATE and TIME labeled fields in source text.",
+                }
+            )
+
         for match in DATE_PATTERN.finditer(source_text):
+            if not _has_appointment_context(source_text, match.start(), match.end()):
+                continue
             due_dt = _parse_due_datetime_from_match(source_text, match, today)
             if not due_dt:
                 continue
@@ -605,6 +806,8 @@ def _extract_rule_based_notifications(
             )
 
         for match in DATE_PATTERN_MONTH_DAY.finditer(source_text):
+            if not _has_appointment_context(source_text, match.start(), match.end()):
+                continue
             due_dt = _parse_due_datetime_from_month_day_match(source_text, match, today)
             if not due_dt:
                 continue
@@ -627,6 +830,8 @@ def _extract_rule_based_notifications(
             )
 
         for match in DATE_PATTERN_NUMERIC.finditer(source_text):
+            if not _has_appointment_context(source_text, match.start(), match.end()):
+                continue
             due_dt = _parse_due_datetime_from_numeric_match(source_text, match, today)
             if not due_dt:
                 continue
@@ -649,6 +854,8 @@ def _extract_rule_based_notifications(
             )
 
         for match in DATE_PATTERN_YMD.finditer(source_text):
+            if not _has_appointment_context(source_text, match.start(), match.end()):
+                continue
             due_dt = _parse_due_datetime_from_ymd_match(source_text, match, today)
             if not due_dt:
                 continue
@@ -701,21 +908,38 @@ async def extract_upcoming_support_notifications(items: list[dict[str, Any]], to
     today_text = today_iso or datetime.now(timezone.utc).isoformat()
 
     image_direct_notifications: list[dict[str, Any]] = []
+    image_attempt_count = 0
+    image_direct_hit_count = 0
+    image_item_ids: set[str] = set()
     for item in items:
         mime_type = str(item.get("mimeType") or "")
         file_base64 = item.get("fileBase64")
         if mime_type.startswith("image/") and isinstance(file_base64, str) and file_base64:
-            image_direct_notifications.extend(
-                _extract_image_notifications_direct(
-                    item_id=str(item.get("itemId") or ""),
-                    item_name=str(item.get("itemName") or "Support image"),
-                    mime_type=mime_type,
-                    file_base64=file_base64,
-                    today_iso=today_text,
-                )
+            image_attempt_count += 1
+            image_item_ids.add(str(item.get("itemId") or ""))
+            image_rows = _extract_image_notifications_direct(
+                item_id=str(item.get("itemId") or ""),
+                item_name=str(item.get("itemName") or "Support image"),
+                mime_type=mime_type,
+                file_base64=file_base64,
+                today_iso=today_text,
             )
+            if image_rows:
+                image_direct_hit_count += 1
+            image_direct_notifications.extend(image_rows)
 
     sources = _normalize_sources(items)
+    image_source_count = sum(1 for source in sources if str(source.get("itemId") or "") in image_item_ids)
+    logger.info(
+        "Upcoming support extraction source summary",
+        extra={
+            "item_count": len(items),
+            "source_count": len(sources),
+            "image_attempt_count": image_attempt_count,
+            "image_direct_hit_count": image_direct_hit_count,
+            "image_source_count": image_source_count,
+        },
+    )
     if not sources and not image_direct_notifications:
         return []
 
@@ -733,6 +957,7 @@ async def extract_upcoming_support_notifications(items: list[dict[str, Any]], to
         "You are an assistant that reads support correspondence and builds planner reminders. "
         "Find concrete upcoming tasks, appointments, deadlines, hearings, submissions, and follow-ups. "
         "Use only information that appears in the provided source text. "
+        "If a time is present, include it in dueDateISO. "
         "If date is unclear, set dueDateISO to null."
     )
 
@@ -752,7 +977,7 @@ async def extract_upcoming_support_notifications(items: list[dict[str, Any]], to
                 {
                     "title": "short reminder title",
                     "summary": "one sentence summary",
-                    "dueDateISO": "ISO datetime or null",
+                    "dueDateISO": "ISO datetime including time when available, or null",
                     "urgency": "LOW|MEDIUM|HIGH",
                     "confidence": "0.0 to 1.0",
                     "sourceItemId": "string",

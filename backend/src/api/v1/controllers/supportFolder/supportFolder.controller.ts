@@ -421,6 +421,11 @@ const runUpcomingSupportRescan = async (userId: string) => {
   });
 
   let skippedItems = 0;
+  const skippedByReason: Record<string, number> = {
+    missingFileOrUnsupportedMime: 0,
+    oversizedForAnalysis: 0,
+    textDecodeFailed: 0,
+  };
 
   const payloadItems = rawItems
     .map((item: any) => {
@@ -437,11 +442,13 @@ const runUpcomingSupportRescan = async (userId: string) => {
 
       if (!item.fileData || !isAnalyzableMimeType(item.mimeType)) {
         skippedItems += 1;
+        skippedByReason.missingFileOrUnsupportedMime += 1;
         return null;
       }
 
       if (typeof item.sizeBytes === 'number' && item.sizeBytes > MAX_ANALYSIS_FILE_BYTES) {
         skippedItems += 1;
+        skippedByReason.oversizedForAnalysis += 1;
         return null;
       }
 
@@ -449,6 +456,7 @@ const runUpcomingSupportRescan = async (userId: string) => {
         const decoded = safeUtf8FromBuffer(item.fileData);
         if (!decoded) {
           skippedItems += 1;
+          skippedByReason.textDecodeFailed += 1;
           return null;
         }
 
@@ -472,6 +480,14 @@ const runUpcomingSupportRescan = async (userId: string) => {
       };
     })
     .filter(Boolean);
+
+  console.info('Upcoming support rescan payload summary', {
+    userId,
+    totalItemsFetched: rawItems.length,
+    payloadItems: payloadItems.length,
+    skippedItems,
+    skippedByReason,
+  });
 
   if (payloadItems.length === 0) {
     await upcomingSupportNotificationModel.deleteMany({ where: { userId } });
@@ -504,6 +520,10 @@ const runUpcomingSupportRescan = async (userId: string) => {
 
   const aiData = await response.json();
   const aiRows = Array.isArray(aiData?.data) ? aiData.data : [];
+  console.info('Upcoming support rescan AI response summary', {
+    userId,
+    aiRows: aiRows.length,
+  });
 
   const dedupedMap = new Map<string, any>();
   for (const row of aiRows) {

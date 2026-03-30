@@ -1,7 +1,11 @@
+import logging
 import os
 import re
 import time
+
 from fastapi.responses import JSONResponse
+
+logger = logging.getLogger(__name__)
 
 
 def allowed_file(filename: str, allowed_extensions: set) -> bool:
@@ -12,6 +16,8 @@ def allowed_file(filename: str, allowed_extensions: set) -> bool:
 def sanitize_filename(filename: str) -> str:
     """Sanitize the filename by removing or replacing invalid characters."""
     name = os.path.splitext(filename)[0]
+    if not name:
+        return "File"
     name = name[0].upper() + name[1:]
     return re.sub(r'[^a-zA-Z0-9_\-]', '-', name)
 
@@ -19,7 +25,7 @@ def split_filename_from_extension(filename: str) -> str:
     """Split the filename from the extension."""
     return filename.rsplit('.', 1)[0]
 
-def handle_exception(request, exc) -> JSONResponse:
+def handle_exception(_request, exc: Exception) -> JSONResponse:
     """Custom exception handler for FastAPI."""
     return JSONResponse(
         status_code=500,
@@ -27,7 +33,7 @@ def handle_exception(request, exc) -> JSONResponse:
     )
 
 
-def delete_files_older_than(folder_path, minutes):
+def delete_files_older_than(folder_path: str, minutes: int) -> None:
     # Calculate the threshold time in seconds
     threshold_time = time.time() - minutes * 60
 
@@ -44,9 +50,9 @@ def delete_files_older_than(folder_path, minutes):
                 # If the file is older than the threshold, delete it
                 if file_mod_time < threshold_time:
                     os.remove(file_path)
-                    print(f"Deleted file: {file_path}")
+                    logger.info("Deleted file: %s", file_path)
 
-        print("Deletion process completed.")
+        logger.info("Deletion process completed")
 
     except Exception as e:
-        print(f"An error occurred: {e}")
+        logger.error("An error occurred while deleting old files: %s", e)
