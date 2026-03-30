@@ -1,6 +1,7 @@
 import express from 'express';
 import multer from 'multer';
 import {
+  createUpcomingSupportNotificationFromVoice,
   createSupportFolderTextItem,
   deleteSupportFolderItem,
   downloadSupportFolderItem,
@@ -28,6 +29,7 @@ router.use(authenticate);
 
 router.get('/:googleId/items', authorizeUserAccess, getSupportFolderItems);
 router.get('/:googleId/upcoming-support', authorizeUserAccess, getUpcomingSupportNotifications);
+router.post('/:googleId/upcoming-support/voice', authorizeUserAccess, createUpcomingSupportNotificationFromVoice);
 router.patch('/:googleId/upcoming-support/:notificationId/read', authorizeUserAccess, updateUpcomingSupportReadStatus);
 router.patch('/:googleId/upcoming-support/:notificationId/dismiss', authorizeUserAccess, updateUpcomingSupportDismissStatus);
 router.patch('/:googleId/upcoming-support/:notificationId/due-date', authorizeUserAccess, updateUpcomingSupportDueDate);

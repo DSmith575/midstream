@@ -1,9 +1,50 @@
-import { useState } from 'react'
-import { AlertTriangle, CalendarClock, CircleAlert, RefreshCw } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { AlertTriangle, CalendarClock, CircleAlert, Mic, RefreshCw, Square } from 'lucide-react'
 import { Spinner } from '@/components/spinner/Spinner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { useUpcomingSupport } from '@/hooks/userProfile'
+
+type SpeechRecognitionResultLike = {
+    [index: number]: {
+        transcript: string
+    }
+    isFinal?: boolean
+}
+
+type SpeechRecognitionEventLike = {
+    resultIndex: number
+    results: {
+        [index: number]: SpeechRecognitionResultLike
+        length: number
+        item: (index: number) => SpeechRecognitionResultLike
+    }
+}
+
+type SpeechRecognitionLike = {
+    continuous: boolean
+    interimResults: boolean
+    lang: string
+    onresult: ((event: SpeechRecognitionEventLike) => void) | null
+    onerror: (() => void) | null
+    onend: (() => void) | null
+    start: () => void
+    stop: () => void
+}
+
+type SpeechRecognitionConstructorLike = new () => SpeechRecognitionLike
+
+const getSpeechRecognitionConstructor = (): SpeechRecognitionConstructorLike | null => {
+    if (typeof window === 'undefined') return null
+
+    const maybeWindow = window as Window & {
+        SpeechRecognition?: SpeechRecognitionConstructorLike
+        webkitSpeechRecognition?: SpeechRecognitionConstructorLike
+    }
+
+    return maybeWindow.SpeechRecognition || maybeWindow.webkitSpeechRecognition || null
+}
 
 const emptyStateClassName = 'rounded-xl border border-dashed border-border/60 bg-background/40 p-4 text-sm text-muted-foreground'
 
@@ -74,12 +115,29 @@ export const UpcomingSupportCard = ({ userId }: { userId: string }) => {
         moveToUpcomingPending,
         setDueDate,
         dueDatePending,
+        createVoiceAppointment,
+        createVoiceAppointmentPending,
     } = useUpcomingSupport(userId)
     const notifications = data?.data || []
     const pastNotifications = data?.pastData || []
     const actionPending = readStatusPending || dismissStatusPending || moveToUpcomingPending || dueDatePending
+    const voiceSupported = !!getSpeechRecognitionConstructor()
+    const recognitionRef = useRef<SpeechRecognitionLike | null>(null)
+    const voiceCaptureBaseRef = useRef('')
+    const [isListening, setIsListening] = useState(false)
+    const [voiceDraft, setVoiceDraft] = useState('')
+    const [voiceSaveSuccess, setVoiceSaveSuccess] = useState(false)
     const [editingNotificationId, setEditingNotificationId] = useState<string | null>(null)
     const [editedDateValue, setEditedDateValue] = useState('')
+
+    useEffect(() => {
+        return () => {
+            if (recognitionRef.current) {
+                recognitionRef.current.stop()
+                recognitionRef.current = null
+            }
+        }
+    }, [])
 
     const startEditDueDate = (notificationId: string, currentDueDateISO: string | null) => {
         setEditingNotificationId(notificationId)
@@ -97,6 +155,70 @@ export const UpcomingSupportCard = ({ userId }: { userId: string }) => {
         setDueDate({ notificationId, dueDateISO })
         setEditingNotificationId(null)
         setEditedDateValue('')
+    }
+
+    const stopVoiceCapture = () => {
+        if (!recognitionRef.current) return
+        recognitionRef.current.stop()
+    }
+
+    const startVoiceCapture = () => {
+        const SpeechRecognitionCtor = getSpeechRecognitionConstructor()
+        if (!SpeechRecognitionCtor) return
+
+        voiceCaptureBaseRef.current = voiceDraft.trim()
+        setVoiceSaveSuccess(false)
+
+        const recognition = new SpeechRecognitionCtor()
+        recognitionRef.current = recognition
+        recognition.lang = 'en-NZ'
+        recognition.continuous = true
+        recognition.interimResults = true
+
+        recognition.onresult = (event) => {
+            let finalTranscript = ''
+            let interimTranscript = ''
+
+            for (let i = 0; i < event.results.length; i += 1) {
+                const segment = event.results[i]?.[0]?.transcript?.trim()
+                if (!segment) continue
+                if (event.results[i].isFinal) {
+                    finalTranscript = `${finalTranscript} ${segment}`.trim()
+                } else {
+                    interimTranscript = `${interimTranscript} ${segment}`.trim()
+                }
+            }
+
+            const capturedText = `${finalTranscript} ${interimTranscript}`.trim()
+            const baseText = voiceCaptureBaseRef.current
+            setVoiceDraft(`${baseText} ${capturedText}`.trim())
+        }
+
+        recognition.onerror = () => {
+            setIsListening(false)
+        }
+
+        recognition.onend = () => {
+            setIsListening(false)
+            recognitionRef.current = null
+        }
+
+        setIsListening(true)
+        recognition.start()
+    }
+
+    const createAppointmentFromVoice = () => {
+        if (!voiceDraft.trim()) return
+        setVoiceSaveSuccess(false)
+        createVoiceAppointment(
+            { transcript: voiceDraft.trim() },
+            {
+                onSuccess: () => {
+                    setVoiceDraft('')
+                    setVoiceSaveSuccess(true)
+                },
+            },
+        )
     }
 
     const renderNotificationItem = (
@@ -250,6 +372,62 @@ export const UpcomingSupportCard = ({ userId }: { userId: string }) => {
                     <StatsBadge text={`${data?.persistedCount ?? 0} saved`} />
                     {isLoading && <Spinner />}
                 </div>
+
+                <section className="rounded-xl border border-border/60 bg-background/40 p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                        <p className="text-sm font-semibold text-foreground">Create appointment from voice</p>
+                        {voiceSupported ? (
+                            <Button
+                                type="button"
+                                size="sm"
+                                variant={isListening ? 'destructive' : 'outline'}
+                                onClick={isListening ? stopVoiceCapture : startVoiceCapture}
+                                disabled={createVoiceAppointmentPending || refreshScanPending}
+                            >
+                                {isListening ? (
+                                    <>
+                                        <Square className="mr-2 h-4 w-4" />
+                                        Stop listening
+                                    </>
+                                ) : (
+                                    <>
+                                        <Mic className="mr-2 h-4 w-4" />
+                                        Start voice capture
+                                    </>
+                                )}
+                            </Button>
+                        ) : (
+                            <p className="text-xs text-muted-foreground">Voice capture is not supported in this browser. You can still type your appointment note below.</p>
+                        )}
+                    </div>
+                    <p className="mt-2 text-xs text-muted-foreground">
+                        Speak details like appointment date, time, provider, and location. We save this directly as an upcoming support notification.
+                    </p>
+                    <Textarea
+                        className="mt-3"
+                        placeholder="Example: Appointment with Dr Smith on 14 April at 2:30 PM at Auckland City Hospital."
+                        value={voiceDraft}
+                        onChange={(event) => {
+                            setVoiceDraft(event.target.value)
+                            setVoiceSaveSuccess(false)
+                        }}
+                    />
+                    <div className="mt-3 flex justify-end">
+                        <Button
+                            type="button"
+                            size="sm"
+                            onClick={createAppointmentFromVoice}
+                            disabled={!voiceDraft.trim() || createVoiceAppointmentPending || refreshScanPending}
+                        >
+                            {createVoiceAppointmentPending || refreshScanPending ? 'Creating appointment...' : 'Create appointment from voice note'}
+                        </Button>
+                    </div>
+                    {voiceSaveSuccess ? (
+                        <p className="mt-2 text-xs font-medium text-emerald-700">
+                            Saved directly to Upcoming Support notifications.
+                        </p>
+                    ) : null}
+                </section>
 
                 {error ? (
                     <p className="text-sm text-destructive">

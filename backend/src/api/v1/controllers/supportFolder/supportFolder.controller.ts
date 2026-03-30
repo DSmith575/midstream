@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { Request, Response } from 'express';
 import { statusCodes } from '@/constants';
+import { randomUUID } from 'crypto';
 
 const prisma = new PrismaClient();
 const PYTHON_API_URL = process.env.PYTHON_API_KEY || process.env.PYTHON_API_URL;
@@ -85,6 +86,87 @@ const parseDueDate = (value: unknown): Date | null => {
   if (!value) return null;
   const parsed = new Date(String(value));
   return Number.isNaN(parsed.getTime()) ? null : parsed;
+};
+
+const MONTH_NUMBER_BY_NAME: Record<string, number> = {
+  january: 1,
+  february: 2,
+  march: 3,
+  april: 4,
+  may: 5,
+  june: 6,
+  july: 7,
+  august: 8,
+  september: 9,
+  october: 10,
+  november: 11,
+  december: 12,
+};
+
+const MONTH_NAMES_PATTERN =
+  'january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|jun|jul|aug|sep|sept|oct|nov|dec';
+
+const normalizeMonthName = (value: string): string => {
+  const normalized = value.trim().toLowerCase();
+  const aliases: Record<string, string> = {
+    jan: 'january',
+    feb: 'february',
+    mar: 'march',
+    apr: 'april',
+    jun: 'june',
+    jul: 'july',
+    aug: 'august',
+    sep: 'september',
+    sept: 'september',
+    oct: 'october',
+    nov: 'november',
+    dec: 'december',
+  };
+  return aliases[normalized] || normalized;
+};
+
+const inferDueDateFromVoiceTranscript = (transcript: string, now: Date): Date | null => {
+  const text = transcript.trim();
+  if (!text) return null;
+
+  const dayMonthPattern = new RegExp(
+    `\\b(?<day>\\d{1,2})(?:st|nd|rd|th)?\\s*(?:of\\s+)?(?<month>${MONTH_NAMES_PATTERN})\\b(?:\\s*(?:,|of)?\\s*(?<year>\\d{4}))?(?:[^\\n]*?\\bat\\s+(?<hour>\\d{1,2})(?::(?<minute>\\d{2}))?\\s*(?<ampm>am|pm))?`,
+    'i',
+  );
+  const monthDayPattern = new RegExp(
+    `\\b(?<month>${MONTH_NAMES_PATTERN})\\s+(?<day>\\d{1,2})(?:st|nd|rd|th)?\\b(?:\\s*,?\\s*(?<year>\\d{4}))?(?:[^\\n]*?\\bat\\s+(?<hour>\\d{1,2})(?::(?<minute>\\d{2}))?\\s*(?<ampm>am|pm))?`,
+    'i',
+  );
+
+  const match = dayMonthPattern.exec(text) || monthDayPattern.exec(text);
+  if (!match?.groups) return null;
+
+  const day = Number(match.groups.day);
+  const monthKey = normalizeMonthName(match.groups.month || '');
+  const month = MONTH_NUMBER_BY_NAME[monthKey];
+  if (!month || Number.isNaN(day) || day < 1 || day > 31) return null;
+
+  const explicitYear = Number(match.groups.year);
+  const hasYear = !Number.isNaN(explicitYear) && explicitYear >= 1900;
+  let year = hasYear ? explicitYear : now.getUTCFullYear();
+
+  let hour = 9;
+  let minute = 0;
+  if (match.groups.hour) {
+    hour = Number(match.groups.hour);
+    minute = Number(match.groups.minute || 0);
+    const ampm = String(match.groups.ampm || '').toLowerCase();
+    if (ampm === 'pm' && hour !== 12) hour += 12;
+    if (ampm === 'am' && hour === 12) hour = 0;
+  }
+
+  const candidate = new Date(Date.UTC(year, month - 1, day, hour, minute, 0, 0));
+  if (!hasYear && candidate.getTime() < now.getTime()) {
+    year += 1;
+    return new Date(Date.UTC(year, month - 1, day, hour, minute, 0, 0));
+  }
+
+  return candidate;
 };
 
 const createFingerprint = (item: any): string => {
@@ -906,6 +988,125 @@ const moveUpcomingSupportToUpcoming = async (req: Request, res: Response): Promi
   }
 };
 
+const createUpcomingSupportNotificationFromVoice = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { googleId } = req.params;
+    const { transcript } = req.body || {};
+
+    if (!googleId) {
+      return sendError(res, statusCodes.badRequest, 'User ID is required');
+    }
+
+    if (typeof transcript !== 'string' || transcript.trim().length === 0) {
+      return sendError(res, statusCodes.badRequest, 'Voice transcript is required');
+    }
+
+    const user = await findUserByGoogleId(googleId);
+    if (!user) {
+      return sendError(res, statusCodes.notFound, 'User not found');
+    }
+
+    if (!upcomingSupportNotificationModel) {
+      return sendError(
+        res,
+        statusCodes.internalServerError,
+        'Upcoming support notification model is not available. Run prisma generate.',
+      );
+    }
+
+    const cleanTranscript = transcript.trim();
+    const now = new Date();
+
+    let derived = {
+      title: 'Voice appointment',
+      summary: cleanTranscript,
+      dueDateISO: null as Date | null,
+      urgency: 'MEDIUM' as 'LOW' | 'MEDIUM' | 'HIGH',
+      confidence: 0.75,
+      reason: 'Created from voice input.',
+    };
+
+    if (PYTHON_API_URL) {
+      const form = new FormData();
+      form.append(
+        'metadata',
+        JSON.stringify({
+          today: now.toISOString(),
+          items: [
+            {
+              itemId: `voice-${randomUUID()}`,
+              itemName: 'Voice appointment note',
+              itemType: 'TEXT',
+              mimeType: 'text/plain',
+              createdAt: now.toISOString(),
+              textContent: cleanTranscript,
+            },
+          ],
+        }),
+      );
+
+      const response = await fetch(`${normalizeBaseUrl(PYTHON_API_URL)}upcoming-support`, {
+        method: 'POST',
+        body: form,
+      });
+
+      if (response.ok) {
+        const aiData = await response.json().catch(() => ({}));
+        const aiRows = Array.isArray(aiData?.data) ? aiData.data : [];
+        if (aiRows.length > 0) {
+          const first = aiRows[0] || {};
+          derived = {
+            title: String(first?.title || derived.title).trim(),
+            summary: String(first?.summary || derived.summary).trim(),
+            dueDateISO: parseDueDate(first?.dueDateISO),
+            urgency: normalizeUrgency(first?.urgency),
+            confidence: normalizeConfidence(first?.confidence),
+            reason: String(first?.reason || 'Created from voice input.').trim(),
+          };
+        }
+      }
+    }
+
+    if (!derived.dueDateISO) {
+      const inferredDueDate = inferDueDateFromVoiceTranscript(cleanTranscript, now);
+      if (inferredDueDate) {
+        derived = {
+          ...derived,
+          dueDateISO: inferredDueDate,
+          reason: derived.reason || 'Parsed date/time from voice input.',
+        };
+      }
+    }
+
+    const row = await upcomingSupportNotificationModel.create({
+      data: {
+        userId: user.id,
+        fingerprint: `voice|${randomUUID()}`,
+        title: derived.title || 'Voice appointment',
+        summary: derived.summary || cleanTranscript,
+        dueDateISO: derived.dueDateISO,
+        urgency: derived.urgency,
+        confidence: derived.confidence,
+        sourceItemId: null,
+        sourceItemName: 'Voice appointment',
+        reason: derived.reason || 'Created from voice input.',
+        isRead: false,
+        isDismissed: false,
+        scannedAt: now,
+      },
+    });
+
+    return res.status(statusCodes.created).json({ data: serializeNotification(row) });
+  } catch (error) {
+    console.error('Error creating upcoming support notification from voice:', error);
+    return sendError(
+      res,
+      statusCodes.internalServerError,
+      'Failed to create appointment from voice input',
+    );
+  }
+};
+
 export {
   getSupportFolderItems,
   createSupportFolderTextItem,
@@ -917,4 +1118,5 @@ export {
   updateUpcomingSupportDismissStatus,
   updateUpcomingSupportDueDate,
   moveUpcomingSupportToUpcoming,
+  createUpcomingSupportNotificationFromVoice,
 };

@@ -1,6 +1,6 @@
 const apiBaseUrl = import.meta.env.VITE_API_BACKEND_URL
 
-type HttpMethod = 'GET' | 'PATCH'
+type HttpMethod = 'GET' | 'PATCH' | 'POST'
 
 const getErrorMessage = async (response: Response, fallbackMessage: string) => {
   const errorData = await response.json().catch(() => ({}))

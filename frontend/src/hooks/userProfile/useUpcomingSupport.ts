@@ -6,6 +6,7 @@ import { patchUpcomingSupportReadStatus } from '@/lib/api/patchUpcomingSupportRe
 import { patchUpcomingSupportDismissStatus } from '@/lib/api/patchUpcomingSupportDismissStatus'
 import { patchUpcomingSupportMoveToUpcoming } from '@/lib/api/patchUpcomingSupportMoveToUpcoming'
 import { patchUpcomingSupportDueDate } from '@/lib/api/patchUpcomingSupportDueDate'
+import { postUpcomingSupportVoiceNotification } from '@/lib/api/postUpcomingSupportVoiceNotification'
 
 export const useUpcomingSupport = (googleId: string) => {
   const { getToken } = useAuth()
@@ -108,6 +109,18 @@ export const useUpcomingSupport = (googleId: string) => {
     },
   })
 
+  const createVoiceAppointmentMutation = useMutation({
+    mutationFn: ({ transcript }: { transcript: string }) =>
+      withToken((token) => postUpcomingSupportVoiceNotification(googleId, transcript, token)),
+    onSuccess: async () => {
+      toast.success('Appointment created from voice note')
+      await invalidate()
+    },
+    onError: (error: Error) => {
+      toast.error(error.message || 'Failed to create appointment from voice note')
+    },
+  })
+
   return {
     ...query,
     refreshScan: refreshScanMutation.mutate,
@@ -120,5 +133,7 @@ export const useUpcomingSupport = (googleId: string) => {
     moveToUpcomingPending: moveToUpcomingMutation.isPending,
     setDueDate: dueDateMutation.mutate,
     dueDatePending: dueDateMutation.isPending,
+    createVoiceAppointment: createVoiceAppointmentMutation.mutate,
+    createVoiceAppointmentPending: createVoiceAppointmentMutation.isPending,
   }
 }
