@@ -8,6 +8,10 @@
     "build": "vite build && tsc",
     "serve": "vite preview",
     "test": "vitest run",
+    "test:unit": "vitest run tests/unit",
+    "test:smoke": "vitest run tests/unit/smoke",
+    "test:components": "vitest run tests/unit/components",
+    "test:components:folders": "vitest run tests/unit/components/folders",
     "lint": "eslint",
     "format": "prettier --write .",
     "check": "prettier --write . && eslint --fix"

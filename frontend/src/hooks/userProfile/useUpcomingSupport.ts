@@ -11,13 +11,20 @@ export const useUpcomingSupport = (googleId: string) => {
   const { getToken } = useAuth()
   const queryClient = useQueryClient()
 
+  const getRequiredToken = async () => {
+    const token = await getToken()
+    if (!token) throw new Error('Not authenticated')
+    return token
+  }
+
+  const withToken = async <T>(run: (token: string) => Promise<T>) => {
+    const token = await getRequiredToken()
+    return run(token)
+  }
+
   const query = useQuery({
     queryKey: ['upcomingSupport', googleId],
-    queryFn: async () => {
-      const token = await getToken()
-      if (!token) throw new Error('Not authenticated')
-      return fetchUpcomingSupportNotifications(googleId, token)
-    },
+    queryFn: () => withToken((token) => fetchUpcomingSupportNotifications(googleId, token)),
     enabled: !!googleId,
     staleTime: 60 * 1000,
     refetchOnWindowFocus: false,
@@ -30,13 +37,12 @@ export const useUpcomingSupport = (googleId: string) => {
   }
 
   const refreshScanMutation = useMutation({
-    mutationFn: async () => {
-      const token = await getToken()
-      if (!token) throw new Error('Not authenticated')
-      return fetchUpcomingSupportNotifications(googleId, token, {
+    mutationFn: () =>
+      withToken((token) =>
+        fetchUpcomingSupportNotifications(googleId, token, {
         rescan: true,
-      })
-    },
+        }),
+      ),
     onSuccess: (response) => {
       queryClient.setQueryData(['upcomingSupport', googleId], response)
       toast.success('Upcoming support scan completed')
@@ -47,11 +53,8 @@ export const useUpcomingSupport = (googleId: string) => {
   })
 
   const readStatusMutation = useMutation({
-    mutationFn: async ({ notificationId, isRead }: { notificationId: string; isRead: boolean }) => {
-      const token = await getToken()
-      if (!token) throw new Error('Not authenticated')
-      return patchUpcomingSupportReadStatus(googleId, notificationId, isRead, token)
-    },
+    mutationFn: ({ notificationId, isRead }: { notificationId: string; isRead: boolean }) =>
+      withToken((token) => patchUpcomingSupportReadStatus(googleId, notificationId, isRead, token)),
     onSuccess: async () => {
       await invalidate()
     },
@@ -61,17 +64,13 @@ export const useUpcomingSupport = (googleId: string) => {
   })
 
   const dismissStatusMutation = useMutation({
-    mutationFn: async ({
+    mutationFn: ({
       notificationId,
       isDismissed,
     }: {
       notificationId: string
       isDismissed: boolean
-    }) => {
-      const token = await getToken()
-      if (!token) throw new Error('Not authenticated')
-      return patchUpcomingSupportDismissStatus(googleId, notificationId, isDismissed, token)
-    },
+    }) => withToken((token) => patchUpcomingSupportDismissStatus(googleId, notificationId, isDismissed, token)),
     onSuccess: async () => {
       await invalidate()
     },
@@ -81,11 +80,8 @@ export const useUpcomingSupport = (googleId: string) => {
   })
 
   const moveToUpcomingMutation = useMutation({
-    mutationFn: async ({ notificationId }: { notificationId: string }) => {
-      const token = await getToken()
-      if (!token) throw new Error('Not authenticated')
-      return patchUpcomingSupportMoveToUpcoming(googleId, notificationId, token)
-    },
+    mutationFn: ({ notificationId }: { notificationId: string }) =>
+      withToken((token) => patchUpcomingSupportMoveToUpcoming(googleId, notificationId, token)),
     onSuccess: async () => {
       toast.success('Moved back to upcoming')
       await invalidate()
@@ -96,17 +92,13 @@ export const useUpcomingSupport = (googleId: string) => {
   })
 
   const dueDateMutation = useMutation({
-    mutationFn: async ({
+    mutationFn: ({
       notificationId,
       dueDateISO,
     }: {
       notificationId: string
       dueDateISO: string
-    }) => {
-      const token = await getToken()
-      if (!token) throw new Error('Not authenticated')
-      return patchUpcomingSupportDueDate(googleId, notificationId, dueDateISO, token)
-    },
+    }) => withToken((token) => patchUpcomingSupportDueDate(googleId, notificationId, dueDateISO, token)),
     onSuccess: async () => {
       toast.success('Due date updated')
       await invalidate()

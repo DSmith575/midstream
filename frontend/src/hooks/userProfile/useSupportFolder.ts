@@ -14,12 +14,21 @@ export const useSupportFolder = (googleId: string) => {
   const { getToken } = useAuth()
   const queryClient = useQueryClient()
 
+  const getRequiredToken = async () => {
+    const token = await getToken()
+    if (!token) throw new Error('Not authenticated')
+    return token
+  }
+
+  const withToken = async <T>(run: (token: string) => Promise<T>) => {
+    const token = await getRequiredToken()
+    return run(token)
+  }
+
   const query = useQuery({
     queryKey: ['supportFolderItems', googleId],
     queryFn: async () => {
-      const token = await getToken()
-      if (!token) throw new Error('Not authenticated')
-      const response = await fetchSupportFolderItems(googleId, token)
+      const response = await withToken((token) => fetchSupportFolderItems(googleId, token))
       return response.data || []
     },
     enabled: !!googleId,
@@ -33,11 +42,7 @@ export const useSupportFolder = (googleId: string) => {
   }
 
   const uploadFileMutation = useMutation({
-    mutationFn: async (file: File) => {
-      const token = await getToken()
-      if (!token) throw new Error('Not authenticated')
-      return postSupportFolderUpload(googleId, file, token)
-    },
+    mutationFn: (file: File) => withToken((token) => postSupportFolderUpload(googleId, file, token)),
     onSuccess: async () => {
       toast.success('File uploaded to support folder')
       await refreshItems()
@@ -48,11 +53,8 @@ export const useSupportFolder = (googleId: string) => {
   })
 
   const createTextMutation = useMutation({
-    mutationFn: async (payload: { name: string; content: string }) => {
-      const token = await getToken()
-      if (!token) throw new Error('Not authenticated')
-      return postSupportFolderTextItem(googleId, payload, token)
-    },
+    mutationFn: (payload: { name: string; content: string }) =>
+      withToken((token) => postSupportFolderTextItem(googleId, payload, token)),
     onSuccess: async () => {
       toast.success('Text file created in support folder')
       await refreshItems()
@@ -63,11 +65,7 @@ export const useSupportFolder = (googleId: string) => {
   })
 
   const deleteItemMutation = useMutation({
-    mutationFn: async (itemId: string) => {
-      const token = await getToken()
-      if (!token) throw new Error('Not authenticated')
-      return deleteSupportFolderItem(googleId, itemId, token)
-    },
+    mutationFn: (itemId: string) => withToken((token) => deleteSupportFolderItem(googleId, itemId, token)),
     onSuccess: async () => {
       toast.success('Support folder item deleted')
       await refreshItems()
@@ -79,10 +77,7 @@ export const useSupportFolder = (googleId: string) => {
 
   const handleDownload = async (item: Pick<SupportFolderItem, 'id' | 'name'>) => {
     try {
-      const token = await getToken()
-      if (!token) throw new Error('Not authenticated')
-
-      const blob = await downloadSupportFolderItem(googleId, item.id, token)
+      const blob = await withToken((token) => downloadSupportFolderItem(googleId, item.id, token))
       const url = window.URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = url

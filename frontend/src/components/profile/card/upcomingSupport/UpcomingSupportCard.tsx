@@ -5,23 +5,40 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useUpcomingSupport } from '@/hooks/userProfile'
 
+const emptyStateClassName = 'rounded-xl border border-dashed border-border/60 bg-background/40 p-4 text-sm text-muted-foreground'
+
 const urgencyStyles: Record<'LOW' | 'MEDIUM' | 'HIGH', string> = {
     LOW: 'bg-emerald-500/10 text-emerald-700 border-emerald-500/30',
     MEDIUM: 'bg-amber-500/10 text-amber-700 border-amber-500/30',
     HIGH: 'bg-red-500/10 text-red-700 border-red-500/30',
 }
 
-const formatDate = (value: string | null) => {
+const formatDueDateTime = (value: string | null) => {
     if (!value) return 'Date not specified'
     const date = new Date(value)
     if (Number.isNaN(date.getTime())) return 'Date not specified'
-    return date.toLocaleDateString(undefined, {
+
+    const dateText = date.toLocaleDateString(undefined, {
         weekday: 'short',
         year: 'numeric',
         month: 'short',
         day: 'numeric',
         timeZone: 'UTC',
     })
+
+    const hasMeaningfulTime = date.getUTCHours() !== 0 || date.getUTCMinutes() !== 0
+    if (!hasMeaningfulTime) {
+        return dateText
+    }
+
+    const timeText = date.toLocaleTimeString(undefined, {
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+        timeZone: 'UTC',
+    })
+
+    return `${dateText} at ${timeText} UTC`
 }
 
 const toLocalDateTimeValue = (value: string | null) => {
@@ -31,6 +48,15 @@ const toLocalDateTimeValue = (value: string | null) => {
     const offsetMs = date.getTimezoneOffset() * 60 * 1000
     return new Date(date.getTime() - offsetMs).toISOString().slice(0, 16)
 }
+
+const EmptyState = ({ text }: { text: string }) => <div className={emptyStateClassName}>{text}</div>
+
+const StatsBadge = ({ icon, text }: { icon?: React.ReactNode; text: string }) => (
+    <span className="inline-flex items-center gap-1 rounded-full border border-border/60 px-2 py-1">
+        {icon}
+        {text}
+    </span>
+)
 
 export const UpcomingSupportCard = ({ userId }: { userId: string }) => {
     const {
@@ -95,7 +121,7 @@ export const UpcomingSupportCard = ({ userId }: { userId: string }) => {
             </div>
 
             <div className="mt-3 grid gap-1 text-xs text-muted-foreground">
-                <p>Due: {formatDate(item.dueDateISO)}</p>
+                <p>Due: {formatDueDateTime(item.dueDateISO)}</p>
                 <p>Source: {item.sourceItemName || 'Support folder item'}</p>
                 <p>Confidence: {Math.round((item.confidence || 0) * 100)}%</p>
                 <p>Status: {item.isRead ? 'Read' : 'Unread'}</p>
@@ -219,17 +245,9 @@ export const UpcomingSupportCard = ({ userId }: { userId: string }) => {
 
             <div className="space-y-4 px-6 py-5">
                 <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-                    <span className="inline-flex items-center gap-1 rounded-full border border-border/60 px-2 py-1">
-                        <CalendarClock className="h-3.5 w-3.5" />
-                        {data?.scannedItems ?? 0} scanned
-                    </span>
-                    <span className="inline-flex items-center gap-1 rounded-full border border-border/60 px-2 py-1">
-                        <CircleAlert className="h-3.5 w-3.5" />
-                        {data?.skippedItems ?? 0} skipped
-                    </span>
-                    <span className="inline-flex items-center gap-1 rounded-full border border-border/60 px-2 py-1">
-                        {data?.persistedCount ?? 0} saved
-                    </span>
+                    <StatsBadge icon={<CalendarClock className="h-3.5 w-3.5" />} text={`${data?.scannedItems ?? 0} scanned`} />
+                    <StatsBadge icon={<CircleAlert className="h-3.5 w-3.5" />} text={`${data?.skippedItems ?? 0} skipped`} />
+                    <StatsBadge text={`${data?.persistedCount ?? 0} saved`} />
                     {isLoading && <Spinner />}
                 </div>
 
@@ -238,9 +256,7 @@ export const UpcomingSupportCard = ({ userId }: { userId: string }) => {
                         Could not generate upcoming support notifications right now.
                     </p>
                 ) : notifications.length === 0 && pastNotifications.length === 0 ? (
-                    <div className="rounded-xl border border-dashed border-border/60 bg-background/40 p-4 text-sm text-muted-foreground">
-                        No upcoming reminders found yet. Add letters or notes in your support folder and run a refresh scan.
-                    </div>
+                    <EmptyState text="No upcoming reminders found yet. Add letters or notes in your support folder and run a refresh scan." />
                 ) : (
                     <div className="space-y-5">
                         <section>
@@ -248,9 +264,7 @@ export const UpcomingSupportCard = ({ userId }: { userId: string }) => {
                                 Upcoming
                             </p>
                             {notifications.length === 0 ? (
-                                <div className="rounded-xl border border-dashed border-border/60 bg-background/40 p-4 text-sm text-muted-foreground">
-                                    No upcoming reminders.
-                                </div>
+                                <EmptyState text="No upcoming reminders." />
                             ) : (
                                 <ul className="space-y-3">{notifications.map((item, index) => renderNotificationItem(item, index, false))}</ul>
                             )}
@@ -261,9 +275,7 @@ export const UpcomingSupportCard = ({ userId }: { userId: string }) => {
                                 Completed / Past
                             </p>
                             {pastNotifications.length === 0 ? (
-                                <div className="rounded-xl border border-dashed border-border/60 bg-background/40 p-4 text-sm text-muted-foreground">
-                                    No past reminders.
-                                </div>
+                                <EmptyState text="No past reminders." />
                             ) : (
                                 <ul className="space-y-3">{pastNotifications.map((item, index) => renderNotificationItem(item, index, true))}</ul>
                             )}

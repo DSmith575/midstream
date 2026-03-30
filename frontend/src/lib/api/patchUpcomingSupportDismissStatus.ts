@@ -1,4 +1,4 @@
-const apiKey = import.meta.env.VITE_API_BACKEND_URL
+import { requestUpcomingSupport } from './upcomingSupportClient'
 
 export const patchUpcomingSupportDismissStatus = async (
   googleId: string,
@@ -6,22 +6,12 @@ export const patchUpcomingSupportDismissStatus = async (
   isDismissed: boolean,
   token: string,
 ) => {
-  const response = await fetch(
-    `${apiKey}support-folder/${encodeURIComponent(googleId)}/upcoming-support/${encodeURIComponent(notificationId)}/dismiss`,
-    {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ isDismissed }),
-    },
-  )
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}))
-    throw new Error(errorData.message || 'Failed to update dismiss status')
-  }
-
-  return response.json()
+  return requestUpcomingSupport({
+    googleId,
+    token,
+    method: 'PATCH',
+    suffix: `/${encodeURIComponent(notificationId)}/dismiss`,
+    body: { isDismissed },
+    errorMessage: 'Failed to update dismiss status',
+  })
 }

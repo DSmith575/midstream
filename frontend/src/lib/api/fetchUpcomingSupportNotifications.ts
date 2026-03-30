@@ -1,4 +1,4 @@
-const apiKey = import.meta.env.VITE_API_BACKEND_URL
+import { requestUpcomingSupport } from './upcomingSupportClient'
 
 export interface UpcomingSupportNotification {
   id: string
@@ -30,27 +30,13 @@ export const fetchUpcomingSupportNotifications = async (
   token: string,
   options?: { rescan?: boolean },
 ): Promise<UpcomingSupportResponse> => {
-  const query = options?.rescan ? '?rescan=true' : ''
-  const response = await fetch(
-    `${apiKey}support-folder/${encodeURIComponent(googleId)}/upcoming-support${query}`,
-    {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    },
-  )
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}))
-    throw new Error(
-      errorData.message ||
-        'Failed to generate upcoming support notifications',
-    )
-  }
-
-  const payload = await response.json()
+  const suffix = options?.rescan ? '?rescan=true' : ''
+  const payload = await requestUpcomingSupport<Record<string, unknown>>({
+    googleId,
+    token,
+    suffix,
+    errorMessage: 'Failed to generate upcoming support notifications',
+  })
   return {
     data: Array.isArray(payload?.data) ? payload.data : [],
     pastData: Array.isArray(payload?.pastData) ? payload.pastData : [],
