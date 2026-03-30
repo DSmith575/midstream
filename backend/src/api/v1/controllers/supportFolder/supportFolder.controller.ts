@@ -572,12 +572,25 @@ const runUpcomingSupportRescan = async (userId: string) => {
   });
 
   if (payloadItems.length === 0) {
-    await upcomingSupportNotificationModel.deleteMany({ where: { userId } });
+    await upcomingSupportNotificationModel.deleteMany({
+      where: {
+        userId,
+        NOT: {
+          fingerprint: {
+            startsWith: 'voice|',
+          },
+        },
+      },
+    });
+
+    const stored = await fetchStoredNotifications(userId);
+    const split = splitNotificationsByDate(stored);
     return {
-      data: [],
+      data: split.upcoming,
+      pastData: split.past,
       scannedItems: 0,
       skippedItems,
-      persistedCount: 0,
+      persistedCount: stored.length,
     };
   }
 
@@ -691,13 +704,27 @@ const runUpcomingSupportRescan = async (userId: string) => {
     await upcomingSupportNotificationModel.deleteMany({
       where: {
         userId,
+        NOT: {
+          fingerprint: {
+            startsWith: 'voice|',
+          },
+        },
         fingerprint: {
           notIn: fingerprintKeys,
         },
       },
     });
   } else {
-    await upcomingSupportNotificationModel.deleteMany({ where: { userId } });
+    await upcomingSupportNotificationModel.deleteMany({
+      where: {
+        userId,
+        NOT: {
+          fingerprint: {
+            startsWith: 'voice|',
+          },
+        },
+      },
+    });
   }
 
   const stored = await fetchStoredNotifications(userId);
