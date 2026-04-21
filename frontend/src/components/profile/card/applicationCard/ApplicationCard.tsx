@@ -1,4 +1,17 @@
-import { FileAudio2, FileText, FileUp, Wand2 } from 'lucide-react'
+import { useState } from 'react'
+import {
+  Download,
+  ExternalLink,
+  FileAudio2,
+  FileText,
+  FileUp,
+  Lock,
+  Mail,
+  MoreVertical,
+  Wand2,
+} from 'lucide-react'
+import { useAuth } from '@clerk/clerk-react'
+import { toast } from 'sonner'
 
 import { ChecklistItem } from './ChecklistItem'
 import { RecordAudioButton } from './RecordAudioButton'
@@ -14,13 +27,20 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion'
 import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import {
-  useGenerateReferralPdf,
   useHandleFile,
   useCreateReferralNote,
 } from '@/hooks/referralForms'
 import { useGetReferralForms } from '@/hooks/userProfile/useGetReferralForms'
+import { generateReferralPdf } from '@/lib/api/generateReferralPdf'
+import { useQueryClient } from '@tanstack/react-query'
 
 interface ApplicationCardProps {
   userId: string
@@ -35,12 +55,22 @@ const BUTTON_GRADIENT_CLASS =
   'border border-primary/20 hover:text-white bg-gradient-to-b from-primary/5 to-primary/10 text-primary font-medium shadow-sm hover:shadow-md hover:from-primary/10 hover:to-primary/15 transition-all duration-200'
 const GENERATE_BUTTON_CLASS =
   'border border-primary/15 hover:text-white bg-gradient-to-b from-primary/10 to-primary/5 text-primary font-medium shadow-sm hover:shadow-md hover:from-primary/15 hover:to-primary/10 transition-all duration-200'
+const GENERATED_REFERRAL_PREFIX = 'generated-referral-'
 
 const ErrorMessage = ({ message }: { message: string }) => (
   <p className="px-6 pt-2 text-sm text-destructive">{message}</p>
 )
 
 export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
+  const { getToken } = useAuth()
+  const queryClient = useQueryClient()
+  const [activeGeneratedFileFormId, setActiveGeneratedFileFormId] = useState<
+    string | null
+  >(null)
+  const [generatedFileCache, setGeneratedFileCache] = useState<
+    Record<string, { blob: Blob; fileName: string }>
+  >({})
+  const [isGeneratingFormId, setIsGeneratingFormId] = useState<string | null>(null)
   const { error, isLoading, referralForms } = useGetReferralForms(userId)
   const {
     handleFileChange,
@@ -48,17 +78,165 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
     error: fileError,
   } = useHandleFile(userId)
   const {
-    mutate: generateReferralPdf,
-    isPending: generatePending,
-    error: generateError,
-  } = useGenerateReferralPdf()
-  const {
     mutate: createNote,
     isPending: notesPending,
     error: notesError,
   } = useCreateReferralNote(userId)
 
-  if (generatePending) {
+  const downloadBlob = (blob: Blob, fileName: string) => {
+    try {
+      const url = window.URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = fileName
+      document.body.appendChild(link)
+      link.click()
+      setTimeout(() => {
+        link.remove()
+        window.URL.revokeObjectURL(url)
+      }, 100)
+    } catch (err) {
+      console.error('[downloadBlob] Error:', err)
+      throw new Error('Failed to download file')
+    }
+  }
+
+  const openBlob = (blob: Blob) => {
+    try {
+      const url = window.URL.createObjectURL(blob)
+      const win = window.open(url, '_blank', 'noopener,noreferrer')
+      if (!win) {
+        throw new Error('Popup blocked - please allow popups for this site')
+      }
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url)
+      }, 60000)
+    } catch (err) {
+      console.error('[openBlob] Error:', err)
+      throw err
+    }
+  }
+
+  const openEmailDraft = (fileName: string) => {
+    const subject = encodeURIComponent('Referral Form - Ready to Share')
+    const body = encodeURIComponent(
+      `Please find the referral form attached.
+
+File name: ${fileName}
+
+This is the complete referral form with all collected information.`,
+    )
+    window.location.href = `mailto:?subject=${subject}&body=${body}`
+    toast.info(`File downloaded. Now attaching "${fileName}" to your email.`)
+  }
+
+  const handleGenerateFile = async (formId: string) => {
+    try {
+      setIsGeneratingFormId(formId)
+      const token = await getToken()
+      if (!token) throw new Error('Not authenticated')
+
+      console.log(`[Generate] Starting generation for form ${formId}`)
+      const result = await generateReferralPdf(formId, token)
+      console.log(`[Generate] Got result:`, result)
+
+      if (!result || !result.blob) {
+        throw new Error('No file returned from server')
+      }
+
+      // Cache the result
+      setGeneratedFileCache((prev) => ({
+        ...prev,
+        [formId]: result,
+      }))
+      console.log(
+        `[Generate] Cached blob: ${result.fileName}, size: ${result.blob.size} bytes`,
+      )
+
+      // Download the file
+      downloadBlob(result.blob, result.fileName)
+      toast.success(`Generated and downloaded: ${result.fileName}`)
+
+      // Invalidate referral forms to refresh the UI
+      await queryClient.invalidateQueries({ queryKey: ['referralForms', userId] })
+    } catch (error) {
+      console.error('[Generate] Error:', error)
+      const err = error instanceof Error ? error : new Error('Failed to generate file')
+      toast.error(err.message)
+    } finally {
+      setIsGeneratingFormId(null)
+    }
+  }
+
+  const handleGeneratedFileAction = async (
+    formId: string,
+    action: 'open' | 'download' | 'email',
+  ) => {
+    try {
+      setActiveGeneratedFileFormId(formId)
+      const token = await getToken()
+      if (!token) throw new Error('Not authenticated')
+
+      console.log(`[FileAction] Starting ${action} for form ${formId}`)
+
+      // Check cache first
+      let result = generatedFileCache[formId]
+      if (!result) {
+        console.log(`[FileAction] Cache miss for ${formId}, fetching from server`)
+        result = await generateReferralPdf(formId, token)
+        console.log(`[FileAction] Got result:`, result)
+
+        if (!result || !result.blob) {
+          throw new Error('No file returned from server')
+        }
+
+        if (result.blob.size === 0) {
+          throw new Error('Generated file is empty')
+        }
+
+        // Cache the result
+        setGeneratedFileCache((prev) => ({
+          ...prev,
+          [formId]: result,
+        }))
+        console.log(
+          `[FileAction] Cached blob: ${result.fileName}, size: ${result.blob.size} bytes`,
+        )
+      } else {
+        console.log(
+          `[FileAction] Using cached blob: ${result.fileName}, size: ${result.blob.size} bytes`,
+        )
+      }
+
+      if (action === 'open') {
+        console.log('[FileAction] Opening file in new window')
+        openBlob(result.blob)
+        return
+      }
+
+      console.log(`[FileAction] Downloading: ${result.fileName}`)
+      downloadBlob(result.blob, result.fileName)
+
+      if (action === 'email') {
+        console.log('[FileAction] Opening email draft with file attachment instructions')
+        toast.success(`Downloaded: ${result.fileName}`)
+        // Add a small delay to ensure file download completes before opening email
+        setTimeout(() => {
+          openEmailDraft(result.fileName)
+        }, 500)
+      } else {
+        toast.success(`Downloaded: ${result.fileName}`)
+      }
+    } catch (error) {
+      console.error('[FileAction] Error:', error)
+      const err = error instanceof Error ? error : new Error('File action failed')
+      toast.error(err.message)
+    } finally {
+      setActiveGeneratedFileFormId(null)
+    }
+  }
+
+  if (isGeneratingFormId) {
     return (
       <div className="flex justify-center py-10">
         <UploadSpinner text="Generating referral PDF..." />
@@ -76,7 +254,6 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
         </div>
       )}
       {fileError && <ErrorMessage message={fileError.message} />}
-      {generateError && <ErrorMessage message={generateError.message} />}
       {notesError && <ErrorMessage message={notesError.message} />}
 
       <div className="space-y-3 px-6 py-5">
@@ -100,12 +277,21 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
           >
             {referralForms.map((form: any, idx: number) => {
               const formId = String(form?.id ?? idx)
+              const generatedFile = form?.documents?.find((doc: any) =>
+                String(doc?.name ?? '').startsWith(GENERATED_REFERRAL_PREFIX),
+              )
+              const hasGeneratedFile = Boolean(generatedFile)
+              const actionLocked =
+                isGeneratingFormId === formId ||
+                activeGeneratedFileFormId === formId ||
+                hasGeneratedFile
               const statusClass =
                 form?.status === 'SUBMITTED'
                   ? STATUS_STYLES.submitted
                   : STATUS_STYLES.pending
               const checklistValues = {
                 audio: Boolean(form?.checklistAudioComplete),
+
                 notes: Boolean(form?.checklistNotesComplete),
                 review: Boolean(form?.checklistReviewComplete),
                 submit: Boolean(form?.checklistSubmitComplete),
@@ -142,9 +328,24 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
                   <AccordionContent className="px-4 pb-5">
                     <div className="grid gap-4 sm:grid-cols-5">
                       <div className="sm:col-span-2 space-y-3 rounded-lg border border-border/60 bg-background/40 p-3">
-                        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                          Actions
-                        </p>
+                        <div className="flex items-center justify-between gap-2">
+                          <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+                            Actions
+                          </p>
+                          {hasGeneratedFile && (
+                            <span className="inline-flex items-center gap-1 rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-700">
+                              <Lock className="h-3 w-3" />
+                              Locked
+                            </span>
+                          )}
+                        </div>
+                        {hasGeneratedFile && (
+                          <p className="rounded-md border border-emerald-200 bg-emerald-50/60 px-2 py-1 text-xs text-emerald-800">
+                            This referral file has been generated. Audio and notes
+                            are now locked. Use File actions to open, download, or
+                            email the generated file.
+                          </p>
+                        )}
                         <div className="flex flex-wrap gap-2">
                           <UserReferralFormView
                             disabled={filePending}
@@ -159,8 +360,7 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
                             className="hidden"
                           />
                           <Button
-                            disabled={filePending}
-                            asChild
+                            disabled={filePending || actionLocked}
                             size="sm"
                             className={BUTTON_GRADIENT_CLASS}
                           >
@@ -175,11 +375,11 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
                           <RecordAudioButton
                             formId={formId}
                             userId={userId}
-                            disabled={generatePending}
+                            disabled={actionLocked}
                           />
                           <AddNotesDialog
                             formId={formId}
-                            disabled={notesPending || generatePending}
+                            disabled={notesPending || actionLocked}
                             onSave={(formId, content) =>
                               createNote({ referralId: formId, content })
                             }
@@ -188,12 +388,57 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
                           <Button
                             size="sm"
                             className={GENERATE_BUTTON_CLASS}
-                            disabled={generatePending}
-                            onClick={() => generateReferralPdf(formId)}
+                            disabled={actionLocked}
+                            onClick={() => handleGenerateFile(formId)}
                           >
                             <FileUp className="h-4 w-4" />
-                            Generate file
+                            {hasGeneratedFile ? 'File generated' : 'Generate file'}
                           </Button>
+
+                          {hasGeneratedFile && (
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="border-primary/30"
+                                  disabled={
+                                    activeGeneratedFileFormId === formId ||
+                                    isGeneratingFormId === formId
+                                  }
+                                >
+                                  <MoreVertical className="h-4 w-4" />
+                                  File actions
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="w-44">
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    handleGeneratedFileAction(formId, 'open')
+                                  }
+                                >
+                                  <ExternalLink className="h-4 w-4" />
+                                  Open
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    handleGeneratedFileAction(formId, 'download')
+                                  }
+                                >
+                                  <Download className="h-4 w-4" />
+                                  Download
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    handleGeneratedFileAction(formId, 'email')
+                                  }
+                                >
+                                  <Mail className="h-4 w-4" />
+                                  Email
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          )}
                         </div>
                       </div>
 
@@ -228,12 +473,12 @@ export const ApplicationCard = ({ userId }: ApplicationCardProps) => {
                             description="Open the PDF to verify details are accurate."
                             icon={<Wand2 className="h-4 w-4 text-primary" />}
                           />
-                          <ChecklistItem
+                          {/* <ChecklistItem
                             checked={checklistValues.submit}
                             title="Submit or resend"
                             description="Confirm the referral is submitted or resend to your worker."
                             icon={<FileUp className="h-4 w-4 text-primary" />}
-                          />
+                          /> */}
                         </div>
                       </div>
                     </div>

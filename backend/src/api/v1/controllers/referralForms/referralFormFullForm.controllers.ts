@@ -20,6 +20,12 @@ const sendError = (res: Response, status: number, message: string) => {
 	return res.status(status).json({ message });
 };
 
+const GENERATED_REFERRAL_PREFIX = "generated-referral-";
+
+const buildGeneratedReferralFileName = (referralId: string) => {
+	return `${GENERATED_REFERRAL_PREFIX}${referralId}.pdf`;
+};
+
 const sendReferralToPythonService = async (referralForm: any) => {
 	const form = new FormData();
 	
@@ -89,6 +95,30 @@ const generateFullReferralForm = async (
 		}
 
 		const pdfBuffer = Buffer.from(await pythonResponse.arrayBuffer());
+
+		await prisma.$transaction(async (tx) => {
+			await tx.document.deleteMany({
+				where: {
+					referralId: String(referralFormId),
+					name: {
+						startsWith: GENERATED_REFERRAL_PREFIX,
+					},
+				},
+			});
+
+			await tx.document.create({
+				data: {
+					referralId: String(referralFormId),
+					name: buildGeneratedReferralFileName(String(referralFormId)),
+					type: "PDF",
+				},
+			});
+
+			await tx.referralForm.update({
+				where: { id: String(referralFormId) },
+				data: { checklistReviewComplete: true },
+			});
+		});
 
 		res.setHeader("Content-Type", "application/pdf");
 		res.setHeader(
